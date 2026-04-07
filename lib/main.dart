@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hunarmand_kashmir/widgets/common_widgets.dart'
+    show HunarmandDrawer, HunarmandAppBar;
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'theme/app_theme.dart';
@@ -9,14 +11,12 @@ import 'screens/courses_screen.dart';
 import 'screens/gallery_screen.dart';
 import 'screens/contact_screen.dart';
 import 'screens/donate_screen.dart';
-import 'widgets/common_widgets.dart';
+import 'utils/responsive.dart';
 
 void main() {
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AppState()),
-      ],
+    ChangeNotifierProvider(
+      create: (_) => AppState(),
       child: const HunarmandKashmirApp(),
     ),
   );
@@ -36,62 +36,68 @@ class HunarmandKashmirApp extends StatelessWidget {
   }
 }
 
-class MainNavigator extends StatefulWidget {
+class MainNavigator extends StatelessWidget {
   const MainNavigator({super.key});
-
-  @override
-  State<MainNavigator> createState() => _MainNavigatorState();
-}
-
-class _MainNavigatorState extends State<MainNavigator> {
-  late final List<Widget> _screens;
-
-  @override
-  void initState() {
-    super.initState();
-    _screens = [
-      HomeScreen(onNavTap: (page) => context.read<AppState>().navigate(page)),
-      AboutScreen(onNavTap: (page) => context.read<AppState>().navigate(page)),
-      CoursesScreen(onNavTap: (page) => context.read<AppState>().navigate(page)),
-      GalleryScreen(onNavTap: (page) => context.read<AppState>().navigate(page)),
-      ContactScreen(onNavTap: (page) => context.read<AppState>().navigate(page)),
-      DonateScreen(onNavTap: (page) => context.read<AppState>().navigate(page)),
-    ];
-  }
 
   int _getPageIndex(String page) {
     switch (page) {
-      case 'home': return 0;
-      case 'about': return 1;
-      case 'courses': return 2;
-      case 'gallery': return 3;
-      case 'contact': return 4;
-      case 'donate': return 5;
-      default: return 0;
+      case 'home':
+        return 0;
+      case 'about':
+        return 1;
+      case 'courses':
+        return 2;
+      case 'gallery':
+        return 3;
+      case 'contact':
+        return 4;
+      case 'donate':
+        return 5;
+      default:
+        return 0;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width > 700;
-    final appState = context.watch<AppState>();
-    final currentPage = appState.currentPage;
+    final isDesktop = Responsive.isDesktop(context);
+    final isTabletOrDesktop = Responsive.isTabletOrDesktop(context);
 
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      drawer: isDesktop ? null : HunarmandDrawer(onNavTap: appState.navigate),
-      appBar: isDesktop
-          ? HunarmandAppBar(currentPage: currentPage, onNavTap: appState.navigate)
-          : _buildMobileAppBar(context),
-      body: IndexedStack(
-        index: _getPageIndex(currentPage),
-        children: _screens,
-      ),
-      bottomNavigationBar: isDesktop ? null : _buildBottomNav(context, currentPage),
+    // Screens list
+    final screens = const [
+      HomeScreen(),
+      AboutScreen(),
+      CoursesScreen(),
+      GalleryScreen(),
+      ContactScreen(),
+      DonateScreen(),
+    ];
+
+    return Consumer<AppState>(
+      builder: (context, appState, _) {
+        final currentPage = appState.currentPage;
+        return Scaffold(
+          backgroundColor: AppColors.white,
+          drawer: isTabletOrDesktop
+              ? null
+              : const HunarmandDrawer(),
+          appBar: isTabletOrDesktop
+              ? HunarmandAppBar(currentPage: currentPage)
+              : _buildMobileAppBar(context, appState),
+          body: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: screens[_getPageIndex(currentPage)],
+          ),
+          bottomNavigationBar: isTabletOrDesktop
+              ? null
+              : _buildBottomNav(context, currentPage, appState),
+        );
+      },
     );
   }
 
-  PreferredSizeWidget _buildMobileAppBar(BuildContext context) {
+  PreferredSizeWidget _buildMobileAppBar(
+      BuildContext context, AppState appState) {
     return AppBar(
       backgroundColor: AppColors.darkGreen,
       leading: Builder(
@@ -115,7 +121,7 @@ class _MainNavigatorState extends State<MainNavigator> {
         MouseRegion(
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
-            onTap: () => context.read<AppState>().navigate('donate'),
+            onTap: () => appState.navigate('donate'),
             child: Container(
               margin: const EdgeInsets.only(right: 12),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -126,7 +132,8 @@ class _MainNavigatorState extends State<MainNavigator> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.favorite, color: AppColors.accentGold, size: 13),
+                  const Icon(Icons.favorite,
+                      color: AppColors.accentGold, size: 13),
                   const SizedBox(width: 4),
                   Text(
                     'Donate',
@@ -145,13 +152,39 @@ class _MainNavigatorState extends State<MainNavigator> {
     );
   }
 
-  Widget _buildBottomNav(BuildContext context, String currentPage) {
+  Widget _buildBottomNav(
+      BuildContext context, String currentPage, AppState appState) {
     final items = [
-      {'icon': Icons.home_outlined, 'activeIcon': Icons.home, 'label': 'Home', 'page': 'home'},
-      {'icon': Icons.info_outline, 'activeIcon': Icons.info, 'label': 'About', 'page': 'about'},
-      {'icon': Icons.school_outlined, 'activeIcon': Icons.school, 'label': 'Courses', 'page': 'courses'},
-      {'icon': Icons.photo_library_outlined, 'activeIcon': Icons.photo_library, 'label': 'Gallery', 'page': 'gallery'},
-      {'icon': Icons.contact_mail_outlined, 'activeIcon': Icons.contact_mail, 'label': 'Contact', 'page': 'contact'},
+      {
+        'icon': Icons.home_outlined,
+        'activeIcon': Icons.home,
+        'label': 'Home',
+        'page': 'home'
+      },
+      {
+        'icon': Icons.info_outline,
+        'activeIcon': Icons.info,
+        'label': 'About',
+        'page': 'about'
+      },
+      {
+        'icon': Icons.school_outlined,
+        'activeIcon': Icons.school,
+        'label': 'Courses',
+        'page': 'courses'
+      },
+      {
+        'icon': Icons.photo_library_outlined,
+        'activeIcon': Icons.photo_library,
+        'label': 'Gallery',
+        'page': 'gallery'
+      },
+      {
+        'icon': Icons.contact_mail_outlined,
+        'activeIcon': Icons.contact_mail,
+        'label': 'Contact',
+        'page': 'contact'
+      },
     ];
 
     return Container(
@@ -175,9 +208,10 @@ class _MainNavigatorState extends State<MainNavigator> {
               return MouseRegion(
                 cursor: SystemMouseCursors.click,
                 child: GestureDetector(
-                  onTap: () => context.read<AppState>().navigate(item['page'] as String),
+                  onTap: () => appState.navigate(item['page'] as String),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: isActive
                         ? BoxDecoration(
                             color: AppColors.lightTeal,
@@ -188,17 +222,24 @@ class _MainNavigatorState extends State<MainNavigator> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          isActive ? item['activeIcon'] as IconData : item['icon'] as IconData,
-                          color: isActive ? AppColors.darkGreen : AppColors.textLight,
+                          isActive
+                              ? item['activeIcon'] as IconData
+                              : item['icon'] as IconData,
+                          color: isActive
+                              ? AppColors.darkGreen
+                              : AppColors.textLight,
                           size: 22,
                         ),
                         const SizedBox(height: 2),
                         Text(
                           item['label'] as String,
                           style: GoogleFonts.poppins(
-                            color: isActive ? AppColors.darkGreen : AppColors.textLight,
+                            color: isActive
+                                ? AppColors.darkGreen
+                                : AppColors.textLight,
                             fontSize: 10,
-                            fontWeight: isActive ? FontWeight.w700 : FontWeight.normal,
+                            fontWeight:
+                                isActive ? FontWeight.w700 : FontWeight.normal,
                           ),
                         ),
                       ],

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-// ----------------------- Models -----------------------
+/// ───────────────────────────────────────────────
+/// Models
+/// ───────────────────────────────────────────────
 
 class Course {
   final String title;
@@ -30,8 +32,6 @@ class Feature {
     required this.title,
     required this.description,
   });
-
-  void operator [](String other) {}
 }
 
 class DonationTier {
@@ -39,6 +39,8 @@ class DonationTier {
   final String amount;
   final String description;
   final IconData icon;
+
+  /// 🔥 FIX: aligned with UI usage (tier.popular)
   final bool popular;
 
   const DonationTier({
@@ -46,7 +48,7 @@ class DonationTier {
     required this.amount,
     required this.description,
     required this.icon,
-    required this.popular,
+    this.popular = false, // default safe
   });
 }
 
@@ -62,9 +64,12 @@ class TeamMember {
   });
 }
 
-// ----------------------- Data -----------------------
+/// ───────────────────────────────────────────────
+/// Static App Data
+/// ───────────────────────────────────────────────
 
 class AppData {
+  /// Courses offered
   static const List<Course> courses = [
     Course(
       title: 'AI Mastery',
@@ -138,6 +143,7 @@ class AppData {
     ),
   ];
 
+  /// Platform features
   static const List<Feature> features = [
     Feature(
       icon: Icons.connect_without_contact_outlined,
@@ -159,6 +165,7 @@ class AppData {
     ),
   ];
 
+  /// Donation tiers
   static const List<DonationTier> donationTiers = [
     DonationTier(
       title: 'Learning Kit',
@@ -172,20 +179,21 @@ class AppData {
       title: 'Sponsor a Skill',
       amount: 'Rs. 5,000',
       description:
-          'Cover the cost of a complete short-term module (e.g., Graphic Design Basics) for one deserving student.',
+          'Cover the cost of a complete short-term module for one deserving student.',
       icon: Icons.menu_book_outlined,
-      popular: true,
+      popular: true, // ⭐ highlighted
     ),
     DonationTier(
       title: 'Full Scholarship',
       amount: 'Rs. 15,000',
       description:
-          'Sponsor a student\'s entire journey from beginner to job-ready professional, including mentorship.',
+          'Sponsor a student\'s full journey from beginner to job-ready professional.',
       icon: Icons.school_outlined,
       popular: false,
     ),
   ];
 
+  /// Team members
   static const List<TeamMember> teamMembers = [
     TeamMember(
       name: 'Ahmad Raza',

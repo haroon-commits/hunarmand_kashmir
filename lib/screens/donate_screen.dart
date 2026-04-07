@@ -3,42 +3,58 @@ import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common_widgets.dart';
 import '../data/app_data.dart';
+import '../utils/responsive.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DonateScreen extends StatelessWidget {
-  final Function(String) onNavTap;
+  const DonateScreen({super.key});
 
-  const DonateScreen({super.key, required this.onNavTap});
+  Future<void> _launchWhatsApp(BuildContext context) async {
+    final url = Uri.parse('https://wa.me/923138840971');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to open WhatsApp')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildHero(),
-          _buildImpactCards(),
-          _buildTransparencySection(),
-          _buildDonationTiers(context),
-          _buildBankTransferSection(),
-          AppFooter(onNavTap: onNavTap),
-        ],
-      ),
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(child: _buildHero(context)),
+        SliverToBoxAdapter(child: _buildImpactCards(context)),
+        SliverToBoxAdapter(child: _buildTransparencySection()),
+        SliverToBoxAdapter(child: _buildDonationTiers(context)),
+        SliverToBoxAdapter(child: _buildBankTransferSection(context)),
+        const SliverToBoxAdapter(child: AppFooter()),
+      ],
     );
   }
 
   // ---------------- Hero Section ----------------
-  Widget _buildHero() {
+  Widget _buildHero(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(24, 36, 24, 48),
       decoration: const BoxDecoration(color: AppColors.darkGreen),
-      child: Column(
-        children: [
-          _supportTag(),
-          const SizedBox(height: 20),
-          _heroTitle(),
-          const SizedBox(height: 16),
-          _heroDescription(),
-        ],
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 36, 24, 48),
+            child: Column(
+              children: [
+                _supportTag(),
+                const SizedBox(height: 20),
+                _heroTitle(),
+                const SizedBox(height: 16),
+                _heroDescription(),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -92,7 +108,7 @@ class DonateScreen extends StatelessWidget {
       );
 
   Widget _heroDescription() => Text(
-        "Your contribution doesn't just pay a fee; it unlocks a future. Help us empower the youth of Kashmir with the skills they need to stand tall, earn a livelihood, and build a self-reliant community.",
+        "Your contribution unlocks futures. Help empower youth in Kashmir to earn a livelihood and build self-reliant communities.",
         textAlign: TextAlign.center,
         style: GoogleFonts.poppins(
           color: Colors.white70,
@@ -102,69 +118,47 @@ class DonateScreen extends StatelessWidget {
       );
 
   // ---------------- Impact Cards ----------------
-  Widget _buildImpactCards() {
+  Widget _buildImpactCards(BuildContext context) {
     final impacts = [
       Impact(
         icon: '📖',
         title: 'Sponsor Education',
         description:
-            'Many talented students in remote villages drop out due to lack of funds. Your donation covers their tuition, software licenses, and learning materials.',
+            'Cover tuition, licenses, and learning materials for talented students in remote villages.',
       ),
       Impact(
         icon: '👥',
         title: 'Empower Mentorship',
         description:
-            'We bring in industry experts to mentor our students. Your support helps us organize workshops, hackathons, and career counseling sessions.',
+            'Support workshops, hackathons, and career counseling with industry experts.',
       ),
       Impact(
         icon: '🛡️',
         title: 'Create Independence',
         description:
-            "We don't give handouts; we give hand-ups. Students you support go on to become freelancers and entrepreneurs who support their families.",
+            'Students become freelancers and entrepreneurs who support their families.',
       ),
     ];
 
     return Container(
       color: AppColors.white,
       padding: const EdgeInsets.all(20),
-      child: Column(
-        children: impacts
-            .map((impact) => Container(
-                  margin: const EdgeInsets.only(bottom: 14),
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: AppColors.offWhite,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.grey.shade200),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(impact.icon, style: const TextStyle(fontSize: 28)),
-                      const SizedBox(height: 10),
-                      Text(
-                        impact.title,
-                        style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textDark,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        impact.description,
-                        style: GoogleFonts.poppins(
-                          color: AppColors.textMedium,
-                          fontSize: 12,
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ))
-            .toList(),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+          child: ResponsiveCardGrid(
+            mobileCols: 1,
+            tabletCols: 3,
+            desktopCols: 3,
+            children: impacts.map((impact) => _impactCard(impact)).toList(),
+          ),
+        ),
       ),
     );
+  }
+
+  Widget _impactCard(Impact impact) {
+    return ImpactCard(impact: impact);
   }
 
   // ---------------- Transparency ----------------
@@ -184,6 +178,13 @@ class DonateScreen extends StatelessWidget {
           color: AppColors.tealAccent),
     ];
 
+    final notes = [
+      '100% of student scholarship funds go directly to training costs.',
+      'Regular impact reports sent to all donors.',
+      'Open-door policy: Visit our campus to see your impact in action.',
+      'Focus on long-term sustainability, not temporary relief.',
+    ];
+
     return Container(
       color: AppColors.offWhite,
       padding: const EdgeInsets.all(20),
@@ -200,7 +201,7 @@ class DonateScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'We understand that trust is the foundation of any contribution. At Hunarmand Kashmir, every rupee is accounted for. We operate with a strict policy of ethical allocation.',
+            'Every rupee is accounted for with ethical allocation.',
             style: GoogleFonts.poppins(
               color: AppColors.textMedium,
               fontSize: 12,
@@ -208,12 +209,7 @@ class DonateScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          ...[
-            '100% of student scholarship funds go directly to training costs.',
-            'Regular impact reports sent to all donors.',
-            'Open-door policy: Visit our campus to see your impact in action.',
-            'Focus on long-term sustainability, not temporary relief.',
-          ].map((item) => Padding(
+          ...notes.map((note) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +219,7 @@ class DonateScreen extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        item,
+                        note,
                         style: GoogleFonts.poppins(
                             fontSize: 12,
                             color: AppColors.textMedium,
@@ -249,39 +245,41 @@ class DonateScreen extends StatelessWidget {
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: fundUsage.map((item) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(item.label,
-                              style: GoogleFonts.poppins(
-                                  fontSize: 11, color: AppColors.textMedium)),
-                          Text('${item.percent}%',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textDark)),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: item.percent / 100,
-                          backgroundColor: Colors.grey.shade200,
-                          color: item.color,
-                          minHeight: 8,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
+              children: fundUsage.map((item) => _fundUsageRow(item)).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _fundUsageRow(FundUsage item) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(item.label,
+                  style: GoogleFonts.poppins(
+                      fontSize: 11, color: AppColors.textMedium)),
+              Text('${item.percent}%',
+                  style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textDark)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: item.percent / 100,
+              backgroundColor: Colors.grey.shade200,
+              color: item.color,
+              minHeight: 8,
             ),
           ),
         ],
@@ -307,7 +305,7 @@ class DonateScreen extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Choose how you want to make a difference. Every amount counts towards building a skilled Kashmir.',
+            'Every amount counts towards building a skilled Kashmir.',
             textAlign: TextAlign.center,
             style:
                 GoogleFonts.poppins(color: AppColors.textMedium, fontSize: 12),
@@ -331,7 +329,7 @@ class DonateScreen extends StatelessWidget {
   }
 
   // ---------------- Bank Transfer ----------------
-  Widget _buildBankTransferSection() {
+  Widget _buildBankTransferSection(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(24),
@@ -352,26 +350,12 @@ class DonateScreen extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Prefer to transfer directly? You can send your contributions to our registered trust account. Please share the receipt via WhatsApp.',
+            'Transfer directly and share receipt via WhatsApp.',
             style: GoogleFonts.poppins(
                 color: Colors.white70, fontSize: 11, height: 1.5),
           ),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.mediumGreen,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              children: [
-                _bankRow('Account Name:', 'Hunarmand Kashmir Trust'),
-                _bankRow('Account No:', '1234 5678 9012'),
-                _bankRow('Bank:', 'Bank of AJK, Mirpur'),
-                _bankRow('Branch Code:', '0123'),
-              ],
-            ),
-          ),
+          _bankInfoCard(),
           const SizedBox(height: 16),
           const Divider(color: Colors.white12),
           const SizedBox(height: 8),
@@ -385,26 +369,31 @@ class DonateScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.chat, size: 16),
-              label: Text(
-                'Contact Finance Team',
-                style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600, fontSize: 13),
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.white,
-                side: const BorderSide(color: Colors.white38),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25)),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
-          ),
+          _primaryButton(
+              context, 'Contact Finance Team', () => _launchWhatsApp(context)),
         ],
+      ),
+    );
+  }
+
+  Widget _bankInfoCard() {
+    final bankDetails = {
+      'Account Name:': 'Hunarmand Kashmir Trust',
+      'Account No:': '1234 5678 9012',
+      'Bank:': 'Bank of AJK, Mirpur',
+      'Branch Code:': '0123',
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.mediumGreen,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        children: bankDetails.entries
+            .map((entry) => _bankRow(entry.key, entry.value))
+            .toList(),
       ),
     );
   }
@@ -434,6 +423,7 @@ class DonateScreen extends StatelessWidget {
     );
   }
 
+  // ---------------- Donate Dialog ----------------
   void _showDonateDialog(BuildContext context, String title, String amount) {
     showModalBottomSheet(
       context: context,
@@ -474,32 +464,36 @@ class DonateScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Please transfer to the account above and share your receipt via WhatsApp. JazakAllah Khair for your generous contribution!',
+              'Transfer to the account above and share receipt via WhatsApp.',
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                   color: AppColors.textMedium, fontSize: 13, height: 1.6),
             ),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.successGreen,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25)),
-                    ),
-                    child: Text(
-                      'Chat on WhatsApp',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            _primaryButton(ctx, 'Chat on WhatsApp', () => _launchWhatsApp(ctx)),
             const SizedBox(height: 8),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _primaryButton(
+      BuildContext context, String label, VoidCallback onPressed) {
+    return SizedBox(
+      width: double.infinity,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.successGreen,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+          ),
+          child: Text(label,
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w700)),
         ),
       ),
     );
@@ -521,4 +515,80 @@ class FundUsage {
   final Color color;
 
   FundUsage({required this.label, required this.percent, required this.color});
+}
+
+class ImpactCard extends StatefulWidget {
+  final Impact impact;
+  const ImpactCard({super.key, required this.impact});
+
+  @override
+  State<ImpactCard> createState() => _ImpactCardState();
+}
+
+class _ImpactCardState extends State<ImpactCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          transform: Matrix4.identity()..translate(0.0, _isHovered ? -4.0 : 0.0),
+          margin: const EdgeInsets.only(bottom: 14),
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: _isHovered
+                  ? AppColors.accentGold.withOpacity(0.5)
+                  : Colors.grey.shade200,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: _isHovered
+                    ? AppColors.darkGreen.withOpacity(0.08)
+                    : Colors.black.withOpacity(0.02),
+                blurRadius: _isHovered ? 15 : 4,
+                offset: Offset(0, _isHovered ? 8 : 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AnimatedScale(
+                scale: _isHovered ? 1.15 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                child:
+                    Text(widget.impact.icon, style: const TextStyle(fontSize: 28)),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                widget.impact.title,
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                widget.impact.description,
+                style: GoogleFonts.poppins(
+                  color: AppColors.textMedium,
+                  fontSize: 12,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

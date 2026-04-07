@@ -1,71 +1,83 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
+import '../utils/responsive.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_state.dart';
 
 // ─── CUSTOM APP BAR ───────────────────────────────────────────────────────────
 class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String currentPage;
-  final Function(String) onNavTap;
 
   const HunarmandAppBar({
     super.key,
     required this.currentPage,
-    required this.onNavTap,
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(60);
+  Size get preferredSize => const Size.fromHeight(64);
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = Responsive.isDesktop(context);
     return AppBar(
       backgroundColor: AppColors.darkGreen,
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            onTap: () => onNavTap('home'),
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              child: Text(
-                'حُنر',
-                style: GoogleFonts.amiriQuran(
-                  color: AppColors.accentGold,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+      elevation: 0,
+      titleSpacing: 0,
+      title: Center(
+        child: ConstrainedBox(
+          constraints:
+              const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(
+              children: [
+                // Logo
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () => context.read<AppState>().navigate('home'),
+                    child: Text(
+                      'حُنر مند کشمیر',
+                      style: GoogleFonts.amiriQuran(
+                        color: AppColors.accentGold,
+                        fontSize: isDesktop ? 24 : 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                const Spacer(),
+                // Nav items
+                if (isDesktop) ...[
+                  _navItem(context, 'Home', 'home'),
+                  _navItem(context, 'About', 'about'),
+                  _navItem(context, 'Courses', 'courses'),
+                  _navItem(context, 'Gallery', 'gallery'),
+                  _navItem(context, 'Contact', 'contact'),
+                  const SizedBox(width: 16),
+                ] else ...[
+                  _navItem(context, 'Courses', 'courses'),
+                  _navItem(context, 'About', 'about'),
+                  const SizedBox(width: 8),
+                ],
+                _donateButton(context),
+                const SizedBox(width: 8),
+                _joinNowButton(context),
+              ],
             ),
           ),
         ),
       ),
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _navItem('Home', 'home'),
-          _navItem('About', 'about'),
-          _navItem('Courses', 'courses'),
-          _navItem('Gallery', 'gallery'),
-          _navItem('Contact', 'contact'),
-        ],
-      ),
-      centerTitle: false,
-      actions: [
-        _donateButton(context),
-        const SizedBox(width: 8),
-        _joinNowButton(context),
-        const SizedBox(width: 12),
-      ],
     );
   }
 
-  Widget _navItem(String label, String page) {
+  Widget _navItem(BuildContext context, String label, String page) {
     final isActive = currentPage == page;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () => onNavTap(page),
+        onTap: () => context.read<AppState>().navigate(page),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: isActive
@@ -92,7 +104,7 @@ class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () => onNavTap('donate'),
+        onTap: () => context.read<AppState>().navigate('donate'),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
           decoration: BoxDecoration(
@@ -122,7 +134,7 @@ class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () => onNavTap('contact'),
+        onTap: () => context.read<AppState>().navigate('contact'),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
           decoration: BoxDecoration(
@@ -145,9 +157,7 @@ class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
 
 // ─── MOBILE DRAWER ────────────────────────────────────────────────────────────
 class HunarmandDrawer extends StatelessWidget {
-  final Function(String) onNavTap;
-
-  const HunarmandDrawer({super.key, required this.onNavTap});
+  const HunarmandDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +206,7 @@ class HunarmandDrawer extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  onNavTap('contact');
+                  context.read<AppState>().navigate('contact');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accentGold,
@@ -222,7 +232,7 @@ class HunarmandDrawer extends StatelessWidget {
           style: GoogleFonts.poppins(color: AppColors.white, fontSize: 14)),
       onTap: () {
         Navigator.pop(context);
-        onNavTap(page);
+        context.read<AppState>().navigate(page);
       },
     );
   }
@@ -238,39 +248,72 @@ class GreenPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = Responsive.isDesktop(context);
+    final isTablet = Responsive.isTablet(context);
+    final titleSize = isDesktop ? 42.0 : isTablet ? 34.0 : 28.0;
+    final subSize = isDesktop ? 16.0 : isTablet ? 15.0 : 14.0;
+    final vPad = isDesktop ? 72.0 : isTablet ? 56.0 : 44.0;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
-      decoration: const BoxDecoration(
-        color: AppColors.darkGreen,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(0),
-          bottomRight: Radius.circular(0),
+      color: AppColors.darkGreen,
+      child: Center(
+        child: ConstrainedBox(
+          constraints:
+              const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: vPad,
+              horizontal: Responsive.contentPaddingH(context),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.playfairDisplay(
+                    color: AppColors.white,
+                    fontSize: titleSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 640),
+                  child: Text(
+                    subtitle,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white70,
+                      fontSize: subSize,
+                      height: 1.6,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-      child: Column(
-        children: [
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
-              color: AppColors.white,
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              color: Colors.white70,
-              fontSize: 14,
-              height: 1.6,
-            ),
-          ),
-        ],
-      ),
+    );
+  }
+}
+
+// ─── SLIVER GREEN PAGE HEADER ───────────────────────────────────────────────
+class SliverGreenPageHeader extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const SliverGreenPageHeader({
+    super.key,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: GreenPageHeader(title: title, subtitle: subtitle),
     );
   }
 }
@@ -327,6 +370,7 @@ class GoldDivider extends StatelessWidget {
   }
 }
 
+// ─── FEATURE CARD ─────────────────────────────────────────────────────────────
 class FeatureCard extends StatefulWidget {
   final IconData icon;
   final String title;
@@ -347,11 +391,12 @@ class _FeatureCardState extends State<FeatureCard> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
+    return RepaintBoundary(
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOutCubic,
         transform: Matrix4.identity()..translate(0.0, _isHovered ? -6.0 : 0.0),
@@ -438,10 +483,123 @@ class _FeatureCardState extends State<FeatureCard> {
           ],
         ),
       ),
+    ),
+  );
+}
+}
+
+// ─── SLIVER RESPONSIVE CARD GRID ──────────────────────────────────────────────
+class SliverResponsiveCardGrid extends StatelessWidget {
+  final List<Widget> children;
+  final int mobileCols;
+  final int tabletCols;
+  final int desktopCols;
+  final double spacing;
+
+  const SliverResponsiveCardGrid({
+    super.key,
+    required this.children,
+    this.mobileCols = 1,
+    this.tabletCols = 2,
+    this.desktopCols = 3,
+    this.spacing = 16,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cols = Responsive.gridCols(
+      context,
+      mobileCols: mobileCols,
+      tabletCols: tabletCols,
+      desktopCols: desktopCols,
+    );
+
+    return SliverGrid(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: cols,
+        crossAxisSpacing: spacing,
+        mainAxisSpacing: spacing,
+        childAspectRatio: cols == 1 ? 2.8 : (cols == 2 ? 1.0 : 0.85),
+      ),
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => children[index],
+        childCount: children.length,
+      ),
     );
   }
 }
 
+// ─── RESPONSIVE CARD GRID ─────────────────────────────────────────────────────
+/// Wraps a list of cards into a responsive grid.
+class ResponsiveCardGrid extends StatelessWidget {
+  final List<Widget> children;
+  final int mobileCols;
+  final int tabletCols;
+  final int desktopCols;
+  final double spacing;
+
+  const ResponsiveCardGrid({
+    super.key,
+    required this.children,
+    this.mobileCols = 1,
+    this.tabletCols = 2,
+    this.desktopCols = 3,
+    this.spacing = 16,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cols = Responsive.gridCols(
+      context,
+      mobileCols: mobileCols,
+      tabletCols: tabletCols,
+      desktopCols: desktopCols,
+    );
+
+    if (cols == 1) {
+      return Column(
+        children: children
+            .map((child) => Padding(
+                  padding: EdgeInsets.only(bottom: spacing),
+                  child: child,
+                ))
+            .toList(),
+      );
+    }
+
+    // Build rows
+    final rows = <Widget>[];
+    for (var i = 0; i < children.length; i += cols) {
+      final List<Widget> rowChildren = <Widget>[...children.skip(i).take(cols)];
+      // Pad last row if incomplete
+      while (rowChildren.length < cols) {
+        rowChildren.add(const SizedBox.shrink());
+      }
+      rows.add(
+        Padding(
+          padding: EdgeInsets.only(bottom: spacing),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: rowChildren.asMap().entries.map((e) {
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: e.key == 0 ? 0 : spacing / 2,
+                    right: e.key == cols - 1 ? 0 : spacing / 2,
+                  ),
+                  child: e.value,
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      );
+    }
+    return Column(children: rows);
+  }
+}
+
+// ─── COURSE CARD ──────────────────────────────────────────────────────────────
 class CourseCard extends StatefulWidget {
   final IconData icon;
   final String title;
@@ -469,13 +627,14 @@ class _CourseCardState extends State<CourseCard> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
+    return RepaintBoundary(
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.all(20),
@@ -565,8 +724,8 @@ class _CourseCardState extends State<CourseCard> {
                   ),
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: _isHovered
                           ? AppColors.accentGold
@@ -607,8 +766,9 @@ class _CourseCardState extends State<CourseCard> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 // ─── CONTACT INFO TILE ───────────────────────────────────────────────────────
@@ -662,118 +822,184 @@ class ContactInfoTile extends StatelessWidget {
 
 // ─── APP FOOTER ───────────────────────────────────────────────────────────────
 class AppFooter extends StatelessWidget {
-  final Function(String) onNavTap;
-
-  const AppFooter({super.key, required this.onNavTap});
+  const AppFooter({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = Responsive.isDesktop(context);
+    final isTablet = Responsive.isTablet(context);
+    final hPad = Responsive.contentPaddingH(context);
+
     return Container(
       color: AppColors.darkGreen,
-      padding: const EdgeInsets.fromLTRB(24, 36, 24, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Logo + description
-          Text(
-            'حُنر مند',
-            style: GoogleFonts.amiriQuran(
-              color: AppColors.accentGold,
-              fontSize: 24,
+      child: Center(
+        child: ConstrainedBox(
+          constraints:
+              const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+          child: Padding(
+            padding:
+                EdgeInsets.fromLTRB(hPad, 48, hPad, 28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top row — logo + columns
+                if (isDesktop || isTablet)
+                  _buildWideFooter(context)
+                else
+                  _buildNarrowFooter(context),
+
+                const SizedBox(height: 28),
+                const Divider(color: Colors.white12),
+                const SizedBox(height: 14),
+                // Bottom bar
+                _buildBottomBar(),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Empowering Youth. Empowering the youth of Kashmir through digital skills, fostering self-reliance, and building a future where talent meets opportunity.',
-            style: GoogleFonts.poppins(
-              color: Colors.white54,
-              fontSize: 12,
-              height: 1.6,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Quick Links',
-                      style: GoogleFonts.poppins(
-                        color: AppColors.accentGold,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _footerLink('Our Story', 'about'),
-                    _footerLink('All Courses', 'courses'),
-                    _footerLink('Donate', 'donate'),
-                    _footerLink('Impact Gallery', 'gallery'),
-                    _footerLink('Admissions', 'contact'),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Get in Touch',
-                      style: GoogleFonts.poppins(
-                        color: AppColors.accentGold,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _footerContact(Icons.location_on_outlined,
-                        'SCO Software Technology Park, Mirpur'),
-                    const SizedBox(height: 6),
-                    _footerContact(Icons.phone_outlined, '0313 884 0971'),
-                    const SizedBox(height: 6),
-                    _footerContact(
-                        Icons.email_outlined, 'salam@hunarmandkashmir.com'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          const Divider(color: Colors.white12),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '© 2026 Hunarmand Kashmir. All rights reserved.',
-                style: GoogleFonts.poppins(color: Colors.white38, fontSize: 11),
-              ),
-              Row(
-                children: [
-                  _socialIcon(Icons.camera_alt_outlined),
-                  const SizedBox(width: 12),
-                  _socialIcon(Icons.facebook_outlined),
-                  const SizedBox(width: 12),
-                  _socialIcon(Icons.alternate_email),
-                ],
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _footerLink(String label, String page) {
+  Widget _buildWideFooter(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Logo + description (wider on desktop)
+        Expanded(
+          flex: 2,
+          child: _buildLogoColumn(),
+        ),
+        const SizedBox(width: 40),
+        Expanded(
+          child: _buildQuickLinks(context),
+        ),
+        const SizedBox(width: 24),
+        Expanded(
+          child: _buildContactColumn(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNarrowFooter(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildLogoColumn(),
+        const SizedBox(height: 28),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: _buildQuickLinks(context)),
+            const SizedBox(width: 20),
+            Expanded(child: _buildContactColumn()),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLogoColumn() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'حُنر مند',
+          style: GoogleFonts.amiriQuran(
+            color: AppColors.accentGold,
+            fontSize: 28,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'Empowering Youth. Empowering the youth of Kashmir through digital skills, fostering self-reliance, and building a future where talent meets opportunity.',
+          style: GoogleFonts.poppins(
+            color: Colors.white54,
+            fontSize: 12,
+            height: 1.7,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickLinks(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Quick Links',
+          style: GoogleFonts.poppins(
+            color: AppColors.accentGold,
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 12),
+        _footerLink(context, 'Our Story', 'about'),
+        _footerLink(context, 'All Courses', 'courses'),
+        _footerLink(context, 'Donate', 'donate'),
+        _footerLink(context, 'Impact Gallery', 'gallery'),
+        _footerLink(context, 'Admissions', 'contact'),
+      ],
+    );
+  }
+
+  Widget _buildContactColumn() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Get in Touch',
+          style: GoogleFonts.poppins(
+            color: AppColors.accentGold,
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 12),
+        _footerContact(
+            Icons.location_on_outlined, 'SCO Software Technology Park, Mirpur'),
+        const SizedBox(height: 8),
+        _footerContact(Icons.phone_outlined, '0313 884 0971'),
+        const SizedBox(height: 8),
+        _footerContact(
+            Icons.email_outlined, 'salam@hunarmandkashmir.com'),
+      ],
+    );
+  }
+
+  Widget _buildBottomBar() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(
+          child: Text(
+            '© 2026 Hunarmand Kashmir. All rights reserved.',
+            style: GoogleFonts.poppins(color: Colors.white38, fontSize: 11),
+          ),
+        ),
+        Row(
+          children: [
+            _socialIcon(Icons.camera_alt_outlined),
+            const SizedBox(width: 12),
+            _socialIcon(Icons.facebook_outlined),
+            const SizedBox(width: 12),
+            _socialIcon(Icons.alternate_email),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _footerLink(BuildContext context, String label, String page) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () => onNavTap(page),
+        onTap: () => context.read<AppState>().navigate(page),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3),
+          padding: const EdgeInsets.symmetric(vertical: 4),
           child: Text(
             label,
             style: GoogleFonts.poppins(color: Colors.white70, fontSize: 12),
@@ -813,7 +1039,7 @@ class AppFooter extends StatelessWidget {
 }
 
 // ─── DONATION TIER CARD ───────────────────────────────────────────────────────
-class DonationTierCard extends StatelessWidget {
+class DonationTierCard extends StatefulWidget {
   final IconData icon;
   final String title;
   final String amount;
@@ -832,37 +1058,67 @@ class DonationTierCard extends StatelessWidget {
   });
 
   @override
+  State<DonationTierCard> createState() => _DonationTierCardState();
+}
+
+class _DonationTierCardState extends State<DonationTierCard> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         MouseRegion(
           cursor: SystemMouseCursors.click,
+          onEnter: (_) => setState(() => _isHovered = true),
+          onExit: (_) => setState(() => _isHovered = false),
           child: GestureDetector(
-            onTap: onTap,
-            child: Container(
+            onTap: widget.onTap,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              transform: Matrix4.identity()..translate(0.0, _isHovered ? -6.0 : 0.0),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color:
-                      isPopular ? AppColors.accentGold : Colors.grey.shade200,
-                  width: isPopular ? 2 : 1,
+                  color: widget.isPopular 
+                      ? AppColors.accentGold 
+                      : (_isHovered ? AppColors.darkGreen.withOpacity(0.5) : Colors.grey.shade200),
+                  width: widget.isPopular ? 2 : 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    color: _isHovered 
+                        ? AppColors.darkGreen.withOpacity(0.12)
+                        : Colors.black.withOpacity(0.05),
+                    blurRadius: _isHovered ? 20 : 10,
+                    offset: Offset(0, _isHovered ? 8 : 4),
                   ),
                 ],
               ),
               child: Column(
                 children: [
-                  Icon(icon, size: 32, color: AppColors.darkGreen),
+                  AnimatedScale(
+                    scale: _isHovered ? 1.15 : 1.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: _isHovered ? AppColors.darkGreen : AppColors.lightTeal,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        widget.icon, 
+                        size: 32, 
+                        color: _isHovered ? AppColors.white : AppColors.darkGreen
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   Text(
-                    title,
+                    widget.title,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -871,7 +1127,7 @@ class DonationTierCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    amount,
+                    widget.amount,
                     style: GoogleFonts.poppins(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -880,7 +1136,7 @@ class DonationTierCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    description,
+                    widget.description,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       fontSize: 11,
@@ -892,13 +1148,13 @@ class DonationTierCard extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: onTap,
+                      onPressed: widget.onTap,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isPopular
+                        backgroundColor: widget.isPopular
                             ? AppColors.accentGold
                             : AppColors.darkGreen,
                         foregroundColor:
-                            isPopular ? AppColors.darkGreen : AppColors.white,
+                            widget.isPopular ? AppColors.darkGreen : AppColors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25)),
@@ -915,7 +1171,7 @@ class DonationTierCard extends StatelessWidget {
             ),
           ),
         ),
-        if (isPopular)
+        if (widget.isPopular)
           Positioned(
             top: 10,
             right: 10,
