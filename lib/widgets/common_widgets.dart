@@ -250,9 +250,21 @@ class GreenPageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
     final isTablet = Responsive.isTablet(context);
-    final titleSize = isDesktop ? 42.0 : isTablet ? 34.0 : 28.0;
-    final subSize = isDesktop ? 16.0 : isTablet ? 15.0 : 14.0;
-    final vPad = isDesktop ? 72.0 : isTablet ? 56.0 : 44.0;
+    final titleSize = isDesktop
+        ? 42.0
+        : isTablet
+            ? 34.0
+            : 28.0;
+    final subSize = isDesktop
+        ? 16.0
+        : isTablet
+            ? 15.0
+            : 14.0;
+    final vPad = isDesktop
+        ? 72.0
+        : isTablet
+            ? 56.0
+            : 44.0;
 
     return Container(
       width: double.infinity,
@@ -397,95 +409,128 @@ class _FeatureCardState extends State<FeatureCard> {
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),
         child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic,
-        transform: Matrix4.identity()..translate(0.0, _isHovered ? -6.0 : 0.0),
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+
+          // Card lift effect (kept)
+          transform: Matrix4.identity()
+            ..translate(0.0, _isHovered ? -6.0 : 0.0),
+
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(20),
+
+            // Border hover effect
+            border: Border.all(
               color: _isHovered
                   ? AppColors.accentGold.withOpacity(0.5)
                   : Colors.grey.shade100,
-              width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: _isHovered
-                  ? AppColors.darkGreen.withOpacity(0.08)
-                  : Colors.black.withOpacity(0.04),
-              blurRadius: _isHovered ? 20 : 12,
-              offset: Offset(0, _isHovered ? 12 : 4),
+              width: 1.5,
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: _isHovered ? AppColors.darkGreen : AppColors.lightTeal,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: _isHovered
-                    ? [
-                        BoxShadow(
-                            color: AppColors.darkGreen.withOpacity(0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4))
-                      ]
-                    : [],
+
+            // Shadow hover effect
+            boxShadow: [
+              BoxShadow(
+                color: _isHovered
+                    ? AppColors.darkGreen.withOpacity(0.08)
+                    : Colors.black.withOpacity(0.04),
+                blurRadius: _isHovered ? 20 : 12,
+                offset: Offset(0, _isHovered ? 12 : 4),
               ),
-              child: Center(
-                child: AnimatedScale(
-                  scale: _isHovered ? 1.1 : 1.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: Icon(widget.icon, size: 28, color: Colors.white),
+            ],
+          ),
+
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ================= ICON CONTAINER =================
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  // ✅ Solid green background (no opacity change)
+                  color: AppColors.darkGreen,
+
+                  borderRadius: BorderRadius.circular(16),
+
+                  // Optional: keep subtle shadow on hover for depth
+                  boxShadow: _isHovered
+                      ? [
+                          BoxShadow(
+                            color: AppColors.darkGreen.withOpacity(0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          )
+                        ]
+                      : [],
+                ),
+                child: Center(
+                  // ✅ Static icon (no animation)
+                  child: Icon(
+                    widget.icon,
+                    size: 28,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              widget.title,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textDark,
+
+              const SizedBox(height: 20),
+
+              // ================= TITLE =================
+              Text(
+                widget.title,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              widget.description,
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: AppColors.textMedium,
-                height: 1.6,
+
+              const SizedBox(height: 10),
+
+              // ================= DESCRIPTION =================
+              Text(
+                widget.description,
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: AppColors.textMedium,
+                  height: 1.6,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            AnimatedOpacity(
-              opacity: _isHovered ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 250),
-              child: Row(
-                children: [
-                  Text('Learn more',
+
+              const SizedBox(height: 16),
+
+              // ================= CTA =================
+              AnimatedOpacity(
+                opacity: _isHovered ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 250),
+                child: Row(
+                  children: [
+                    Text(
+                      'Learn more',
                       style: GoogleFonts.poppins(
-                          color: AppColors.accentGold,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600)),
-                  const SizedBox(width: 4),
-                  const Icon(Icons.arrow_forward,
-                      color: AppColors.accentGold, size: 14),
-                ],
+                        color: AppColors.accentGold,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.arrow_forward,
+                      color: AppColors.accentGold,
+                      size: 14,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
 
 // ─── SLIVER RESPONSIVE CARD GRID ──────────────────────────────────────────────
@@ -635,140 +680,165 @@ class _CourseCardState extends State<CourseCard> {
         child: GestureDetector(
           onTap: widget.onTap,
           child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(16),
+
+              // Hover border effect (kept)
+              border: Border.all(
                 color: _isHovered
                     ? AppColors.darkGreen.withOpacity(0.3)
-                    : Colors.grey.shade100),
-            boxShadow: [
-              BoxShadow(
-                color: _isHovered
-                    ? AppColors.darkGreen.withOpacity(0.08)
-                    : Colors.black.withOpacity(0.04),
-                blurRadius: _isHovered ? 15 : 8,
-                offset: Offset(0, _isHovered ? 8 : 4),
+                    : Colors.grey.shade100,
               ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: _isHovered
-                          ? AppColors.darkGreen
-                          : AppColors.lightTeal,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Center(
-                      child: AnimatedScale(
-                        scale: _isHovered ? 1.1 : 1.0,
-                        duration: const Duration(milliseconds: 200),
-                        child: Icon(widget.icon, size: 24, color: Colors.white),
+
+              // Hover shadow effect (kept)
+              boxShadow: [
+                BoxShadow(
+                  color: _isHovered
+                      ? AppColors.darkGreen.withOpacity(0.08)
+                      : Colors.black.withOpacity(0.04),
+                  blurRadius: _isHovered ? 15 : 8,
+                  offset: Offset(0, _isHovered ? 8 : 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    // ================= ICON CONTAINER =================
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        // ✅ FIXED COLOR (no hover change)
+                        color: AppColors.darkGreen,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Center(
+                        // ❌ Removed AnimatedScale (no icon animation)
+                        child: Icon(
+                          widget.icon,
+                          size: 24,
+                          color: Colors.white, // ✅ fixed color
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.title,
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textDark,
+
+                    const SizedBox(width: 14),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.title,
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textDark,
+                            ),
                           ),
-                        ),
-                        Text(
-                          widget.duration,
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            color: AppColors.accentGold,
-                            fontWeight: FontWeight.w600,
+                          Text(
+                            widget.duration,
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: AppColors.accentGold,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // ================= DESCRIPTION =================
+                Text(
+                  widget.description,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: AppColors.textMedium,
+                    height: 1.5,
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                widget.description,
-                style: GoogleFonts.poppins(
-                    fontSize: 13, color: AppColors.textMedium, height: 1.5),
-              ),
-              const SizedBox(height: 18),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    widget.fee,
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.darkGreen,
+                ),
+
+                const SizedBox(height: 18),
+
+                // ================= BOTTOM SECTION =================
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.fee,
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.darkGreen,
+                      ),
                     ),
-                  ),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: _isHovered
-                          ? AppColors.accentGold
-                          : AppColors.darkGreen,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: _isHovered
-                          ? [
-                              BoxShadow(
+
+                    // ================= APPLY BUTTON =================
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: _isHovered
+                            ? AppColors.accentGold
+                            : AppColors.darkGreen,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: _isHovered
+                            ? [
+                                BoxShadow(
                                   color: AppColors.accentGold.withOpacity(0.4),
                                   blurRadius: 8,
-                                  offset: const Offset(0, 4))
-                            ]
-                          : [],
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Apply',
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: _isHovered
-                                ? AppColors.darkGreen
-                                : AppColors.white,
+                                  offset: const Offset(0, 4),
+                                )
+                              ]
+                            : [],
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Apply',
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: _isHovered
+                                  ? AppColors.darkGreen
+                                  : AppColors.white,
+                            ),
                           ),
-                        ),
-                        if (_isHovered) ...[
-                          const SizedBox(width: 4),
-                          Icon(Icons.arrow_forward,
-                              color: AppColors.darkGreen, size: 14),
-                        ]
-                      ],
+
+                          // Arrow still appears on hover (kept)
+                          if (_isHovered) ...[
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward,
+                              color: AppColors.darkGreen,
+                              size: 14,
+                            ),
+                          ]
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
 
 // ─── CONTACT INFO TILE ───────────────────────────────────────────────────────
@@ -837,8 +907,7 @@ class AppFooter extends StatelessWidget {
           constraints:
               const BoxConstraints(maxWidth: Responsive.maxContentWidth),
           child: Padding(
-            padding:
-                EdgeInsets.fromLTRB(hPad, 48, hPad, 28),
+            padding: EdgeInsets.fromLTRB(hPad, 48, hPad, 28),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -964,8 +1033,7 @@ class AppFooter extends StatelessWidget {
         const SizedBox(height: 8),
         _footerContact(Icons.phone_outlined, '0313 884 0971'),
         const SizedBox(height: 8),
-        _footerContact(
-            Icons.email_outlined, 'salam@hunarmandkashmir.com'),
+        _footerContact(Icons.email_outlined, 'salam@hunarmandkashmir.com'),
       ],
     );
   }
@@ -1077,20 +1145,23 @@ class _DonationTierCardState extends State<DonationTierCard> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               curve: Curves.easeOutCubic,
-              transform: Matrix4.identity()..translate(0.0, _isHovered ? -6.0 : 0.0),
+              transform: Matrix4.identity()
+                ..translate(0.0, _isHovered ? -6.0 : 0.0),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: widget.isPopular 
-                      ? AppColors.accentGold 
-                      : (_isHovered ? AppColors.darkGreen.withOpacity(0.5) : Colors.grey.shade200),
+                  color: widget.isPopular
+                      ? AppColors.accentGold
+                      : (_isHovered
+                          ? AppColors.darkGreen.withOpacity(0.5)
+                          : Colors.grey.shade200),
                   width: widget.isPopular ? 2 : 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: _isHovered 
+                    color: _isHovered
                         ? AppColors.darkGreen.withOpacity(0.12)
                         : Colors.black.withOpacity(0.05),
                     blurRadius: _isHovered ? 20 : 10,
@@ -1106,14 +1177,16 @@ class _DonationTierCardState extends State<DonationTierCard> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: _isHovered ? AppColors.darkGreen : AppColors.lightTeal,
+                        color: _isHovered
+                            ? AppColors.darkGreen
+                            : AppColors.lightTeal,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        widget.icon, 
-                        size: 32, 
-                        color: _isHovered ? AppColors.white : AppColors.darkGreen
-                      ),
+                      child: Icon(widget.icon,
+                          size: 32,
+                          color: _isHovered
+                              ? AppColors.white
+                              : AppColors.darkGreen),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -1153,8 +1226,9 @@ class _DonationTierCardState extends State<DonationTierCard> {
                         backgroundColor: widget.isPopular
                             ? AppColors.accentGold
                             : AppColors.darkGreen,
-                        foregroundColor:
-                            widget.isPopular ? AppColors.darkGreen : AppColors.white,
+                        foregroundColor: widget.isPopular
+                            ? AppColors.darkGreen
+                            : AppColors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25)),
