@@ -1,0 +1,43 @@
+{
+    "hosting":  {
+                    "public":  "build/web",
+                    "ignore":  [
+                                   "firebase.json",
+                                   "**/.*",
+                                   "**/node_modules/**"
+                               ],
+                    "rewrites":  [
+                                     {
+                                         "source":  "**",
+                                         "destination":  "/index.html"
+                                     }
+                                 ]
+                },
+    "flutter":  {
+                    "platforms":  {
+                                      "android":  {
+                                                      "default":  {
+                                                                      "projectId":  "hunarmandkashmir",
+                                                                      "appId":  "1:997495243061:android:5d7a043c43baa967698c7c",
+                                                                      "fileOutput":  "android/app/google-services.json"
+                                                                  }
+                                                  },
+                                      "dart":  {
+                                                   "lib/firebase_options.dart":  {
+                                                                                     "projectId":  "hunarmandkashmir",
+                                                                                     "configurations":  {
+                                                                                                            "android":  "1:997495243061:android:5d7a043c43baa967698c7c",
+                                                                                                            "ios":  "1:997495243061:ios:6600baf24c1d5cc3698c7c",
+                                                                                                            "macos":  "1:997495243061:ios:6600baf24c1d5cc3698c7c",
+                                                                                                            "web":  "1:997495243061:web:a1f6773cb8bc5c0d698c7c",
+                                                                                                            "windows":  "1:997495243061:web:a33d3c6f6d61a85b698c7c"
+                                                                                                        }
+                                                                                 }
+                                               }
+                                  }
+                },
+    "firestore":  {
+                      "indexes":  "firestore.indexes.json",
+                      "rules":  "firestore.rules"
+                  }
+}

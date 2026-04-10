@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common_widgets.dart';
-import '../data/app_data.dart';
 import '../utils/responsive.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:animate_do/animate_do.dart';
 
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
+import '../providers/dynamic_content_provider.dart';
 
 /// A detailed informational page showcasing the available digital skill programs.
 /// Provides deep insights into course topics, fee structures, and interactive enrollment pathways.
@@ -34,27 +34,33 @@ class CoursesScreen extends StatelessWidget {
   @override
   // Building the core page structure using CustomScrollView for optimized vertical stacking
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        // Responsive page header with brand background
-        const SliverGreenPageHeader(
-          title: 'Start Your Journey',
-          subtitle:
-              'Hunarmand Kashmir offers practical digital courses designed to help you master modern skills and start earning from home.',
-        ),
-        // Section highlighting the choice between Campus and Online learning
-        SliverToBoxAdapter(child: _buildLearningChoiceSection(context)),
-        // The primary listing of all vocational programs and their fees
-        SliverToBoxAdapter(child: _buildCoursesAndFeesSection(context)),
-        // Incentive section for early registrations
-        SliverToBoxAdapter(child: _buildEarlyBirdSection(context)),
-        // Targeted scholarship highlight for orphan students
-        SliverToBoxAdapter(child: _buildOrphanSupportCard(context)),
-        // Final secondary conversion banner
-        SliverToBoxAdapter(child: _buildReadyToStartCard(context)),
-        // Global site footer
-        const SliverToBoxAdapter(child: AppFooter()),
-      ],
+    return Consumer<DynamicContentProvider>(
+      builder: (context, provider, _) {
+        final content = provider.content;
+        return CustomScrollView(
+          slivers: [
+            // Responsive page header with brand background
+            const SliverGreenPageHeader(
+              title: 'Start Your Journey',
+              subtitle:
+                  'Hunarmand Kashmir offers practical digital courses designed to help you master modern skills and start earning from home.',
+            ),
+            // Section highlighting the choice between Campus and Online learning
+            SliverToBoxAdapter(child: _buildLearningChoiceSection(context)),
+            // The primary listing of all vocational programs and their fees
+            SliverToBoxAdapter(
+                child: _buildCoursesAndFeesSection(context, content.courses)),
+            // Incentive section for early registrations
+            SliverToBoxAdapter(child: _buildEarlyBirdSection(context)),
+            // Targeted scholarship highlight for orphan students
+            SliverToBoxAdapter(child: _buildOrphanSupportCard(context)),
+            // Final secondary conversion banner
+            SliverToBoxAdapter(child: _buildReadyToStartCard(context)),
+            // Global site footer
+            const SliverToBoxAdapter(child: AppFooter()),
+          ],
+        );
+      },
     );
   }
 
@@ -189,7 +195,7 @@ class CoursesScreen extends StatelessWidget {
   }
 
   /// Builds the core section comprising detailed course entries and fee breakdowns.
-  Widget _buildCoursesAndFeesSection(BuildContext context) {
+  Widget _buildCoursesAndFeesSection(BuildContext context, List<dynamic> courses) {
     // Evaluating standard layout metrics
     final hPad = Responsive.contentPaddingH(context);
     return Container(
@@ -217,7 +223,7 @@ class CoursesScreen extends StatelessWidget {
                 // Gap
                 const SizedBox(height: 20),
                 // Mapping the global course list into individual expandable UI pieces
-                ...AppData.courses.asMap().entries.map(
+                ...courses.asMap().entries.map(
                       (entry) => FadeInUp(
                         // Cascading entrance animation for the list items
                         delay: Duration(milliseconds: 100 * entry.key),

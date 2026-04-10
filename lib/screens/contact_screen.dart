@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common_widgets.dart';
 import '../utils/responsive.dart';
+import 'package:provider/provider.dart';
+import '../providers/dynamic_content_provider.dart';
 
 /// A stateful page facilitating user communication and course applications.
 /// Integrates contact information, a physical location preview, and a validated intake form.
@@ -49,24 +51,34 @@ class _ContactScreenState extends State<ContactScreen> {
   @override
   // Building the core page layout with an adaptive scrollable structure
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        // Brand-aligned header with contextual contact messaging
-        const SliverGreenPageHeader(
-          title: 'Get in Touch',
-          subtitle:
-              'Start your journey today. Visit us, call us, or fill out the form below.',
-        ),
-        // Primary content body containing info and form blocks
-        SliverToBoxAdapter(child: _buildBody(context)),
-        // Global site footer
-        const SliverToBoxAdapter(child: AppFooter()),
-      ],
+    return Consumer<DynamicContentProvider>(
+      builder: (context, provider, _) {
+        final content = provider.content;
+        return CustomScrollView(
+          slivers: [
+            // Brand-aligned header with contextual contact messaging
+            SliverGreenPageHeader(
+              title: content.contactHeroTitle.isEmpty
+                  ? 'Get in Touch'
+                  : content.contactHeroTitle,
+              subtitle: content.contactHeroDescription.isEmpty
+                  ? 'Start your journey today. Visit us, call us, or fill out the form below.'
+                  : content.contactHeroDescription,
+            ),
+            // Primary content body containing info and form blocks
+            SliverToBoxAdapter(
+                child: _buildBody(context, content.contactAddress,
+                    content.contactPhone, content.contactEmail)),
+            // Global site footer
+            const SliverToBoxAdapter(child: AppFooter()),
+          ],
+        );
+      },
     );
   }
 
   /// Builds the main responsive arrangement of information and the contact form.
-  Widget _buildBody(BuildContext context) {
+  Widget _buildBody(BuildContext context, String address, String phone, String email) {
     // Evaluating device class for layout strategy (Row vs Column)
     final hPad = Responsive.contentPaddingH(context);
     final isWide = Responsive.isTabletOrDesktop(context);
@@ -80,11 +92,11 @@ class _ContactScreenState extends State<ContactScreen> {
           padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 40),
           // Horizontal side-by-side for wide screens, stacked for mobile
           child: isWide
-              ? Row(
+               ? Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Physical campus and contact data takes up the left/smaller side
-                    Expanded(flex: 4, child: _buildCampusInfo()),
+                    Expanded(flex: 4, child: _buildCampusInfo(address, phone, email)),
                     const SizedBox(width: 28), // Clear negative space
                     // Interactive form or success state on the right/larger side
                     Expanded(
@@ -97,7 +109,7 @@ class _ContactScreenState extends State<ContactScreen> {
                 )
               : Column(
                   children: [
-                    _buildCampusInfo(),
+                    _buildCampusInfo(address, phone, email),
                     const SizedBox(height: 24),
                     _submitted ? _buildSuccess() : _buildForm(context),
                   ],
@@ -108,7 +120,7 @@ class _ContactScreenState extends State<ContactScreen> {
   }
 
   /// Builds a card containing the physical campus address and direct contact methods.
-  Widget _buildCampusInfo() {
+  Widget _buildCampusInfo(String address, String phone, String email) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -144,22 +156,22 @@ class _ContactScreenState extends State<ContactScreen> {
           ),
           const SizedBox(height: 22),
           // Standardized contact tiles for specific data points
-          const ContactInfoTile(
+          ContactInfoTile(
             icon: Icons.location_on_outlined,
             label: 'Address',
-            value: 'SCO Software Technology Park, Mirpur',
+            value: address,
           ),
           const SizedBox(height: 16),
-          const ContactInfoTile(
+          ContactInfoTile(
             icon: Icons.phone_outlined,
             label: 'Phone',
-            value: '0313 884 0971',
+            value: phone,
           ),
           const SizedBox(height: 16),
-          const ContactInfoTile(
+          ContactInfoTile(
             icon: Icons.email_outlined,
             label: 'Email',
-            value: 'salam@hunarmandkashmir.com',
+            value: email,
           ),
           // Visual map abstraction for orientation
           const SizedBox(height: 20),

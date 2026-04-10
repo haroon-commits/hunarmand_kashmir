@@ -6,6 +6,8 @@ import '../utils/responsive.dart';
 
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
+import '../providers/dynamic_content_provider.dart';
+import '../models/content_model.dart';
 
 /// A descriptive page providing the narrative background, mission, and vision of the platform.
 /// Uses a layered scrollable design with distinct sections for story, values, and action.
@@ -16,32 +18,47 @@ class AboutScreen extends StatelessWidget {
   @override
   // Building the core page structure using CustomScrollView and specialized slivers
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        // Brand-aligned header with page-specific context
-        const SliverGreenPageHeader(
-          title: 'Our Story',
-          subtitle:
-              'Building a legacy of skill, self-reliance, and pride in the heart of Kashmir.',
-        ),
-        // Primary narrative section (Foundational story)
-        SliverToBoxAdapter(child: _buildStorySection(context)),
-        // Philosophical core (Mission, Vision, and Values)
-        SliverToBoxAdapter(child: _buildMissionVisionSection(context)),
-        // Final engagement block
-        SliverToBoxAdapter(child: _buildCtaSection(context)),
-        // Global site footer
-        const SliverToBoxAdapter(child: AppFooter()),
-      ],
+    return Consumer<DynamicContentProvider>(
+      builder: (context, provider, _) {
+        final content = provider.content;
+        return CustomScrollView(
+          slivers: [
+            // Brand-aligned header with page-specific context
+            const SliverGreenPageHeader(
+              title: 'Our Story',
+              subtitle:
+                  'Building a legacy of skill, self-reliance, and pride in the heart of Kashmir.',
+            ),
+            // Primary narrative section (Foundational story)
+            SliverToBoxAdapter(
+                child: _buildStorySection(context, content.aboutStoryHeadline,
+                    content.aboutStoryText)),
+            // Philosophical core (Mission, Vision, and Values)
+            SliverToBoxAdapter(
+                child: _buildMissionVisionSection(
+                    context,
+                    content.aboutMissionText,
+                    content.aboutVisionText,
+                    content.aboutValuesText)),
+            // Dynamic Team section (Mentors and founders)
+            SliverToBoxAdapter(
+                child: _buildTeamSection(context, content.teamMembers)),
+            // Final engagement block
+            SliverToBoxAdapter(child: _buildCtaSection(context)),
+            // Global site footer
+            const SliverToBoxAdapter(child: AppFooter()),
+          ],
+        );
+      },
     );
   }
 
   /// Builds the 'Story' section which combines narrative text with visual identifiers.
-  Widget _buildStorySection(BuildContext context) {
+  Widget _buildStorySection(BuildContext context, String headline, String text) {
     // Evaluating device class for layout transformation (Row vs Column)
     final isDesktop = Responsive.isDesktop(context);
     final hPad = Responsive.contentPaddingH(context);
-
+ 
     return Container(
       color: AppColors.white,
       child: Center(
@@ -57,7 +74,7 @@ class AboutScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Story text takes up the majority of the space
-                      Expanded(flex: 3, child: _buildStoryText()),
+                      Expanded(flex: 3, child: _buildStoryText(headline, text)),
                       const SizedBox(width: 48), // Deep gap for clarity
                       // Right column for visual decorative elements
                       Expanded(flex: 2, child: _buildRightColumn()),
@@ -66,7 +83,7 @@ class AboutScreen extends StatelessWidget {
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildStoryText(),
+                      _buildStoryText(headline, text),
                       const SizedBox(height: 32),
                       _buildRightColumn(),
                     ],
@@ -76,15 +93,15 @@ class AboutScreen extends StatelessWidget {
       ),
     );
   }
-
+ 
   /// Organizes the primary narrative text blocks.
-  Widget _buildStoryText() {
+  Widget _buildStoryText(String headline, String text) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Primary section headline
         Text(
-          'From Kashmir to Global Opportunities',
+          headline,
           style: GoogleFonts.playfairDisplay(
             color: AppColors.darkGreen,
             fontSize: 26,
@@ -94,31 +111,9 @@ class AboutScreen extends StatelessWidget {
         ),
         // Visual gap
         const SizedBox(height: 18),
-        // First paragraph: The Problem/Context
+        // Narrative story body
         Text(
-          'Hunarmand Kashmir was born from a simple yet powerful truth: talent is everywhere, but opportunity is not. For far too long, the brilliant minds of Kashmir have faced challenges—geographical isolation, limited infrastructure, and limited exposure to global industries.',
-          style: GoogleFonts.poppins(
-            color: AppColors.textMedium,
-            fontSize: 14,
-            height: 1.7,
-          ),
-        ),
-        // Gap
-        const SizedBox(height: 16),
-        // Strong emphatic statement
-        Text(
-          'We chose to change that.',
-          style: GoogleFonts.poppins(
-            color: AppColors.textDark,
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        // Gap
-        const SizedBox(height: 12),
-        // Second paragraph: The Solution/Belief
-        Text(
-          'We believe digital skills are the great equalizer. With the right training, mentorship, and access, a student from even the most remote areas of Kashmir can work with companies and clients across the world.',
+          text,
           style: GoogleFonts.poppins(
             color: AppColors.textMedium,
             fontSize: 14,
@@ -170,7 +165,8 @@ class AboutScreen extends StatelessWidget {
   }
 
   /// Builds the 'Mission, Vision & Values' section with a 3-column grid.
-  Widget _buildMissionVisionSection(BuildContext context) {
+  Widget _buildMissionVisionSection(
+      BuildContext context, String mission, String vision, String values) {
     // Standard horizontal content padding
     final hPad = Responsive.contentPaddingH(context);
     // Core foundational data points
@@ -178,23 +174,20 @@ class AboutScreen extends StatelessWidget {
       {
         'icon': '🎯',
         'title': 'Our Mission',
-        'desc':
-            'To bridge the skills gap in Kashmir by delivering world-class digital training that empowers 10,000 young people by 2030 to achieve financial independence with dignity and confidence.',
+        'desc': mission,
       },
       {
         'icon': '👁️',
         'title': 'Our Vision',
-        'desc':
-            'A self-reliant Kashmir where every young person has the skills to compete globally without leaving their homeland.',
+        'desc': vision,
       },
       {
         'icon': '🤝',
         'title': 'Community',
-        'desc':
-            'We are more than an institute; we are a family. We support each other, share opportunities, and grow together as a skilled collective.',
+        'desc': values,
       },
     ];
-
+ 
     return Container(
       color: AppColors.offWhite, // Background shift for distinct sectioning
       child: Center(
@@ -235,6 +228,52 @@ class AboutScreen extends StatelessWidget {
   /// Maps data map into a stylized MissionCard widget.
   Widget _missionCard(Map<String, String> item) {
     return MissionCard(item: item);
+  }
+
+  /// Builds a section highlighting the core team and mentors.
+  Widget _buildTeamSection(BuildContext context, List<TeamMember> members) {
+    final hPad = Responsive.contentPaddingH(context);
+    final isDesktop = Responsive.isDesktop(context);
+
+    return Container(
+      color: AppColors.white,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 64),
+            child: Column(
+              children: [
+                Text(
+                  'Voices of Guidance',
+                  style: GoogleFonts.playfairDisplay(
+                    color: AppColors.darkGreen,
+                    fontSize: isDesktop ? 32.0 : 24.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Our dedicated mentors and instructors bringing world-class expertise to Kashmir.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textMedium,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 48),
+                ResponsiveCardGrid(
+                  mobileCols: 1,
+                  tabletCols: 3,
+                  desktopCols: 3,
+                  children: members.map((m) => TeamCard(member: m)).toList(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   /// Builds a final call-to-action block for user engagement.
@@ -421,6 +460,94 @@ class _MissionCardState extends State<MissionCard> {
 }
 
 /// A decorative visual component styled as a brand workshop identifier card.
+/// An interactive card displaying a team member's profile.
+class TeamCard extends StatefulWidget {
+  final TeamMember member;
+  const TeamCard({super.key, required this.member});
+
+  @override
+  State<TeamCard> createState() => _TeamCardState();
+}
+
+class _TeamCardState extends State<TeamCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: _isHovered ? AppColors.darkGreen : Colors.grey.shade100,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: _isHovered
+                  ? AppColors.darkGreen.withOpacity(0.08)
+                  : Colors.black.withOpacity(0.04),
+              blurRadius: _isHovered ? 15 : 8,
+              offset: Offset(0, _isHovered ? 8 : 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.accentGold, width: 2),
+              ),
+              child: ClipOval(
+                child: widget.member.imageUrl.startsWith('http')
+                    ? Image.network(
+                        widget.member.imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.person, color: Colors.grey),
+                      )
+                    : Center(
+                        child: Text(
+                          widget.member.imageUrl,
+                          style: const TextStyle(fontSize: 32),
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              widget.member.name,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: AppColors.darkGreen,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              widget.member.role,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: AppColors.accentGold,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class WorkshopCard extends StatefulWidget {
   // Constructor
   const WorkshopCard({super.key});

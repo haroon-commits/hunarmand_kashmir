@@ -4,6 +4,7 @@ import '../theme/app_theme.dart';
 import '../utils/responsive.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
+import '../providers/dynamic_content_provider.dart';
 
 // ─── CUSTOM APP BAR ───────────────────────────────────────────────────────────
 /// A premium, responsive top navigation bar designed for desktop and large tablets.
@@ -48,21 +49,39 @@ class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: Row(
               children: [
                 // Branding/Logo Section
-                MouseRegion(
-                  // Changing cursor to pointer to signify navigation capability
-                  cursor: SystemMouseCursors.click,
-                  // Handling logo click event
-                  child: GestureDetector(
-                    // Redirecting to home screen on logo tap
-                    onTap: () => context.read<AppState>().navigate('home'),
-                    // Urdu branding with professional calligraphy font
-                    child: Text(
-                      'حُنر مند کشمیر',
-                      style: GoogleFonts.amiriQuran(
-                        color: AppColors.accentGold, // Using brand gold for visibility
-                        fontSize: isDesktop ? 24 : 20, // Adaptive font size
-                        fontWeight: FontWeight.bold, // Bold presence
-                      ),
+                Consumer<DynamicContentProvider>(
+                  builder: (context, provider, _) => MouseRegion(
+                    // Changing cursor to pointer to signify navigation capability
+                    cursor: SystemMouseCursors.click,
+                    // Handling logo click event
+                    child: GestureDetector(
+                      // Redirecting to home screen on logo tap
+                      onTap: () => context.read<AppState>().navigate('home'),
+                      // Urdu branding with professional calligraphy font
+                      child: provider.content.logoPath != null &&
+                              provider.content.logoPath!.isNotEmpty
+                          ? Image.network(
+                              provider.content.logoPath!,
+                              height: isDesktop ? 40 : 32,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Text(
+                                provider.content.logoText,
+                                style: GoogleFonts.amiriQuran(
+                                  color: AppColors.accentGold,
+                                  fontSize: isDesktop ? 24 : 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              provider.content.logoText,
+                              style: GoogleFonts.amiriQuran(
+                                color: AppColors.accentGold,
+                                fontSize: isDesktop ? 24 : 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
                   ),
                 ),
@@ -228,28 +247,44 @@ class HunarmandDrawer extends StatelessWidget {
             decoration: const BoxDecoration(color: AppColors.mediumGreen),
             child: Center(
               // Centered branding stack
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Signature Urdu logo
-                  Text(
-                    'حُنر مند کشمیر',
-                    style: GoogleFonts.amiriQuran(
-                      color: AppColors.accentGold,
-                      fontSize: 28, // Large impact size
+              child: Consumer<DynamicContentProvider>(
+                builder: (context, provider, _) => Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Signature Urdu logo
+                    provider.content.logoPath != null &&
+                            provider.content.logoPath!.isNotEmpty
+                        ? Image.network(
+                            provider.content.logoPath!,
+                            height: 50,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) => Text(
+                              provider.content.logoText,
+                              style: GoogleFonts.amiriQuran(
+                                color: AppColors.accentGold,
+                                fontSize: 28,
+                              ),
+                            ),
+                          )
+                        : Text(
+                            provider.content.logoText,
+                            style: GoogleFonts.amiriQuran(
+                              color: AppColors.accentGold,
+                              fontSize: 28,
+                            ),
+                          ),
+                    // Visual gap
+                    const SizedBox(height: 8),
+                    // English secondary branding
+                    Text(
+                      provider.content.appTitle,
+                      style: GoogleFonts.poppins(
+                        color: Colors.white70,
+                        fontSize: 13, // Subtitle size
+                      ),
                     ),
-                  ),
-                  // Visual gap
-                  const SizedBox(height: 8),
-                  // English secondary branding
-                  Text(
-                    'Hunarmand Kashmir',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white70,
-                      fontSize: 13, // Subtitle size
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -508,8 +543,8 @@ class GoldDivider extends StatelessWidget {
 /// An interactive card used to showcase platform features or core values.
 /// Features a lift animation, border highlight, and a dynamic 'Learn more' indicator on hover.
 class FeatureCard extends StatefulWidget {
-  // Icon representing the feature
-  final IconData icon;
+  // Icon representing the feature as String (emoji or URL)
+  final String icon;
   // Short headline for the feature
   final String title;
   // Detailed description text
@@ -602,12 +637,9 @@ class _FeatureCardState extends State<FeatureCard> {
                       : [],
                 ),
                 child: Center(
-                  // Displaying the feature icon in contrasting white
-                  child: Icon(
-                    widget.icon,
-                    size: 28,
-                    color: Colors.white,
-                  ),
+                  // Displaying the dynamic icon
+                  child: _renderDynamicIcon(widget.icon,
+                      color: Colors.white, size: 28),
                 ),
               ),
 
@@ -815,7 +847,7 @@ class ResponsiveCardGrid extends StatelessWidget {
 
 // ─── COURSE CARD ──────────────────────────────────────────────────────────────
 class CourseCard extends StatefulWidget {
-  final IconData icon;
+  final String icon;
   final String title;
   final String description;
   final String duration;
@@ -891,11 +923,10 @@ class _CourseCardState extends State<CourseCard> {
                       ),
                       child: Center(
                         // ❌ Removed AnimatedScale (no icon animation)
-                        child: Icon(
-                          widget.icon,
-                          size: 24,
-                          color: Colors.white, // ✅ fixed color
-                        ),
+                      child: Center(
+                        child: _renderDynamicIcon(widget.icon,
+                            color: Colors.white, size: 24),
+                      ),
                       ),
                     ),
 
@@ -1113,7 +1144,7 @@ class AppFooter extends StatelessWidget {
                 const Divider(color: Colors.white12),
                 const SizedBox(height: 14),
                 // Bottom bar containing copyright and social links
-                _buildBottomBar(),
+                _buildBottomBar(context),
               ],
             ),
           ),
@@ -1130,7 +1161,7 @@ class AppFooter extends StatelessWidget {
         // Branding and mission statement (takes up double the space of other columns)
         Expanded(
           flex: 2,
-          child: _buildLogoColumn(),
+          child: _buildLogoColumn(context),
         ),
         // Spacer for better column breathing room
         const SizedBox(width: 40),
@@ -1142,7 +1173,7 @@ class AppFooter extends StatelessWidget {
         const SizedBox(width: 24),
         // Vital contact and location data
         Expanded(
-          child: _buildContactColumn(),
+          child: _buildContactColumn(context),
         ),
       ],
     );
@@ -1154,7 +1185,7 @@ class AppFooter extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Primary branding always at the top
-        _buildLogoColumn(),
+        _buildLogoColumn(context),
         // Gap before secondary columns
         const SizedBox(height: 28),
         // Side-by-side secondary links for efficient vertical space usage
@@ -1163,7 +1194,7 @@ class AppFooter extends StatelessWidget {
           children: [
             Expanded(child: _buildQuickLinks(context)),
             const SizedBox(width: 20),
-            Expanded(child: _buildContactColumn()),
+            Expanded(child: _buildContactColumn(context)),
           ],
         ),
       ],
@@ -1171,30 +1202,35 @@ class AppFooter extends StatelessWidget {
   }
 
   /// Builds the primary branding column including the Urdu logo and description.
-  Widget _buildLogoColumn() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Elegant Urdu branding
-        Text(
-          'حُنر مند',
-          style: GoogleFonts.amiriQuran(
-            color: AppColors.accentGold,
-            fontSize: 28,
-          ),
-        ),
-        // Small gap
-        const SizedBox(height: 10),
-        // Passionate platform mission statement
-        Text(
-          'Empowering Youth. Empowering the youth of Kashmir through digital skills, fostering self-reliance, and building a future where talent meets opportunity.',
-          style: GoogleFonts.poppins(
-            color: Colors.white54,
-            fontSize: 12,
-            height: 1.7, // Airy line height for body text on dark BG
-          ),
-        ),
-      ],
+  Widget _buildLogoColumn(BuildContext context) {
+    return Consumer<DynamicContentProvider>(
+      builder: (context, provider, _) {
+        final content = provider.content;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Elegant Urdu branding
+            Text(
+              content.logoText,
+              style: GoogleFonts.amiriQuran(
+                color: AppColors.accentGold,
+                fontSize: 28,
+              ),
+            ),
+            // Small gap
+            const SizedBox(height: 10),
+            // Passionate platform mission statement
+            Text(
+              content.footerDescription,
+              style: GoogleFonts.poppins(
+                color: Colors.white54,
+                fontSize: 12,
+                height: 1.7, // Airy line height for body text on dark BG
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1225,34 +1261,38 @@ class AppFooter extends StatelessWidget {
   }
 
   /// Builds the 'Get in Touch' contact column.
-  Widget _buildContactColumn() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Section headline
-        Text(
-          'Get in Touch',
-          style: GoogleFonts.poppins(
-            color: AppColors.accentGold,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        // Gap before contacts
-        const SizedBox(height: 12),
-        // Specific contact entry points
-        _footerContact(
-            Icons.location_on_outlined, 'SCO Software Technology Park, Mirpur'),
-        const SizedBox(height: 8),
-        _footerContact(Icons.phone_outlined, '0313 884 0971'),
-        const SizedBox(height: 8),
-        _footerContact(Icons.email_outlined, 'salam@hunarmandkashmir.com'),
-      ],
+  Widget _buildContactColumn(BuildContext context) {
+    return Consumer<DynamicContentProvider>(
+      builder: (context, provider, _) {
+        final content = provider.content;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Section headline
+            Text(
+              'Get in Touch',
+              style: GoogleFonts.poppins(
+                color: AppColors.accentGold,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            // Gap before contacts
+            const SizedBox(height: 12),
+            // Specific contact entry points
+            _footerContact(Icons.location_on_outlined, content.contactAddress),
+            const SizedBox(height: 8),
+            _footerContact(Icons.phone_outlined, content.contactPhone),
+            const SizedBox(height: 8),
+            _footerContact(Icons.email_outlined, content.contactEmail),
+          ],
+        );
+      },
     );
   }
 
   /// Builds the final bottom bar containing copyright notice and social icons.
-  Widget _buildBottomBar() {
+  Widget _buildBottomBar(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -1266,6 +1306,23 @@ class AppFooter extends StatelessWidget {
         // Collection of social interaction points
         Row(
           children: [
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () => context.read<AppState>().navigate('admin'),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Text(
+                    'Admin Portal',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white24,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             _socialIcon(Icons.camera_alt_outlined),
             const SizedBox(width: 12),
             _socialIcon(Icons.facebook_outlined),
@@ -1334,8 +1391,8 @@ class AppFooter extends StatelessWidget {
 /// A specialized card for displaying various donation tiers with distinct visual importance.
 /// Highlights 'Popular' choices and provides interactive scaling effects on hover.
 class DonationTierCard extends StatefulWidget {
-  // Symbol representing the donation purpose
-  final IconData icon;
+  // Symbol representing the donation purpose as String (emoji or URL)
+  final String icon;
   // Label for the tier (e.g., 'Learning Kit')
   final String title;
   // Cost level for this tier
@@ -1427,12 +1484,13 @@ class _DonationTierCardState extends State<DonationTierCard> {
                             : AppColors.lightTeal,
                         shape: BoxShape.circle,
                       ),
-                      // Dynamic icon color scaling
-                      child: Icon(widget.icon,
-                          size: 32,
-                          color: _isHovered
-                              ? AppColors.white
-                              : AppColors.darkGreen),
+                      // Dynamic icon rendering
+                      child: _renderDynamicIcon(
+                        widget.icon,
+                        size: 32,
+                        color: _isHovered ? AppColors.white : AppColors.darkGreen,
+                        circle: true,
+                      ),
                     ),
                   ),
                   // Gap after icon
@@ -1526,6 +1584,79 @@ class _DonationTierCardState extends State<DonationTierCard> {
             ),
           ),
       ],
+    );
+  }
+}
+Widget _renderDynamicIcon(String icon,
+    {Color? color, double size = 24, bool circle = false}) {
+  bool isUrl = icon.startsWith('http');
+
+  if (isUrl) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(circle ? 100 : 8),
+      child: Image.network(
+        icon,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) =>
+            Icon(Icons.broken_image, color: color, size: size * 0.8),
+      ),
+    );
+  } else {
+    return Text(
+      icon,
+      style: TextStyle(fontSize: size),
+    );
+  }
+}
+
+// ─── PREMIUM SPLASH SCREEN ──────────────────────────────────────────────────
+/// A high-fidelity, branded loading screen displayed while the application fetches data.
+class HunarmandSplash extends StatelessWidget {
+  const HunarmandSplash({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.darkGreen,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Urdu Branded Logo Text
+            Text(
+              'ہنرمند',
+              style: GoogleFonts.amiriQuran(
+                color: AppColors.accentGold,
+                fontSize: 64,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            // English Tagline
+            Text(
+              'Hunarmand Kashmir',
+              style: GoogleFonts.poppins(
+                color: AppColors.white.withOpacity(0.7),
+                fontSize: 14,
+                letterSpacing: 2,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 48),
+            // Themed circular progress indicator
+            const SizedBox(
+              width: 40,
+              height: 40,
+              child: CircularProgressIndicator(
+                color: AppColors.accentGold,
+                strokeWidth: 3,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

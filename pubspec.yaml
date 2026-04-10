@@ -18,6 +18,11 @@ dependencies:
   percent_indicator: ^4.2.3
   carousel_slider: ^4.2.1
   provider: ^6.1.5+1
+  shared_preferences: ^2.5.5
+  image_picker: ^1.2.1
+  path_provider: ^2.1.5
+  firebase_core: ^4.6.0
+  cloud_firestore: ^6.2.0
 
 dev_dependencies:
   flutter_test:

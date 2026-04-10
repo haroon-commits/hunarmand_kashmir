@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common_widgets.dart';
-import '../data/app_data.dart';
+import '../providers/dynamic_content_provider.dart';
 import '../utils/responsive.dart';
 
 import 'package:provider/provider.dart';
@@ -55,25 +55,42 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   // Building the core page structure using CustomScrollView for high-performance layout
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        // The cinematic entrance section
-        SliverToBoxAdapter(
-          child: _HeroSection(
-              controller: _heroController, fade: _heroFade, slide: _heroSlide),
-        ),
-        // The philosophical mission section ('Why us?')
-        const _WhySectionSliver(),
-        // The featured courses highlight section
-        const _CoursesSectionSliver(),
-        // The final conversion point (CTA)
-        const SliverPadding(
-          padding: EdgeInsets.zero,
-          sliver: SliverToBoxAdapter(child: _CtaSection()),
-        ),
-        // Global site footer
-        const SliverToBoxAdapter(child: AppFooter()),
-      ],
+    return Consumer<DynamicContentProvider>(
+      builder: (context, dynamicContent, child) {
+        final content = dynamicContent.content;
+        return CustomScrollView(
+          slivers: [
+            // The cinematic entrance section
+            SliverToBoxAdapter(
+              child: _HeroSection(
+                controller: _heroController,
+                fade: _heroFade,
+                slide: _heroSlide,
+                headline: content.heroHeadline,
+                subheadline: content.heroSubheadline,
+                logoText: content.logoText,
+              ),
+            ),
+            // The philosophical mission section ('Why us?')
+            _WhySectionSliver(
+              features: content.features,
+              title: content.homeWhyTitle,
+              description: content.homeWhyDescription,
+            ),
+            // The featured courses highlight section
+            _CoursesSectionSliver(courses: content.courses),
+            // The final conversion point (CTA)
+            SliverToBoxAdapter(
+              child: _CtaSection(
+                title: content.homeCtaTitle,
+                description: content.homeCtaDescription,
+              ),
+            ),
+            // Global site footer
+            const SliverToBoxAdapter(child: AppFooter()),
+          ],
+        );
+      },
     );
   }
 }
@@ -84,12 +101,18 @@ class _HeroSection extends StatelessWidget {
   final AnimationController controller;
   final Animation<double> fade;
   final Animation<Offset> slide;
+  final String headline;
+  final String subheadline;
+  final String logoText;
 
   // Passing in animations from the parent state for synchronized build
   const _HeroSection({
     required this.controller,
     required this.fade,
     required this.slide,
+    required this.headline,
+    required this.subheadline,
+    required this.logoText,
   });
 
   @override
@@ -158,7 +181,7 @@ class _HeroSection extends StatelessWidget {
                       children: [
                         // The primary brand name in Urdu calligraphy font
                         Text(
-                          'حُنر مند کشمیر',
+                          logoText,
                           style: GoogleFonts.amiriQuran(
                             color: AppColors.accentGold,
                             fontSize: titleSize,
@@ -170,7 +193,7 @@ class _HeroSection extends StatelessWidget {
                         const SizedBox(height: 20),
                         // Secondary English headline with serif elegance
                         Text(
-                          'Rooted in Kashmir.\nReady for the World.',
+                          headline,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.playfairDisplay(
                             color: AppColors.white,
@@ -185,7 +208,7 @@ class _HeroSection extends StatelessWidget {
                         ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 600),
                           child: Text(
-                            'Empowering the youth of the Valley with cutting-edge digital skills.\nTurning talent into livelihood, and dreams into reality.',
+                            subheadline,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.poppins(
                               color: Colors.white70, // Muted for hierarchy
@@ -234,7 +257,15 @@ class _HeroSection extends StatelessWidget {
 // ─── Why Section (Sliver) ──────────────────────────────────────────────────
 /// Explains the platform's value proposition using a grid of feature cards.
 class _WhySectionSliver extends StatelessWidget {
-  const _WhySectionSliver();
+  final List<dynamic> features;
+  final String title;
+  final String description;
+
+  const _WhySectionSliver({
+    required this.features,
+    required this.title,
+    required this.description,
+  });
 
   @override
   // Building the section content within a sliver adapter
@@ -256,7 +287,7 @@ class _WhySectionSliver extends StatelessWidget {
                 children: [
                   // Main section question headline
                   Text(
-                    'Why Hunarmand Kashmir?',
+                    title,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.playfairDisplay(
                       color: AppColors.darkGreen,
@@ -270,7 +301,7 @@ class _WhySectionSliver extends StatelessWidget {
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 640),
                     child: Text(
-                      'We believe in "Skills over Degrees". In a rapidly changing world, we provide practical, hands-on training that the industry demands, right here in Mirpur.',
+                      description,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         color: AppColors.textMedium,
@@ -286,7 +317,7 @@ class _WhySectionSliver extends StatelessWidget {
                     mobileCols: 1,
                     tabletCols: 2,
                     desktopCols: 3,
-                    children: AppData.features
+                    children: features
                         .map(
                           (f) => FeatureCard(
                             icon: f.icon,
@@ -309,7 +340,8 @@ class _WhySectionSliver extends StatelessWidget {
 // ─── Courses Section (Sliver) ────────────────────────────────────────────────
 /// Showcases a preview of the available digital skills programs.
 class _CoursesSectionSliver extends StatelessWidget {
-  const _CoursesSectionSliver();
+  final List<dynamic> courses;
+  const _CoursesSectionSliver({required this.courses});
 
   @override
   // Building the course highlight area
@@ -355,7 +387,7 @@ class _CoursesSectionSliver extends StatelessWidget {
                     mobileCols: 1,
                     tabletCols: 2,
                     desktopCols: 3,
-                    children: AppData.courses
+                    children: courses
                         .take(3) // Only showing the first 3 for the homepage preview
                         .map(
                           (c) => CourseCard(
@@ -408,7 +440,10 @@ class _CoursesSectionSliver extends StatelessWidget {
 // ─── CTA Section ──────────────────────────────────────────────────────────────
 /// A high-contrast call-to-action block designed to drive final user conversion.
 class _CtaSection extends StatelessWidget {
-  const _CtaSection();
+  final String title;
+  final String description;
+
+  const _CtaSection({required this.title, required this.description});
 
   @override
   // Building the conversion banner
@@ -440,7 +475,7 @@ class _CtaSection extends StatelessWidget {
                       children: [
                         // Informative CTA text
                         Expanded(
-                          child: _ctaText(),
+                          child: _ctaText(title, description),
                         ),
                         // Visual gap
                         const SizedBox(width: 40),
@@ -455,7 +490,7 @@ class _CtaSection extends StatelessWidget {
                   : Column(
                       children: [
                         // Informative text (centered for mobile)
-                        _ctaText(centered: true),
+                        _ctaText(title, description, centered: true),
                         // Visual gap
                         const SizedBox(height: 28),
                         // Primary directive button
@@ -474,14 +509,14 @@ class _CtaSection extends StatelessWidget {
   }
 
   /// Builds the textual components of the CTA section.
-  Widget _ctaText({bool centered = false}) {
+  Widget _ctaText(String title, String description, {bool centered = false}) {
     return Column(
       crossAxisAlignment:
           centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
         // Catchy conversion headline
         Text(
-          'Your Journey Begins Here',
+          title,
           textAlign: centered ? TextAlign.center : TextAlign.start,
           style: GoogleFonts.playfairDisplay(
             color: AppColors.white,
@@ -493,7 +528,7 @@ class _CtaSection extends StatelessWidget {
         const SizedBox(height: 12),
         // Persuasive description encouraging the user to act
         Text(
-          "Don't let lack of opportunity hold you back. Join Hunarmand Kashmir today and unlock a future of dignity, independence, and success.",
+          description,
           textAlign: centered ? TextAlign.center : TextAlign.start,
           style: GoogleFonts.poppins(
               color: Colors.white70, fontSize: 14, height: 1.6),

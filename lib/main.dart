@@ -2,7 +2,8 @@ import 'package:flutter/material.dart'; // Importing standard Flutter material c
 import 'package:hunarmand_kashmir/widgets/common_widgets.dart' // Importing custom widgets from our widgets folder
     show
         HunarmandDrawer,
-        HunarmandAppBar; // Specifically importing the drawer and custom app bar
+        HunarmandAppBar,
+        HunarmandSplash; // Specifically importing the essentials
 import 'package:provider/provider.dart'; // Importing provider for global state management
 import 'package:google_fonts/google_fonts.dart'; // Importing Google Fonts for high-quality typography
 import 'theme/app_theme.dart'; // Importing our application's design system and theme
@@ -13,16 +14,33 @@ import 'screens/courses_screen.dart'; // Importing the courses screen class
 import 'screens/gallery_screen.dart'; // Importing the gallery screen class
 import 'screens/contact_screen.dart'; // Importing the contact screen class
 import 'screens/donate_screen.dart'; // Importing the donate screen class
+import 'screens/admin/admin_login_screen.dart'; // Importing admin login screen
+import 'screens/admin/admin_dashboard_screen.dart'; // Importing admin dashboard
+import 'providers/dynamic_content_provider.dart'; // Importing dynamic content provider
+import 'providers/admin_provider.dart'; // Importing admin provider
+import 'package:firebase_core/firebase_core.dart'; // Importing Firebase Core
+import 'firebase_options.dart'; // Importing generated Firebase options
 import 'utils/responsive.dart'; // Importing the responsive utility for layout detection
 
 /// The entry point of the Flutter application.
 /// This function initializes the application state and runs the root widget.
-void main() {
-  // Wrapping the entire app in a ChangeNotifierProvider to manage global state
+void main() async {
+  // Ensure that Flutter bindings are initialized before Firebase
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initializing Firebase with the generated options for the current platform
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Wrapping the entire app in a MultiProvider to manage multiple global states
   runApp(
-    ChangeNotifierProvider(
-      // Initializing the AppState object which tracks things like navigation
-      create: (_) => AppState(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppState()),
+        ChangeNotifierProvider(create: (_) => DynamicContentProvider()),
+        ChangeNotifierProvider(create: (_) => AdminProvider()),
+      ],
       // The root widget of our application
       child: const HunarmandKashmirApp(),
     ),
@@ -97,11 +115,25 @@ class MainNavigator extends StatelessWidget {
     ];
 
     // Listening to state changes using the Consumer widget from Provider
-    return Consumer<AppState>(
-      // Building the UI whenever the AppState notifies listeners (e.g., page change)
-      builder: (context, appState, _) {
+    return Consumer3<AppState, AdminProvider, DynamicContentProvider>(
+      // Building the UI whenever any state notifies listeners
+      builder: (context, appState, adminProvider, dynamicContent, _) {
+        // If the dynamic content is still being fetched from Firestore,
+        // display the premium branded splash screen.
+        if (dynamicContent.isLoading) {
+          return const HunarmandSplash();
+        }
+
         // Getting the current page identifier from global state
         final currentPage = appState.currentPage;
+
+        // Special handling for Admin screens
+        if (currentPage == 'admin') {
+          return adminProvider.isAdmin
+              ? const AdminDashboardScreen()
+              : const AdminLoginScreen();
+        }
+
         // The Scaffold provides the standard visual structural layout of the page
         return Scaffold(
           // Setting a consistent white background across the entire app
@@ -156,14 +188,28 @@ class MainNavigator extends StatelessWidget {
         ),
       ),
       // Setting the title with custom Kashmiri-style typography
-      title: Text(
-        'حُنر مند کشمیر', // Urdu text for Hunarmand Kashmir
-        style: GoogleFonts.amiriQuran(
-          // Using a gold accent color for elegance
-          color: AppColors.accentGold,
-          // Large enough to be readable but not overwhelming
-          fontSize: 22,
-        ),
+      title: Consumer<DynamicContentProvider>(
+        builder: (context, provider, _) => provider.content.logoPath != null &&
+                provider.content.logoPath!.isNotEmpty
+            ? Image.network(
+                provider.content.logoPath!,
+                height: 32,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => Text(
+                  provider.content.logoText,
+                  style: GoogleFonts.amiriQuran(
+                    color: AppColors.accentGold,
+                    fontSize: 22,
+                  ),
+                ),
+              )
+            : Text(
+                provider.content.logoText,
+                style: GoogleFonts.amiriQuran(
+                  color: AppColors.accentGold,
+                  fontSize: 22,
+                ),
+              ),
       ),
       // Aligning the title to the center of the bar
       centerTitle: true,

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common_widgets.dart';
-import '../data/app_data.dart';
 import '../utils/responsive.dart';
+import 'package:provider/provider.dart';
+import '../providers/dynamic_content_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// A dedicated page for facilitating charitable contributions and sponsorships.
@@ -29,28 +30,36 @@ class DonateScreen extends StatelessWidget {
   @override
   // Building the donation experience using a scrollable layered approach
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        // Mission-focused introduction
-        SliverToBoxAdapter(child: _buildHero(context)),
-        // Qualitative impact analysis
-        SliverToBoxAdapter(child: _buildImpactCards(context)),
-        // Financial accountability data
-        SliverToBoxAdapter(child: _buildTransparencySection()),
-        // Quantitative giving options (Sponsorship levels)
-        SliverToBoxAdapter(child: _buildDonationTiers(context)),
-        // Offline fulfillment instructions
-        SliverToBoxAdapter(child: _buildBankTransferSection(context)),
-        // Global site footer
-        const SliverToBoxAdapter(child: AppFooter()),
-      ],
+    return Consumer<DynamicContentProvider>(
+      builder: (context, provider, _) {
+        final content = provider.content;
+        return CustomScrollView(
+          slivers: [
+            // Mission-focused introduction
+            SliverToBoxAdapter(
+                child: _buildHero(
+                    context, content.donateHeroTitle, content.donateHeroDescription)),
+            // Qualitative impact analysis
+            SliverToBoxAdapter(child: _buildImpactCards(context)),
+            // Financial accountability data
+            SliverToBoxAdapter(child: _buildTransparencySection()),
+            // Quantitative giving options (Sponsorship levels)
+            SliverToBoxAdapter(
+                child: _buildDonationTiers(context, content.donationTiers)),
+            // Offline fulfillment instructions
+            SliverToBoxAdapter(child: _buildBankTransferSection(context)),
+            // Global site footer
+            const SliverToBoxAdapter(child: AppFooter()),
+          ],
+        );
+      },
     );
   }
 
   // ---------------- Hero Section ----------------
   
   /// Builds the 'Invest in Dignity' hero block that sets the ethical tone for contributors.
-  Widget _buildHero(BuildContext context) {
+  Widget _buildHero(BuildContext context, String title, String description) {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(color: AppColors.darkGreen), // Branded dark base
@@ -66,10 +75,10 @@ class DonateScreen extends StatelessWidget {
                 _supportTag(),
                 const SizedBox(height: 20),
                 // Emotive primary headline
-                _heroTitle(),
+                _heroTitle(title),
                 const SizedBox(height: 16),
                 // Explanatory body text
-                _heroDescription(),
+                _heroDescription(description),
               ],
             ),
           ),
@@ -103,37 +112,21 @@ class DonateScreen extends StatelessWidget {
         ),
       );
 
-  /// Helper to build the rich-text 'Dignity vs Dependency' headline.
-  Widget _heroTitle() => RichText(
+  /// Helper to build the rich-text header.
+  Widget _heroTitle(String title) => Text(
+        title,
         textAlign: TextAlign.center,
-        text: TextSpan(
-          children: [
-            // Standard emphasis
-            TextSpan(
-              text: 'Invest in Dignity,\n',
-              style: GoogleFonts.playfairDisplay(
-                color: AppColors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                height: 1.3,
-              ),
-            ),
-            // Highlighting the counter-philosophy in gold
-            TextSpan(
-              text: 'Not Dependency.',
-              style: GoogleFonts.playfairDisplay(
-                color: AppColors.accentGold,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        style: GoogleFonts.playfairDisplay(
+          color: AppColors.white,
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          height: 1.3,
         ),
       );
 
   /// Helper to build the secondary persuasive description in the hero.
-  Widget _heroDescription() => Text(
-        "Your contribution unlocks futures. Help empower youth in Kashmir to earn a livelihood and build self-reliant communities.",
+  Widget _heroDescription(String description) => Text(
+        description,
         textAlign: TextAlign.center,
         style: GoogleFonts.poppins(
           color: Colors.white70,
@@ -332,7 +325,7 @@ class DonateScreen extends StatelessWidget {
   // ---------------- Donation Tiers ----------------
   
   /// Builds the 'Ways to Contribute' section listing specific sponsorship levels.
-  Widget _buildDonationTiers(BuildContext context) {
+  Widget _buildDonationTiers(BuildContext context, List<dynamic> tiers) {
     return Container(
       color: AppColors.white,
       padding: const EdgeInsets.all(20),
@@ -358,7 +351,7 @@ class DonateScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           // Mapping global data tiers into specialized interactive cards
-          ...AppData.donationTiers.map((tier) => Padding(
+          ...tiers.map((tier) => Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: DonationTierCard(
                   icon: tier.icon,
