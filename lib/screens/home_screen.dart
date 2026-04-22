@@ -1,12 +1,87 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: home_screen.dart
+/// PURPOSE: The primary landing page for Hunarmand Kashmir. Features dynamic
+///          hero sections, course highlights, platform statistics, and CTAs.
+/// CONNECTIONS:
+///   - USED BY: main.dart (MainNavigator)
+///   - DEPENDS ON: All major models in content_model.dart
+///   - SYNCED WITH: admin/editors/home_editor.dart
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme/app_theme.dart';
-import '../widgets/common_widgets.dart';
+import '../widgets/layout/app_footer.dart';
+import '../widgets/cards/feature_card.dart';
+import '../widgets/cards/course_card.dart';
+import '../widgets/common/responsive_grid.dart';
 import '../providers/dynamic_content_provider.dart';
 import '../utils/responsive.dart';
 
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
+
+// ─── HOME SCREEN UI CONFIGURATION ─────────────────────────────────────────────
+/// Isolated UI configuration specific to only the Home Screen.
+/// Modifying these will only change the Home Screen visually.
+class HomeUIConfig {
+  // Colors specific to Home
+  static const Color darkGreen = Color(0xFF0D3320);
+  static const Color mediumGreen = Color(0xFF1A4A2E);
+  static const Color accentGold = Color(0xFFF5A623);
+  static const Color white = Color(0xFFFFFFFF);
+  static const Color white70 = Color(0xB3FFFFFF); // 70% opacity white
+  static const Color white38 = Color(0x61FFFFFF); // 38% opacity white
+  static const Color offWhite = Color(0xFFF9F9F9);
+  static const Color textMedium = Color(0xFF555555);
+
+  // Dimensions and Constraints
+  static const double maxContentWidth = 1200.0;
+  static const double maxTextWidth = 640.0;
+  static const double paddingSectionVertical = 64.0;
+
+  // Hero Vertical Padding
+  static const double paddingHeroDesktop = 72.0;
+  static const double paddingHeroTablet = 56.0;
+  static const double paddingHeroMobile = 44.0;
+
+  // Spacing (Gaps between elements)
+  static const double spacerSmall = 8.0;
+  static const double spacerMedium = 16.0;
+  static const double spacerLarge = 24.0;
+  static const double spacerExtraLarge = 48.0;
+  static const double spacerDisplay = 32.0;
+
+  // Typography - Hero Section
+  static const double fontHeroDesktop = 102.0;
+  static const double fontHeroTablet = 114.0;
+  static const double fontHeroMobile = 106.0;
+
+  // Typography - Displays & Headlines
+  static const double fontDisplayDesktop = 82.0;
+  static const double fontDisplayTablet = 76.0;
+  static const double fontDisplayMobile = 72.0;
+  static const double fontHeadlineLarge = 38.0;
+  static const double fontHeadlineMedium = 32.0;
+
+  // Typography - Body & Labels
+  static const double fontBodyLarge = 26.0;
+  static const double fontBodyMedium = 14.0;
+  static const double fontLabelLarge = 14.0;
+  static const double fontLabelSmall = 12.0;
+
+  // Component Specifics
+  static const double iconSizeSmall = 18.0;
+  static const double radiusLarge = 30.0; // Button radius
+
+  // Button Paddings
+  static const double paddingButtonLargeH = 50.0;
+  static const double paddingButtonLargeV = 26.0;
+  static const double paddingButtonSmallH = 40.0;
+  static const double paddingButtonSmallV = 22.0;
+
+  // Animations
+  static const Duration heroAnimationDuration = Duration(milliseconds: 900);
+}
 
 /// The landing page of the application that introduces the user to the platform's mission.
 /// Uses a series of specialized sliver sections to showcase hero content, features, and courses.
@@ -33,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.initState();
     // Setting up the timing for the hero entrance (nearly 1 second for elegance)
     _heroController = AnimationController(
-      duration: const Duration(milliseconds: 900),
+      duration: HomeUIConfig.heroAnimationDuration,
       vsync: this,
     );
     // Defining the fade curve
@@ -96,7 +171,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 }
 
 // ─── Hero Section ─────────────────────────────────────────────────────────────
-/// The visual centerpiece of the home screen, featuring branding and primary CTAs.
+
+/// _HeroSection - The cinematic visual entrance of the home screen.
+/// Displays high-impact branding, a compelling headline, and primary call-to-action points.
 class _HeroSection extends StatelessWidget {
   final AnimationController controller;
   final Animation<double> fade;
@@ -105,7 +182,6 @@ class _HeroSection extends StatelessWidget {
   final String subheadline;
   final String logoText;
 
-  // Passing in animations from the parent state for synchronized build
   const _HeroSection({
     required this.controller,
     required this.fade,
@@ -116,127 +192,112 @@ class _HeroSection extends StatelessWidget {
   });
 
   @override
-  // Building the hero visuals with adaptive sizing
   Widget build(BuildContext context) {
-    // Evaluating device class for typographic scaling
     final isDesktop = Responsive.isDesktop(context);
     final isTablet = Responsive.isTablet(context);
-    
-    // Adaptive font sizes for hierarchical headlines
+
+    // Adaptive sizing using AppUIConfig markers
     final titleSize = isDesktop
-        ? 56.0 // Massive impact for desktop
+        ? HomeUIConfig.fontHeroDesktop
         : isTablet
-            ? 44.0
-            : 36.0; // Clear but constrained for mobile
-            
+            ? HomeUIConfig.fontHeroTablet
+            : HomeUIConfig.fontHeroMobile;
+
     final subtitleSize = isDesktop
-        ? 32.0
+        ? HomeUIConfig.fontDisplayDesktop
         : isTablet
-            ? 26.0
-            : 22.0;
-            
-    // Adaptive body text size
-    final bodySize = isDesktop ? 16.0 : 13.0;
-    
-    // Adaptive vertical padding to maintain majestic framing
+            ? HomeUIConfig.fontDisplayTablet
+            : HomeUIConfig.fontDisplayMobile;
+
+    final bodySize =
+        isDesktop ? HomeUIConfig.fontBodyLarge : HomeUIConfig.fontBodyMedium;
+
     final vPad = isDesktop
-        ? 96.0 // Deep majestic padding for monitors
+        ? HomeUIConfig.paddingHeroDesktop + 24
         : isTablet
-            ? 72.0
-            : 52.0;
-            
-    // Applying global standard horizontal content margins
+            ? HomeUIConfig.paddingHeroTablet + 16
+            : HomeUIConfig.paddingHeroMobile + 8;
+
     final hPad = Responsive.contentPaddingH(context);
 
-    // Root hero container with brand background
     return Container(
       width: double.infinity,
-      color: AppColors.darkGreen,
+      color: HomeUIConfig.darkGreen,
       child: Stack(
         children: [
-          // Background visual decoration (diagonal cut)
+          // Visual diagonal decoration
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: CustomPaint(
-              size: const Size(double.infinity, 40),
+              size: const Size(double.infinity, 0),
               painter: _DiagonalPainter(),
             ),
           ),
-          // Centered main content area
           Center(
             child: ConstrainedBox(
-              // Limiting content width for better readability on ultrawide monitors
               constraints:
-                  const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+                  const BoxConstraints(maxWidth: HomeUIConfig.maxContentWidth),
               child: Padding(
-                padding: EdgeInsets.fromLTRB(hPad, vPad, hPad, vPad + 32),
-                // Coordinating the entrance animation
+                padding: EdgeInsets.fromLTRB(
+                    hPad, vPad, hPad, vPad + HomeUIConfig.spacerDisplay),
                 child: FadeTransition(
                   opacity: fade,
                   child: SlideTransition(
                     position: slide,
                     child: Column(
                       children: [
-                        // The primary brand name in Urdu calligraphy font
                         Text(
                           logoText,
                           style: GoogleFonts.amiriQuran(
-                            color: AppColors.accentGold,
+                            color: HomeUIConfig.accentGold,
                             fontSize: titleSize,
                             height: 1.3,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        // Visual gap
-                        const SizedBox(height: 20),
-                        // Secondary English headline with serif elegance
+                        const SizedBox(height: HomeUIConfig.spacerLarge),
                         Text(
                           headline,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.playfairDisplay(
-                            color: AppColors.white,
+                            color: HomeUIConfig.white,
                             fontSize: subtitleSize,
                             fontWeight: FontWeight.bold,
                             height: 1.3,
                           ),
                         ),
-                        // Gap before descriptive body
-                        const SizedBox(height: 16),
-                        // Centered mission summary paragraph
+                        const SizedBox(height: HomeUIConfig.spacerMedium),
                         ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 600),
+                          constraints: const BoxConstraints(
+                              maxWidth: HomeUIConfig.maxTextWidth),
                           child: Text(
                             subheadline,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.poppins(
-                              color: Colors.white70, // Muted for hierarchy
+                              color: HomeUIConfig.white70,
                               fontSize: bodySize,
-                              height: 1.7, // Airy line height
+                              height: 1.7,
                             ),
                           ),
                         ),
-                        // Gap before primary actions
-                        const SizedBox(height: 32),
-                        // Call to Action buttons row
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        const SizedBox(height: HomeUIConfig.spacerExtraLarge),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: HomeUIConfig.spacerMedium,
+                          runSpacing: HomeUIConfig.spacerMedium,
                           children: [
-                            // Main directive: Registration/Contact
                             _PrimaryButton(
-                              label: 'Apply Now',
-                              onTap: () =>
-                                  context.read<AppState>().navigate('contact'),
-                              large: isDesktop || isTablet,
-                            ),
-                            // Gap between buttons
-                            const SizedBox(width: 16),
-                            // Secondary directive: Course exploration
-                            _SecondaryButton(
-                              label: 'View Courses',
+                              label: 'Explore Our Courses  →',
                               onTap: () =>
                                   context.read<AppState>().navigate('courses'),
+                              large: isDesktop || isTablet,
+                            ),
+                            _SecondaryButton(
+                              label: 'Our Mission',
+                              onTap: () =>
+                                  context.read<AppState>().navigate('about'),
                               large: isDesktop || isTablet,
                             ),
                           ],
@@ -255,7 +316,8 @@ class _HeroSection extends StatelessWidget {
 }
 
 // ─── Why Section (Sliver) ──────────────────────────────────────────────────
-/// Explains the platform's value proposition using a grid of feature cards.
+
+/// _WhySectionSliver - Narrates the value proposition and core features of the platform.
 class _WhySectionSliver extends StatelessWidget {
   final List<dynamic> features;
   final String title;
@@ -268,51 +330,60 @@ class _WhySectionSliver extends StatelessWidget {
   });
 
   @override
-  // Building the section content within a sliver adapter
   Widget build(BuildContext context) {
-    // Checking responsive state for layout adjustments
     final hPad = Responsive.contentPaddingH(context);
-    final titleSize = Responsive.isDesktop(context) ? 32.0 : 24.0;
+    final titleSize = Responsive.isDesktop(context)
+        ? HomeUIConfig.fontDisplayDesktop
+        : HomeUIConfig.fontDisplayTablet;
 
     return SliverToBoxAdapter(
       child: Container(
-        color: AppColors.offWhite, // Switching to light background for contrast
+        color: HomeUIConfig.offWhite,
         child: Center(
           child: ConstrainedBox(
             constraints:
-                const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+                const BoxConstraints(maxWidth: HomeUIConfig.maxContentWidth),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 64),
+              padding: EdgeInsets.symmetric(
+                horizontal: hPad,
+                vertical: HomeUIConfig.paddingSectionVertical,
+              ),
               child: Column(
                 children: [
-                  // Main section question headline
                   Text(
                     title,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.playfairDisplay(
-                      color: AppColors.darkGreen,
+                      color: HomeUIConfig.darkGreen,
                       fontSize: titleSize,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  // Small gap
-                  const SizedBox(height: 14),
-                  // Detailed descriptive paragraph explaining the philosophy
+                  const SizedBox(height: HomeUIConfig.spacerSmall + 2),
+                  // Gold accent underline beneath the section title
+                  Container(
+                    width: 48,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      color: HomeUIConfig.accentGold,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: HomeUIConfig.spacerMedium),
                   ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 640),
+                    constraints: const BoxConstraints(
+                        maxWidth: HomeUIConfig.maxTextWidth),
                     child: Text(
                       description,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
-                        color: AppColors.textMedium,
-                        fontSize: 14,
+                        color: HomeUIConfig.textMedium,
+                        fontSize: HomeUIConfig.fontBodyMedium,
                         height: 1.7,
                       ),
                     ),
                   ),
-                  // Large gap before the feature grid
-                  const SizedBox(height: 40),
-                  // Displaying core platform features in an adaptive responsive grid
+                  const SizedBox(height: HomeUIConfig.spacerExtraLarge),
                   ResponsiveCardGrid(
                     mobileCols: 1,
                     tabletCols: 2,
@@ -338,57 +409,54 @@ class _WhySectionSliver extends StatelessWidget {
 }
 
 // ─── Courses Section (Sliver) ────────────────────────────────────────────────
-/// Showcases a preview of the available digital skills programs.
+
+/// _CoursesSectionSliver - Highlights the top digital skills training programs.
 class _CoursesSectionSliver extends StatelessWidget {
   final List<dynamic> courses;
   const _CoursesSectionSliver({required this.courses});
 
   @override
-  // Building the course highlight area
   Widget build(BuildContext context) {
-    // Evaluating device context for button width and margins
     final hPad = Responsive.contentPaddingH(context);
     final isWide = Responsive.isTabletOrDesktop(context);
 
     return SliverToBoxAdapter(
       child: Container(
-        color: AppColors.white, // Returning to bright white for the programs area
+        color: HomeUIConfig.white,
         child: Center(
           child: ConstrainedBox(
             constraints:
-                const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+                const BoxConstraints(maxWidth: HomeUIConfig.maxContentWidth),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 64),
+              padding: EdgeInsets.symmetric(
+                horizontal: hPad,
+                vertical: HomeUIConfig.paddingSectionVertical,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Stylized categorical label
                   Text(
                     'OUR PROGRAMS',
                     style: GoogleFonts.poppins(
-                      color: AppColors.accentGold,
-                      fontSize: 11,
+                      color: HomeUIConfig.accentGold,
+                      fontSize: HomeUIConfig.fontLabelSmall - 1,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.5,
                     ),
                   ),
-                  // Gap after label
-                  const SizedBox(height: 8),
-                  // Dynamic section header with 'View All' capability
+                  const SizedBox(height: HomeUIConfig.spacerSmall),
                   _SectionHeader(
                     title: 'Skills for the Future',
                     onTapViewAll: () =>
                         context.read<AppState>().navigate('courses'),
                   ),
-                  // Gap before course grid
-                  const SizedBox(height: 28),
-                  // Previewing the top 3 programs in a responsive grid
+                  const SizedBox(height: HomeUIConfig.spacerLarge + 4),
                   ResponsiveCardGrid(
                     mobileCols: 1,
                     tabletCols: 2,
                     desktopCols: 3,
                     children: courses
-                        .take(3) // Only showing the first 3 for the homepage preview
+                        .take(3)
                         .map(
                           (c) => CourseCard(
                             icon: c.icon,
@@ -402,9 +470,7 @@ class _CoursesSectionSliver extends StatelessWidget {
                         )
                         .toList(),
                   ),
-                  // Gap before final 'View All' button
-                  const SizedBox(height: 12),
-                  // Centered action button to see complete catalog
+                  const SizedBox(height: HomeUIConfig.spacerMedium - 4),
                   Center(
                     child: SizedBox(
                       width: isWide ? 320 : double.infinity,
@@ -412,17 +478,19 @@ class _CoursesSectionSliver extends StatelessWidget {
                         onPressed: () =>
                             context.read<AppState>().navigate('courses'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.darkGreen,
-                          side: const BorderSide(color: AppColors.darkGreen),
+                          foregroundColor: HomeUIConfig.darkGreen,
+                          side: const BorderSide(color: HomeUIConfig.darkGreen),
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          // Pill-shaped rounded button
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30)),
+                              borderRadius: BorderRadius.circular(
+                                  HomeUIConfig.radiusLarge)),
                         ),
                         child: Text(
                           'View All Courses →',
                           style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w600, fontSize: 14),
+                            fontWeight: FontWeight.w600,
+                            fontSize: HomeUIConfig.fontLabelLarge,
+                          ),
                         ),
                       ),
                     ),
@@ -438,7 +506,8 @@ class _CoursesSectionSliver extends StatelessWidget {
 }
 
 // ─── CTA Section ──────────────────────────────────────────────────────────────
-/// A high-contrast call-to-action block designed to drive final user conversion.
+
+/// _CtaSection - Full-width dark-green conversion banner at the bottom of the home page.
 class _CtaSection extends StatelessWidget {
   final String title;
   final String description;
@@ -446,143 +515,110 @@ class _CtaSection extends StatelessWidget {
   const _CtaSection({required this.title, required this.description});
 
   @override
-  // Building the conversion banner
   Widget build(BuildContext context) {
-    // Evaluating responsive layout requirements
-    final isDesktop = Responsive.isDesktop(context);
     final hPad = Responsive.contentPaddingH(context);
 
     return Container(
-      color: AppColors.offWhite, // Using background offset for contrast
+      width: double.infinity,
+      color: HomeUIConfig.darkGreen,
       child: Center(
         child: ConstrainedBox(
           constraints:
-              const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+              const BoxConstraints(maxWidth: HomeUIConfig.maxContentWidth),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 32),
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(
-                  horizontal: isDesktop ? 56 : 32,
-                  vertical: isDesktop ? 52 : 36),
-              decoration: BoxDecoration(
-                color: AppColors.darkGreen, // Signature brand primary color
-                borderRadius: BorderRadius.circular(24),
-              ),
-              // Organizing content as a Row on desktop, Column on mobile
-              child: isDesktop
-                  ? Row(
-                      children: [
-                        // Informative CTA text
-                        Expanded(
-                          child: _ctaText(title, description),
-                        ),
-                        // Visual gap
-                        const SizedBox(width: 40),
-                        // Primary directive button
-                        _PrimaryButton(
-                            label: 'Apply Now',
-                            onTap: () =>
-                                context.read<AppState>().navigate('contact'),
-                            large: true),
-                      ],
-                    )
-                  : Column(
-                      children: [
-                        // Informative text (centered for mobile)
-                        _ctaText(title, description, centered: true),
-                        // Visual gap
-                        const SizedBox(height: 28),
-                        // Primary directive button
-                        _PrimaryButton(
-                            label: 'Apply Now',
-                            onTap: () =>
-                                context.read<AppState>().navigate('contact'),
-                            large: true),
-                      ],
+            padding: EdgeInsets.symmetric(
+              horizontal: hPad,
+              vertical: HomeUIConfig.paddingSectionVertical,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.playfairDisplay(
+                    color: HomeUIConfig.white,
+                    fontSize: HomeUIConfig.fontHeadlineLarge,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: HomeUIConfig.spacerSmall + 4),
+                ConstrainedBox(
+                  constraints:
+                      const BoxConstraints(maxWidth: HomeUIConfig.maxTextWidth),
+                  child: Text(
+                    description,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      color: HomeUIConfig.white70,
+                      fontSize: HomeUIConfig.fontBodyMedium,
+                      height: 1.6,
                     ),
+                  ),
+                ),
+                const SizedBox(height: HomeUIConfig.spacerLarge + 8),
+                _PrimaryButton(
+                  label: 'Apply Now',
+                  onTap: () => context.read<AppState>().navigate('contact'),
+                  large: true,
+                ),
+              ],
             ),
           ),
         ),
       ),
     );
   }
-
-  /// Builds the textual components of the CTA section.
-  Widget _ctaText(String title, String description, {bool centered = false}) {
-    return Column(
-      crossAxisAlignment:
-          centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-      children: [
-        // Catchy conversion headline
-        Text(
-          title,
-          textAlign: centered ? TextAlign.center : TextAlign.start,
-          style: GoogleFonts.playfairDisplay(
-            color: AppColors.white,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        // Small gap
-        const SizedBox(height: 12),
-        // Persuasive description encouraging the user to act
-        Text(
-          description,
-          textAlign: centered ? TextAlign.center : TextAlign.start,
-          style: GoogleFonts.poppins(
-              color: Colors.white70, fontSize: 14, height: 1.6),
-        ),
-      ],
-    );
-  }
 }
 
 // ─── Section Header ───────────────────────────────────────────────────────────
-/// A helper widget providing a consistent header style with integrated 'View All' navigation.
+
+/// _SectionHeader - Shared header component for sections that require a 'View All' link.
 class _SectionHeader extends StatelessWidget {
   final String title;
   final VoidCallback onTapViewAll;
 
-  // Constructor for the header
   const _SectionHeader({required this.title, required this.onTapViewAll});
 
   @override
-  // Building the header row
   Widget build(BuildContext context) {
-    // Adaptive font scaling
-    final fontSize = Responsive.isDesktop(context) ? 28.0 : 22.0;
+    final fontSize = Responsive.isDesktop(context)
+        ? HomeUIConfig.fontHeadlineLarge
+        : HomeUIConfig.fontHeadlineMedium;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Primary title text
-        Text(
-          title,
-          style: GoogleFonts.playfairDisplay(
-            color: AppColors.darkGreen,
-            fontSize: fontSize,
-            fontWeight: FontWeight.bold,
+        Expanded(
+          child: Text(
+            title,
+            style: GoogleFonts.playfairDisplay(
+              color: HomeUIConfig.darkGreen,
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-        // Grouping 'View all' text with directional icon
+        const SizedBox(width: 16), // Safety gap
         MouseRegion(
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
             onTap: onTapViewAll,
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Link text
                 Text(
                   'View all',
                   style: GoogleFonts.poppins(
-                    color: AppColors.darkGreen,
-                    fontSize: 13,
+                    color: HomeUIConfig.darkGreen,
+                    fontSize: HomeUIConfig.fontBodyMedium - 1,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                // Symbolizing forward movement
-                const Icon(Icons.arrow_forward,
-                    size: 15, color: AppColors.darkGreen),
+                const Icon(
+                  Icons.arrow_forward,
+                  size: HomeUIConfig.iconSizeSmall + 1,
+                  color: HomeUIConfig.darkGreen,
+                ),
               ],
             ),
           ),
@@ -593,7 +629,8 @@ class _SectionHeader extends StatelessWidget {
 }
 
 // ─── Buttons ──────────────────────────────────────────────────────────────────
-/// High-priority solid button for primary site actions.
+
+/// _PrimaryButton - A solid, high-priority button component.
 class _PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
@@ -603,28 +640,36 @@ class _PrimaryButton extends StatelessWidget {
       {required this.label, required this.onTap, this.large = false});
 
   @override
-  // Building the stylized button
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
-        // High visibility gold background
-        backgroundColor: AppColors.accentGold,
-        foregroundColor: AppColors.darkGreen, // Contrasting text color
-        // Adaptive padding based on size request
+        backgroundColor: HomeUIConfig.accentGold,
+        foregroundColor: HomeUIConfig.darkGreen,
         padding: EdgeInsets.symmetric(
-            horizontal: large ? 40 : 28, vertical: large ? 16 : 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          horizontal: large
+              ? HomeUIConfig.paddingButtonLargeH
+              : HomeUIConfig.paddingButtonSmallH,
+          vertical: large
+              ? HomeUIConfig.paddingButtonLargeV
+              : HomeUIConfig.paddingButtonSmallV,
+        ),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(HomeUIConfig.radiusLarge)),
       ),
-      // Bold textual label
-      child: Text(label,
-          style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w700, fontSize: large ? 16 : 14)),
+      child: Text(
+        label,
+        style: GoogleFonts.poppins(
+          fontWeight: FontWeight.w700,
+          fontSize:
+              large ? HomeUIConfig.fontBodyLarge : HomeUIConfig.fontBodyMedium,
+        ),
+      ),
     );
   }
 }
 
-/// Medium-priority outlined button for secondary site actions.
+/// _SecondaryButton - A medium-priority, outlined brand button.
 class _SecondaryButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
@@ -634,28 +679,32 @@ class _SecondaryButton extends StatelessWidget {
       {required this.label, required this.onTap, this.large = false});
 
   @override
-  // Building the outlined interaction component
   Widget build(BuildContext context) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: onTap,
-        // Using a manual Container for precise border and padding control
         child: Container(
           padding: EdgeInsets.symmetric(
-              horizontal: large ? 40 : 28, vertical: large ? 16 : 14),
-          decoration: BoxDecoration(
-            // Subtle white border for visibility against dark backgrounds
-            border: Border.all(color: Colors.white38),
-            borderRadius: BorderRadius.circular(30),
+            horizontal: large
+                ? HomeUIConfig.paddingButtonLargeH
+                : HomeUIConfig.paddingButtonSmallH,
+            vertical: large
+                ? HomeUIConfig.paddingButtonLargeV
+                : HomeUIConfig.paddingButtonSmallV + 2,
           ),
-          // Readable white text
+          decoration: BoxDecoration(
+            border: Border.all(color: HomeUIConfig.white38),
+            borderRadius: BorderRadius.circular(HomeUIConfig.radiusLarge),
+          ),
           child: Text(
             label,
             style: GoogleFonts.poppins(
-              color: AppColors.white,
+              color: HomeUIConfig.white,
               fontWeight: FontWeight.w600,
-              fontSize: large ? 16 : 14,
+              fontSize: large
+                  ? HomeUIConfig.fontBodyLarge
+                  : HomeUIConfig.fontBodyMedium,
             ),
           ),
         ),
@@ -665,25 +714,20 @@ class _SecondaryButton extends StatelessWidget {
 }
 
 // ─── Diagonal Painter ─────────────────────────────────────────────────────────
-/// A custom painter that draws a subtle diagonal visual cut at the bottom of the hero section.
-/// Provides a more modern and dynamic look than a flat straight edge.
+
+/// A custom painter that provides a modern diagonal edge transition between sections.
 class _DiagonalPainter extends CustomPainter {
   @override
-  // Performing the custom path drawing
   void paint(Canvas canvas, Size size) {
-    // Choosing the offWhite color to match the next section
-    final paint = Paint()..color = AppColors.offWhite;
-    // Defining the triangle path
+    final paint = Paint()..color = HomeUIConfig.offWhite;
     final path = Path()
       ..moveTo(0, size.height)
       ..lineTo(size.width, 0)
       ..lineTo(size.width, size.height)
       ..close();
-    // Executing the draw
     canvas.drawPath(path, paint);
   }
 
   @override
-  // Optimization: No need to repaint as the path is static
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

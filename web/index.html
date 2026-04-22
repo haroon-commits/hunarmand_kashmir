@@ -19,19 +19,25 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Hunarmand Kashmir - Empowering the youth of the valley with high-demand digital skills, AI mastery, and professional mentorship.">
+  <meta name="keywords" content="Kashmir, Digital Skills, AI, Freelancing, Mirpur, Education, Hunarmand">
+
+  <!-- Performance Optimization: Preconnect to Font Services -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="hunarmand_kashmir">
+  <meta name="apple-mobile-web-app-title" content="Hunarmand Kashmir">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png" />
 
-  <title>hunarmand_kashmir</title>
+  <title>Hunarmand Kashmir | Empowering the Valley</title>
   <link rel="manifest" href="manifest.json">
+
 
   <style>
     body {
@@ -104,17 +110,11 @@
     <div class="spinner"></div>
   </div>
 
-  <script>
-    window.addEventListener('load', function () {
-      // The loader is removed by the Flutter engine initialization below
-    });
-  </script>
-
   <script src="flutter_bootstrap.js" async></script>
 
   <script>
-    // Hook into the document to detect when the first meaningful paint occurs
-    // and hide the native loader.
+    // Native Loader Cleanup: Ensures the premium HTML loader is removed 
+    // as soon as the Flutter engine starts rendering (flt-glass-pane detected).
     (function () {
       var interval = setInterval(function () {
         if (document.querySelector('flt-glass-pane')) {

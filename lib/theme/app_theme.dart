@@ -1,166 +1,239 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+/// ═══════════════════════════════════════════════════════════════════════
+/// PURPOSE: The master theme definition for the entire Hunarmand Kashmir app.
+///          Contains two core components:
+///          1. AppColors - All brand colors as static constants
+///          2. AppTheme  - The ThemeData generator combining colors + typography
+/// CONNECTIONS:
+///   - USED BY: main.dart → MaterialApp(theme: AppTheme.theme)
+///   - USED BY: Every widget/screen file → references AppColors.* for consistent styling
+///   - DEPENDS ON: google_fonts package → GoogleFonts.poppins, playfairDisplay
+/// ═══════════════════════════════════════════════════════════════════════
 
-/// A centralized repository for all brand colors used throughout the application.
-/// This ensures visual consistency and allows for easy global color updates.
+import 'package:flutter/material.dart'; // Flutter core for Color, ThemeData, etc.
+import 'package:google_fonts/google_fonts.dart'; // Google Fonts for premium typography (Poppins, Playfair Display)
+
+// ─── THEME UI CONFIGURATION ──────────────────────────────────────────────────
+/// Default UI metrics used by the global theme.
+class ThemeUIConfig {
+  static const double fontDisplay = 32.0;
+  static const double fontHeadlineLarge = 28.0;
+  static const double fontHeadlineMedium = 22.0;
+  static const double fontBodyLarge = 16.0;
+  static const double fontBodyMedium = 14.0;
+  static const double fontLabelLarge = 14.0;
+  static const double spacerLarge = 24.0;
+  static const double spacerMedium = 16.0;
+  static const double radiusLarge = 30.0;
+  static const double radiusSmall = 12.0;
+}
+
+/// AppColors - A centralized repository for all brand colors.
+/// This class ensures visual consistency and facilitates unified color adjustments.
+///
+/// USAGE PATTERN: Every widget references colors as AppColors.darkGreen, AppColors.accentGold, etc.
+/// CHANGING any value here instantly updates the entire application's color scheme.
+///
+/// USED BY: All 30 files in the project reference these color constants.
 class AppColors {
-  // Primary brand color: a deep, professional forest green
+  /// Primary brand color: a deep, professional forest green (#0D3320).
+  /// Used for app bars, primary buttons, section backgrounds, and text emphasis.
   static const Color darkGreen = Color(0xFF0D3320);
-  // Secondary green for gradients or secondary UI elements
+
+  /// Secondary green for gradients or secondary UI elements.
+  /// Used in drawer header (hunarmand_drawer.dart) and workshop card gradient (about_screen.dart).
   static const Color mediumGreen = Color(0xFF1A4A2E);
-  // tertiary green for borders or subtle highlights
+
+  /// Tertiary green for borders or subtle highlights.
+  /// Used in workshop card gradient (about_screen.dart) and donate bank info card.
   static const Color lightGreen = Color(0xFF2E6B47);
-  // Primary accent color used for buttons, links, and important highlights
+
+  /// Primary accent color used for buttons, links, and important highlights.
+  /// The signature gold (#F5A623) used across CTAs, icons, badges, and branding.
   static const Color accentGold = Color(0xFFF5A623);
-  // Secondary gold for gradients or hover effects
+
+  /// Secondary gold for gradients or hover effects.
+  /// Available for gradient transitions from accentGold.
   static const Color lightGold = Color(0xFFFBBC05);
-  // Pure white for card backgrounds and clear areas
+
+  /// Pure white for high-contrast areas.
+  /// Used for card backgrounds, text on dark surfaces, and scaffold backgrounds.
   static const Color white = Color(0xFFFFFFFF);
-  // Slightly tinted white for main background area to reduce eye strain
+
+  /// Slightly tinted off-white for main backgrounds.
+  /// Used as section backgrounds to create visual rhythm (home_screen, about_screen, courses_screen).
   static const Color offWhite = Color(0xFFF8F6F0);
-  // Neutral grey for disabled states or secondary containers
+
+  /// Light neutral grey for background containers.
+  /// Used in form input fills (contact_screen.dart) and card backgrounds.
   static const Color lightGrey = Color(0xFFF2F2F2);
-  // Darkest text color for maximum readability on bright backgrounds
+
+  /// Dark text color for primary readability.
+  /// Used for headings, card titles, and critical content.
   static const Color textDark = Color(0xFF1A1A1A);
-  // Intermediate text color for descriptions and secondary info
+
+  /// Intermediate text color for secondary content.
+  /// Used for body text, descriptions, and supporting paragraphs.
   static const Color textMedium = Color(0xFF555555);
-  // Lightest text color for hints or inactive labels
+
+  /// Lightest text color for metadata and hints.
+  /// Used for form hints, inactive navigation items, and timestamp text.
   static const Color textLight = Color(0xFF888888);
-  // Background color specifically for UI cards
+
+  /// Default background color for card-based components.
+  /// Typically white for maximum contrast against section backgrounds.
   static const Color cardBg = Color(0xFFFFFFFF);
-  // Vibrant teal for success messages or specific interface feedback
+
+  /// Teal accent for success messaging or active states.
+  /// Used in donate_screen.dart transparency progress bars.
   static const Color tealAccent = Color(0xFF4ECDC4);
-  // Extremely light teal used for active navigation item backgrounds
+
+  /// Extremely light teal for subtle backgrounds.
+  /// Used for active bottom nav items (main.dart), course icon circles, and success states.
   static const Color lightTeal = Color(0xFFE8F5F3);
-  // Semantic color representing successful operations
+
+  /// Semantic color denoting successful operations.
+  /// Used for checkmarks in course topics (courses_screen.dart) and donate WhatsApp buttons.
   static const Color successGreen = Color(0xFF27AE60);
 }
 
-/// The primary theme configuration for the application.
-/// This class defines the global visual style, including typography and component themes.
+/// AppTheme - The master theme generator for the Hunarmand application.
+/// It integrates AppColors and ThemeUIConfig to provide a cohesive visual experience.
+///
+/// HOW IT WORKS:
+///   1. main.dart passes AppTheme.theme to MaterialApp(theme: ...)
+///   2. Flutter applies this ThemeData to ALL descendant widgets automatically
+///   3. Individual widgets can override via Theme.of(context).textTheme.* or custom styles
+///
+/// DEPENDS ON: AppColors (this file), ThemeUIConfig (this file), GoogleFonts
 class AppTheme {
-  /// Generates the [ThemeData] object used by the MaterialApp.
+  /// Generates the [ThemeData] instance for the application.
+  /// Called once in main.dart's HunarmandKashmirApp.build() method.
   static ThemeData get theme {
-    // Constructing a new ThemeData object based on light mode
     return ThemeData(
-      // Setting the primary brand color
+      // Setting the primary color used by Flutter for default widget theming
       primaryColor: AppColors.darkGreen,
-      // Setting the default background color for all screens
+      // Default background color for all Scaffold widgets in the app
       scaffoldBackgroundColor: AppColors.white,
-      // Configuring the color scheme for consistency across Flutter components
+      // Global fallback fonts for CanvasKit to resolve missing characters (Urdu/Arabic & emojis)
+      fontFamilyFallback: const <String>['Noto Naskh Arabic', 'Noto Color Emoji'],
+
+      
+      // Color Scheme Mapping - Tells Flutter's Material 3 system which colors to use
+      // for primary, secondary, and surface elements across all built-in widgets
       colorScheme: const ColorScheme.light(
-        // Mapping primary to our dark green
-        primary: AppColors.darkGreen,
-        // Mapping secondary to our accent gold
-        secondary: AppColors.accentGold,
-        // Setting surface color to white
-        surface: AppColors.white,
+        primary: AppColors.darkGreen, // Primary swatch: buttons, links, active states
+        secondary: AppColors.accentGold, // Secondary swatch: FABs, accent elements
+        surface: AppColors.white, // Surface color: cards, dialogs, bottom sheets
       ),
-      // Building a comprehensive text theme using Google Fonts
-      textTheme: GoogleFonts.poppinsTextTheme().apply(
-        // Ensuring emoji support for dynamic content
-        fontFamilyFallback: const ['NotoColorEmoji'],
-      ).copyWith(
-        // Style for large display headers (Hero section)
+
+      // Typography Configuration - Sets the global text theme using Google Fonts.
+      // GoogleFonts.poppinsTextTheme() creates a base theme with Poppins,
+      // then .copyWith() overrides specific text styles with custom sizing and colors.
+      textTheme: GoogleFonts.poppinsTextTheme().copyWith(
+        // displayLarge: Used for major hero headings (rare, reserved for impact)
         displayLarge: GoogleFonts.playfairDisplay(
-          fontSize: 32, // Large enough for impact
-          fontWeight: FontWeight.bold, // Strong presence
-          color: AppColors.white, // Contrasting against dark hero bg
+          fontSize: ThemeUIConfig.fontDisplay, 
+          fontWeight: FontWeight.bold, // Maximum emphasis
+          color: AppColors.white, // White on dark hero backgrounds
         ),
-        // Style for secondary section headers
+        // headlineLarge: Used for section titles (e.g., 'Why Hunarmand Kashmir?')
         headlineLarge: GoogleFonts.playfairDisplay(
-          fontSize: 26,
-          fontWeight: FontWeight.bold,
-          color: AppColors.darkGreen,
+          fontSize: ThemeUIConfig.fontHeadlineLarge, 
+          fontWeight: FontWeight.bold, // Bold weight for section headers
+          color: AppColors.darkGreen, // Brand green for section titles
         ),
-        // Style for tertiary headers or card titles
+        // headlineMedium: Used for card titles and sub-section headers
         headlineMedium: GoogleFonts.playfairDisplay(
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: AppColors.darkGreen,
+          fontSize: ThemeUIConfig.fontHeadlineMedium, 
+          fontWeight: FontWeight.bold, // Bold weight
+          color: AppColors.darkGreen, // Consistent brand color
         ),
-        // Primary text style for main content paragraphs
+        // bodyLarge: Primary body text style with comfortable line height
         bodyLarge: GoogleFonts.poppins(
-          fontSize: 15,
-          color: AppColors.textMedium,
-          height: 1.6, // Adding line height for better readability
+          fontSize: ThemeUIConfig.fontBodyLarge, 
+          color: AppColors.textMedium, // Medium grey for readability
+          height: 1.6, // Generous line spacing for long-form text
         ),
-        // Secondary text style for smaller captions or metadata
+        // bodyMedium: Secondary body text style for smaller content
         bodyMedium: GoogleFonts.poppins(
-          fontSize: 13,
-          color: AppColors.textMedium,
+          fontSize: ThemeUIConfig.fontBodyMedium, 
+          color: AppColors.textMedium, // Medium grey for readability
         ),
-        // Style for button labels and clickable text
+        // labelLarge: Used for button labels, navigation items, and badges
         labelLarge: GoogleFonts.poppins(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: AppColors.white,
+          fontSize: ThemeUIConfig.fontLabelLarge, 
+          fontWeight: FontWeight.w600, // Semi-bold for button emphasis
+          color: AppColors.white, // White for dark button backgrounds
         ),
-      ),
-      // Customizing the top application bar theme
+      ).apply(fontFamilyFallback: const ['Noto Naskh Arabic', 'Noto Color Emoji']),
+
+      // AppBar Customization - Global default styling for ALL AppBar widgets.
+      // Individual app bars can override these defaults via their own parameters.
       appBarTheme: AppBarTheme(
-        // Applying dark green for a signature look
-        backgroundColor: AppColors.darkGreen,
-        // Making all icons and text on the bar white
-        foregroundColor: AppColors.white,
-        // Removing shadow for a flatter, modern design
-        elevation: 0,
-        // Typography for the app bar title
+        backgroundColor: AppColors.darkGreen, // Dark green background for all app bars
+        foregroundColor: AppColors.white, // White icons and text by default
+        elevation: 0, // Flat design: no shadow under the app bar
+        // Default title text style for app bar titles
         titleTextStyle: GoogleFonts.poppins(
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-          color: AppColors.white,
+          fontSize: 18, // Title font size
+          fontWeight: FontWeight.w600, // Semi-bold
+          color: AppColors.white, // White text on dark background
         ),
       ),
-      // Centralized design system for all ElevatedButtons
+
+      // Global ElevatedButton Style - Default appearance for ALL ElevatedButton widgets.
+      // Individual buttons can override via ElevatedButton.styleFrom().
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          // Using primary brand color
-          backgroundColor: AppColors.darkGreen,
-          // White text for contrast
-          foregroundColor: AppColors.white,
-          // Spacious padding for easy tapping
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-          // Rounded pill-shaped buttons
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+          backgroundColor: AppColors.darkGreen, // Dark green fill
+          foregroundColor: AppColors.white, // White text and icon color
+          // Generous padding for comfortable touch targets
+          padding: const EdgeInsets.symmetric(
+            horizontal: ThemeUIConfig.spacerLarge + 4, // 28px horizontal padding
+            vertical: ThemeUIConfig.spacerMedium - 2, // 14px vertical padding
           ),
-          // Typography for button labels
+          // Rounded pill-like shape using radiusLarge from design tokens
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(ThemeUIConfig.radiusLarge), // 30px radius
+          ),
+          // Default button text style
           textStyle: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+            fontSize: ThemeUIConfig.fontLabelLarge, 
+            fontWeight: FontWeight.w600, // Semi-bold for legibility
           ),
         ),
       ),
-      // Customizing the look of input fields and text forms
+
+      // Input Decoration (Forms & TextFields) - Global default styling for ALL TextField widgets.
+      // Applied automatically to TextField, TextFormField, etc. across the app.
       inputDecorationTheme: InputDecorationTheme(
-        // Enabling background fill
-        filled: true,
-        // Subtle grey background
-        fillColor: AppColors.lightGrey,
-        // Default border (none, as we use fillColor)
+        filled: true, // Enables background fill color
+        fillColor: AppColors.lightGrey, // Light grey background for form fields
+        // Default border (when not focused or enabled): no visible border line
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(ThemeUIConfig.radiusSmall - 2), // 10px rounded corners
+          borderSide: BorderSide.none, // No visible border line
         ),
-        // Style used when the field is enabled but not focused
+        // Enabled state border: subtle grey outline
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderRadius: BorderRadius.circular(ThemeUIConfig.radiusSmall - 2), // 10px rounded corners
+          borderSide: BorderSide(color: Colors.grey.shade200), // Very subtle grey border
         ),
-        // Style used when the user is currently typing in the field
+        // Focused state border: prominent dark green outline indicating active field
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          // Highlighting with primary brand color
-          borderSide: const BorderSide(color: AppColors.darkGreen, width: 1.5),
+          borderRadius: BorderRadius.circular(ThemeUIConfig.radiusSmall - 2), // 10px rounded corners
+          borderSide: const BorderSide(color: AppColors.darkGreen, width: 1.5), // Green focus ring
         ),
-        // Typography for hint text
+        // Hint text styling for placeholder text inside empty fields
         hintStyle: GoogleFonts.poppins(
-          color: AppColors.textLight,
-          fontSize: 13,
+          color: AppColors.textLight, // Light grey hint color
+          fontSize: ThemeUIConfig.fontBodyMedium, // 14px to match body text
         ),
-        // Internal padding for text fields
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        // Internal padding within the text field
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: ThemeUIConfig.spacerMedium, // 16px horizontal padding
+          vertical: ThemeUIConfig.spacerMedium - 2, // 14px vertical padding
+        ),
       ),
     );
   }

@@ -1,9 +1,30 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: about_editor.dart
+/// PURPOSE: Admin interface for editing the platform's narrative, mission, 
+///          and managing the roster of team members and mentors.
+/// CONNECTIONS:
+///   - USED BY: admin_dashboard_screen.dart
+///   - MUTATES: AppContent via dynamic_content_provider.dart
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/dynamic_content_provider.dart';
 import '../../../models/content_model.dart';
-import '../../../theme/app_theme.dart';
+
+
+// ─── ABOUTEDITORUICONFIG ──────────────────────────────
+/// Isolated UI configuration specific to about_editor.dart.
+class AboutEditorUIConfig {
+  // Brand Colors used locally
+  static const Color darkGreen = Color(0xFF0D3320);
+  static const Color lightTeal = Color(0xFFE8F5F3);
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textMedium = Color(0xFF555555);
+
+}
+
 
 class AboutEditor extends StatefulWidget {
   const AboutEditor({super.key});
@@ -41,7 +62,7 @@ class _AboutEditorState extends State<AboutEditor> {
             style: GoogleFonts.poppins(
               fontSize: 28,
               fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
+              color: AboutEditorUIConfig.textDark,
             ),
           ),
           const SizedBox(height: 24),
@@ -79,7 +100,7 @@ class _AboutEditorState extends State<AboutEditor> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.darkGreen,
+              backgroundColor: AboutEditorUIConfig.darkGreen,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
             ),
@@ -105,7 +126,7 @@ class _AboutEditorState extends State<AboutEditor> {
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textDark,
+                color: AboutEditorUIConfig.textDark,
               ),
             ),
             TextButton.icon(
@@ -126,7 +147,7 @@ class _AboutEditorState extends State<AboutEditor> {
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: AppColors.lightTeal,
+                  backgroundColor: AboutEditorUIConfig.lightTeal,
                   child: member.imageUrl.startsWith('http')
                       ? null
                       : Text(member.imageUrl, style: const TextStyle(fontSize: 18)),
@@ -228,7 +249,7 @@ class _AboutEditorState extends State<AboutEditor> {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: AppColors.darkGreen,
+              color: AboutEditorUIConfig.darkGreen,
             ),
           ),
           const SizedBox(height: 20),
@@ -248,7 +269,7 @@ class _AboutEditorState extends State<AboutEditor> {
           style: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: AppColors.textMedium,
+            color: AboutEditorUIConfig.textMedium,
           ),
         ),
         const SizedBox(height: 8),

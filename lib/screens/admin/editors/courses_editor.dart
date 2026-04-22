@@ -1,9 +1,29 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: courses_editor.dart
+/// PURPOSE: Admin interface for complete CRUD operations on the curriculum 
+///          catalog, managing training programs and their constituent topics.
+/// CONNECTIONS:
+///   - USED BY: admin_dashboard_screen.dart
+///   - MUTATES: AppContent via dynamic_content_provider.dart
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/dynamic_content_provider.dart';
 import '../../../models/content_model.dart';
-import '../../../theme/app_theme.dart';
+
+
+// ─── COURSESEDITORUICONFIG ──────────────────────────────
+/// Isolated UI configuration specific to courses_editor.dart.
+class CoursesEditorUIConfig {
+  // Brand Colors used locally
+  static const Color darkGreen = Color(0xFF0D3320);
+  static const Color lightTeal = Color(0xFFE8F5F3);
+  static const Color textDark = Color(0xFF1A1A1A);
+
+}
+
 
 class CoursesEditor extends StatelessWidget {
   const CoursesEditor({super.key});
@@ -24,7 +44,7 @@ class CoursesEditor extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: 28,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textDark,
+                color: CoursesEditorUIConfig.textDark,
               ),
             ),
             ElevatedButton.icon(
@@ -32,7 +52,7 @@ class CoursesEditor extends StatelessWidget {
               icon: const Icon(Icons.add),
               label: const Text('Add New Course'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.darkGreen,
+                backgroundColor: CoursesEditorUIConfig.darkGreen,
                 foregroundColor: Colors.white,
               ),
             ),
@@ -51,12 +71,12 @@ class CoursesEditor extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: AppColors.lightTeal,
+                      color: CoursesEditorUIConfig.lightTeal,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
                       child: _renderDynamicIcon(course.icon,
-                          color: AppColors.darkGreen, size: 20),
+                          color: CoursesEditorUIConfig.darkGreen, size: 20),
                     ),
                   ),
                   title: Text(course.title, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),

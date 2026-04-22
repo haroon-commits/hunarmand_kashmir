@@ -1,10 +1,57 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: contact_screen.dart
+/// PURPOSE: A stateful page facilitating user communication and course
+///          applications. Integrates contact information, a physical location
+///          preview, and a validated intake form.
+/// CONNECTIONS:
+///   - USED BY: main.dart (MainNavigator)
+///   - DEPENDS ON: providers/dynamic_content_provider.dart
+///   - SYNCED WITH: admin/editors/contact_editor.dart
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme/app_theme.dart';
-import '../widgets/common_widgets.dart';
+import '../widgets/layout/page_header.dart';
+import '../widgets/layout/app_footer.dart';
+import '../widgets/common/contact_info_tile.dart';
 import '../utils/responsive.dart';
 import 'package:provider/provider.dart';
 import '../providers/dynamic_content_provider.dart';
+
+// ─── CONTACTUICONFIG ──────────────────────────────
+/// Isolated UI configuration specific to contact_screen.dart.
+class ContactUIConfig {
+  // Brand Colors used locally
+  static const Color accentGold = Color(0xFFF5A623);
+  static const Color darkGreen = Color(0xFF0D3320);
+  static const Color lightGrey = Color(0xFFF2F2F2);
+  static const Color lightTeal = Color(0xFFE8F5F3);
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textMedium = Color(0xFF555555);
+  static const Color white = Color(0xFFFFFFFF);
+
+  // Dimensions, Spacing & Typography
+  static const double cardIconSize = 60.0;
+  static const double cardPadding = 24.0;
+  static const double fontDisplayMobile = 82.0;
+  static const double fontHeadlineMedium = 32.0;
+  static const double fontLabelLarge = 14.0;
+  static const double fontLabelSmall = 12.0;
+  static const double maxContentWidth = 1200.0;
+  static const double paddingButtonLargeH = 50.0;
+  static const double paddingButtonSmallV = 22.0;
+  static const double paddingHeroMobile = 44.0;
+  static const double paddingSectionVertical = 64.0;
+  static const double radiusExtraLarge = 40.0;
+  static const double radiusExtraSmall = 8.0;
+  static const double radiusLarge = 30.0;
+  static const double radiusMedium = 20.0;
+  static const double radiusSmall = 12.0;
+  static const double spacerDisplay = 32.0;
+  static const double spacerLarge = 24.0;
+  static const double spacerMedium = 16.0;
+  static const double spacerSmall = 8.0;
+}
 
 /// A stateful page facilitating user communication and course applications.
 /// Integrates contact information, a physical location preview, and a validated intake form.
@@ -23,7 +70,7 @@ class _ContactScreenState extends State<ContactScreen> {
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _messageController = TextEditingController();
-  
+
   // Tracking the currently selected course from the available options
   String _selectedCourse = 'Learn and Earn with AI';
   // State flag to switch between the active form and the submission success UI
@@ -78,39 +125,38 @@ class _ContactScreenState extends State<ContactScreen> {
   }
 
   /// Builds the main responsive arrangement of information and the contact form.
-  Widget _buildBody(BuildContext context, String address, String phone, String email) {
-    // Evaluating device class for layout strategy (Row vs Column)
+  Widget _buildBody(
+      BuildContext context, String address, String phone, String email) {
     final hPad = Responsive.contentPaddingH(context);
     final isWide = Responsive.isTabletOrDesktop(context);
-    
+
     return Center(
       child: ConstrainedBox(
-        // Keeping the content centered and readable on larger displays
         constraints:
-            const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+            const BoxConstraints(maxWidth: ContactUIConfig.maxContentWidth),
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 40),
-          // Horizontal side-by-side for wide screens, stacked for mobile
+          padding: EdgeInsets.symmetric(
+            horizontal: hPad,
+            vertical: ContactUIConfig.paddingHeroMobile,
+          ),
           child: isWide
-               ? Row(
+              ? Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Physical campus and contact data takes up the left/smaller side
-                    Expanded(flex: 4, child: _buildCampusInfo(address, phone, email)),
-                    const SizedBox(width: 28), // Clear negative space
-                    // Interactive form or success state on the right/larger side
+                    Expanded(
+                        flex: 4,
+                        child: _buildCampusInfo(address, phone, email)),
+                    const SizedBox(width: ContactUIConfig.spacerLarge + 4),
                     Expanded(
                       flex: 5,
-                      child: _submitted
-                          ? _buildSuccess()
-                          : _buildForm(context),
+                      child: _submitted ? _buildSuccess() : _buildForm(context),
                     ),
                   ],
                 )
               : Column(
                   children: [
                     _buildCampusInfo(address, phone, email),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: ContactUIConfig.spacerLarge),
                     _submitted ? _buildSuccess() : _buildForm(context),
                   ],
                 ),
@@ -122,11 +168,10 @@ class _ContactScreenState extends State<ContactScreen> {
   /// Builds a card containing the physical campus address and direct contact methods.
   Widget _buildCampusInfo(String address, String phone, String email) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(ContactUIConfig.cardPadding),
       decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-        // Soft elevation for a premium card feel
+        color: ContactUIConfig.white,
+        borderRadius: BorderRadius.circular(ContactUIConfig.radiusSmall + 4),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -138,43 +183,42 @@ class _ContactScreenState extends State<ContactScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Informative section title
           Text(
             'Visit Our Campus',
             style: GoogleFonts.playfairDisplay(
-              color: AppColors.darkGreen,
-              fontSize: 22,
+              color: ContactUIConfig.darkGreen,
+              fontSize: ContactUIConfig.fontHeadlineMedium,
               fontWeight: FontWeight.bold,
             ),
           ),
-          // Descriptive text inviting visits
-          const SizedBox(height: 10),
+          const SizedBox(height: ContactUIConfig.spacerSmall + 2),
           Text(
             'Our doors are always open for students and parents. Come see our labs, meet mentors, and feel the energy of innovation.',
             style: GoogleFonts.poppins(
-                color: AppColors.textMedium, fontSize: 13, height: 1.6),
+              color: ContactUIConfig.textMedium,
+              fontSize: ContactUIConfig.fontLabelSmall + 1,
+              height: 1.6,
+            ),
           ),
-          const SizedBox(height: 22),
-          // Standardized contact tiles for specific data points
+          const SizedBox(height: ContactUIConfig.spacerLarge - 2),
           ContactInfoTile(
             icon: Icons.location_on_outlined,
             label: 'Address',
             value: address,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: ContactUIConfig.spacerMedium),
           ContactInfoTile(
             icon: Icons.phone_outlined,
             label: 'Phone',
             value: phone,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: ContactUIConfig.spacerMedium),
           ContactInfoTile(
             icon: Icons.email_outlined,
             label: 'Email',
             value: email,
           ),
-          // Visual map abstraction for orientation
-          const SizedBox(height: 20),
+          const SizedBox(height: ContactUIConfig.spacerLarge - 4),
           const MapPreviewWidget(),
         ],
       ),
@@ -183,13 +227,12 @@ class _ContactScreenState extends State<ContactScreen> {
 
   /// Builds the main interactive course application form.
   Widget _buildForm(BuildContext context) {
-    // Dynamic field arrangement based on mobile vs tablet
     final isMobile = Responsive.isMobile(context);
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(ContactUIConfig.cardPadding),
       decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: ContactUIConfig.white,
+        borderRadius: BorderRadius.circular(ContactUIConfig.radiusSmall + 4),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -201,20 +244,18 @@ class _ContactScreenState extends State<ContactScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Direct call-to-action title
           Text(
             'Send us a message',
             style: GoogleFonts.poppins(
-              fontSize: 20,
+              fontSize: ContactUIConfig.radiusMedium,
               fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
+              color: ContactUIConfig.textDark,
             ),
           ),
-          const SizedBox(height: 20),
-          // Responsive field grouping: Row on desktop, Column on mobile
+          const SizedBox(height: ContactUIConfig.radiusMedium),
           if (isMobile) ...[
             _field('Full Name', 'Enter your name', _nameController),
-            const SizedBox(height: 14),
+            const SizedBox(height: ContactUIConfig.spacerMedium - 2),
             _field('Phone Number', 'Mobile number', _phoneController,
                 isPhone: true),
           ] else
@@ -222,38 +263,39 @@ class _ContactScreenState extends State<ContactScreen> {
               Expanded(
                   child:
                       _field('Full Name', 'Enter your name', _nameController)),
-              const SizedBox(width: 14),
+              const SizedBox(width: ContactUIConfig.spacerMedium - 2),
               Expanded(
-                  child: _field('Phone Number', 'Mobile number', _phoneController,
+                  child: _field(
+                      'Phone Number', 'Mobile number', _phoneController,
                       isPhone: true)),
             ]),
-          const SizedBox(height: 14),
-          // Global contact data fields
+          const SizedBox(height: ContactUIConfig.spacerMedium - 2),
           _field('Email Address', 'you@example.com', _emailController,
               isEmail: true),
-          const SizedBox(height: 14),
-          // Subject/Course selection
+          const SizedBox(height: ContactUIConfig.spacerMedium - 2),
           _dropdown(),
-          const SizedBox(height: 14),
-          // Qualitative message field
+          const SizedBox(height: ContactUIConfig.spacerMedium - 2),
           _messageField(),
-          const SizedBox(height: 22),
-          // Full-width branded submission button
+          const SizedBox(height: ContactUIConfig.spacerLarge - 2),
           SizedBox(
             width: double.infinity,
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
               child: ElevatedButton.icon(
-                onPressed: _submit, // Validating and processing data
+                onPressed: _submit,
                 icon: const Icon(Icons.send_outlined, size: 18),
                 label: Text('Submit Application',
                     style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w700, fontSize: 15)),
+                      fontWeight: FontWeight.w700,
+                      fontSize: ContactUIConfig.fontLabelLarge + 1,
+                    )),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.darkGreen,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: ContactUIConfig.darkGreen,
+                  padding: const EdgeInsets.symmetric(
+                      vertical: ContactUIConfig.paddingSectionVertical / 4),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                      borderRadius:
+                          BorderRadius.circular(ContactUIConfig.radiusSmall)),
                 ),
               ),
             ),
@@ -266,43 +308,49 @@ class _ContactScreenState extends State<ContactScreen> {
   /// Builds a positive success screen displayed after a valid form submission.
   Widget _buildSuccess() {
     return Container(
-      padding: const EdgeInsets.all(40),
+      padding: const EdgeInsets.all(ContactUIConfig.paddingButtonLargeH),
       decoration: BoxDecoration(
-        color: AppColors.lightTeal,
-        borderRadius: BorderRadius.circular(16),
+        color: ContactUIConfig.lightTeal,
+        borderRadius: BorderRadius.circular(ContactUIConfig.radiusSmall + 4),
       ),
       child: Column(
         children: [
-          // Celebration/Confirmation icon
-          const Icon(Icons.check_circle, color: AppColors.darkGreen, size: 64),
-          const SizedBox(height: 18),
-          // Confirming submission headline
+          const Icon(Icons.check_circle,
+              color: ContactUIConfig.darkGreen,
+              size: ContactUIConfig.cardIconSize + 4),
+          const SizedBox(height: ContactUIConfig.spacerMedium + 2),
           Text(
             'Application Submitted!',
             style: GoogleFonts.playfairDisplay(
-              color: AppColors.darkGreen,
-              fontSize: 24,
+              color: ContactUIConfig.darkGreen,
+              fontSize: Responsive.isDesktop(context)
+                  ? ContactUIConfig.fontDisplayMobile + 2
+                  : ContactUIConfig.fontDisplayMobile,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 10),
-          // Detailed follow-up expectations
+          const SizedBox(height: ContactUIConfig.spacerSmall + 2),
           Text(
             'We have received your application. Our team will contact you within 24 hours. JazakAllah Khair!',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-                color: AppColors.textMedium, fontSize: 14, height: 1.6),
+              color: ContactUIConfig.textMedium,
+              fontSize: ContactUIConfig.fontLabelSmall + 2,
+              height: 1.6,
+            ),
           ),
-          const SizedBox(height: 24),
-          // Option to reset state and submit another inquiry
+          const SizedBox(height: ContactUIConfig.radiusExtraLarge),
           ElevatedButton(
             onPressed: () => setState(() => _submitted = false),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.darkGreen,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+              backgroundColor: ContactUIConfig.darkGreen,
+              padding: const EdgeInsets.symmetric(
+                horizontal: ContactUIConfig.spacerDisplay,
+                vertical: ContactUIConfig.paddingButtonSmallV + 2,
+              ),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25)),
+                  borderRadius:
+                      BorderRadius.circular(ContactUIConfig.radiusLarge - 5)),
             ),
             child: Text('Submit Another',
                 style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
@@ -318,14 +366,12 @@ class _ContactScreenState extends State<ContactScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Descriptive field label
         Text(label,
             style: GoogleFonts.poppins(
-                fontSize: 13,
+                fontSize: ContactUIConfig.fontLabelSmall + 1,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textDark)),
-        const SizedBox(height: 6),
-        // Custom animated text field with focus response
+                color: ContactUIConfig.textDark)),
+        const SizedBox(height: ContactUIConfig.spacerSmall - 2),
         _AnimatedTextField(
           controller: controller,
           hint: hint,
@@ -344,32 +390,31 @@ class _ContactScreenState extends State<ContactScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Label for the selection group
         Text('Interested Course',
             style: GoogleFonts.poppins(
-                fontSize: 13,
+                fontSize: ContactUIConfig.fontLabelSmall + 1,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textDark)),
-        const SizedBox(height: 6),
-        // Branded dropdown container
+                color: ContactUIConfig.textDark)),
+        const SizedBox(height: ContactUIConfig.spacerSmall - 2),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
+          padding: const EdgeInsets.symmetric(
+              horizontal: ContactUIConfig.spacerMedium - 2),
           decoration: BoxDecoration(
-            color: AppColors.lightGrey,
-            borderRadius: BorderRadius.circular(10),
+            color: ContactUIConfig.lightGrey,
+            borderRadius:
+                BorderRadius.circular(ContactUIConfig.radiusExtraSmall + 2),
             border: Border.all(color: Colors.grey.shade200),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: _selectedCourse,
               isExpanded: true,
-              style:
-                  GoogleFonts.poppins(fontSize: 13, color: AppColors.textDark),
-              // Mapping available programs into menu items
+              style: GoogleFonts.poppins(
+                  fontSize: ContactUIConfig.fontLabelSmall + 1,
+                  color: ContactUIConfig.textDark),
               items: _courses
                   .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                   .toList(),
-              // Updating the selection in the local state
               onChanged: (val) => setState(() => _selectedCourse = val!),
             ),
           ),
@@ -383,14 +428,12 @@ class _ContactScreenState extends State<ContactScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Message label
         Text('Message',
             style: GoogleFonts.poppins(
-                fontSize: 13,
+                fontSize: ContactUIConfig.fontLabelSmall + 1,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textDark)),
-        const SizedBox(height: 6),
-        // Deep animated text field for long-form text
+                color: ContactUIConfig.textDark)),
+        const SizedBox(height: ContactUIConfig.spacerSmall - 2),
         _AnimatedTextField(
           controller: _messageController,
           maxLines: 4,
@@ -459,23 +502,21 @@ class _AnimatedTextFieldState extends State<_AnimatedTextField> {
   }
 
   @override
-  // Building the interactive text input container
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      // Styling and borders that shift based on focused state
       decoration: BoxDecoration(
-        color: AppColors.lightGrey,
-        borderRadius: BorderRadius.circular(10),
+        color: ContactUIConfig.lightGrey,
+        borderRadius:
+            BorderRadius.circular(ContactUIConfig.radiusExtraSmall + 2),
         border: Border.all(
-          color: _isFocused ? AppColors.darkGreen : Colors.grey.shade200,
+          color: _isFocused ? ContactUIConfig.darkGreen : Colors.grey.shade200,
           width: _isFocused ? 1.5 : 1.0,
         ),
-        // Subtle glow effect when focused for better accessibility
         boxShadow: [
           if (_isFocused)
             BoxShadow(
-              color: AppColors.darkGreen.withOpacity(0.1),
+              color: ContactUIConfig.darkGreen.withOpacity(0.1),
               blurRadius: 8,
               spreadRadius: 1,
             )
@@ -486,11 +527,15 @@ class _AnimatedTextFieldState extends State<_AnimatedTextField> {
         controller: widget.controller,
         keyboardType: widget.keyboardType,
         maxLines: widget.maxLines,
-        style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textDark),
+        style: GoogleFonts.poppins(
+            fontSize: ContactUIConfig.fontLabelSmall + 1,
+            color: ContactUIConfig.textDark),
         decoration: InputDecoration(
           hintText: widget.hint,
-          border: InputBorder.none, // Customizing border in parent container
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+              horizontal: ContactUIConfig.spacerMedium - 2,
+              vertical: ContactUIConfig.spacerSmall + 4),
         ),
       ),
     );
@@ -499,52 +544,49 @@ class _AnimatedTextFieldState extends State<_AnimatedTextField> {
 
 /// A visual decorative widget that represents a location map preview with branded flair.
 class MapPreviewWidget extends StatefulWidget {
-  // Constructor
   const MapPreviewWidget({super.key});
 
   @override
-  // Creating animation state for the map pulse
   State<MapPreviewWidget> createState() => _MapPreviewWidgetState();
 }
 
-class _MapPreviewWidgetState extends State<MapPreviewWidget> with SingleTickerProviderStateMixin {
-  // Controller to handle the breathing/pulsing animation loop
+class _MapPreviewWidgetState extends State<MapPreviewWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
-  
+
   @override
-  // Initialing a repetitive pulse animation for visual interest
   void initState() {
     super.initState();
-    _pulseController = AnimationController(
-        vsync: this, duration: const Duration(seconds: 2))..repeat(reverse: true);
+    _pulseController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2))
+          ..repeat(reverse: true);
   }
-  
+
   @override
-  // Ensuring the animation loop is killed on widget disposal
   void dispose() {
     _pulseController.dispose();
     super.dispose();
   }
 
   @override
-  // Rendering the stylistic map preview
   Widget build(BuildContext context) {
     return Container(
       height: 140,
       decoration: BoxDecoration(
-        color: AppColors.darkGreen,
-        borderRadius: BorderRadius.circular(12),
-        // Abstract grid pattern backdrop
-        image: DecorationImage(
-          image: const NetworkImage('https://www.transparenttextures.com/patterns/cubes.png'),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(AppColors.darkGreen.withOpacity(0.9), BlendMode.dstATop),
+        color: ContactUIConfig.darkGreen,
+        borderRadius: BorderRadius.circular(ContactUIConfig.radiusSmall),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            ContactUIConfig.darkGreen,
+            ContactUIConfig.darkGreen.withOpacity(0.8),
+          ],
         ),
       ),
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Breathing location indicator backdrop
           AnimatedBuilder(
             animation: _pulseController,
             builder: (context, child) {
@@ -553,30 +595,30 @@ class _MapPreviewWidgetState extends State<MapPreviewWidget> with SingleTickerPr
                 height: 60 + (_pulseController.value * 20),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.accentGold.withOpacity(0.2 - (_pulseController.value * 0.2)),
+                  color: ContactUIConfig.accentGold
+                      .withOpacity(0.2 - (_pulseController.value * 0.2)),
                 ),
               );
             },
           ),
-          // Central branding location marker
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Gold location pin
-              const Icon(Icons.location_on, color: AppColors.accentGold, size: 36),
+              const Icon(Icons.location_on,
+                  color: ContactUIConfig.accentGold,
+                  size: ContactUIConfig.spacerDisplay + 4),
               const SizedBox(height: 6),
-              // Simplified campus address text
               Text(
                 'SCO Software Technology Park\nMirpur, AJK',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
-                  color: AppColors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  shadows: [
-                    Shadow(color: Colors.black.withOpacity(0.5), blurRadius: 4),
-                  ]
-                ),
+                    color: ContactUIConfig.white,
+                    fontSize: ContactUIConfig.fontLabelSmall,
+                    fontWeight: FontWeight.w600,
+                    shadows: [
+                      Shadow(
+                          color: Colors.black.withOpacity(0.5), blurRadius: 4),
+                    ]),
               ),
             ],
           ),

@@ -1,9 +1,30 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: donate_editor.dart
+/// PURPOSE: Admin interface for managing donation tier configurations, 
+///          allowing modification of target amounts and engagement phrasing.
+/// CONNECTIONS:
+///   - USED BY: admin_dashboard_screen.dart
+///   - MUTATES: AppContent via dynamic_content_provider.dart
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/dynamic_content_provider.dart';
 import '../../../models/content_model.dart';
-import '../../../theme/app_theme.dart';
+
+
+// ─── DONATEEDITORUICONFIG ──────────────────────────────
+/// Isolated UI configuration specific to donate_editor.dart.
+class DonateEditorUIConfig {
+  // Brand Colors used locally
+  static const Color accentGold = Color(0xFFF5A623);
+  static const Color darkGreen = Color(0xFF0D3320);
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textMedium = Color(0xFF555555);
+
+}
+
 
 class DonateEditor extends StatefulWidget {
   const DonateEditor({super.key});
@@ -35,7 +56,7 @@ class _DonateEditorState extends State<DonateEditor> {
             style: GoogleFonts.poppins(
               fontSize: 28,
               fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
+              color: DonateEditorUIConfig.textDark,
             ),
           ),
           const SizedBox(height: 24),
@@ -54,7 +75,7 @@ class _DonateEditorState extends State<DonateEditor> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.darkGreen,
+              backgroundColor: DonateEditorUIConfig.darkGreen,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
             ),
@@ -80,7 +101,7 @@ class _DonateEditorState extends State<DonateEditor> {
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textDark,
+                color: DonateEditorUIConfig.textDark,
               ),
             ),
             TextButton.icon(
@@ -110,7 +131,7 @@ class _DonateEditorState extends State<DonateEditor> {
                     if (tier.popular)
                       const Padding(
                         padding: EdgeInsets.only(right: 8.0),
-                        child: Icon(Icons.star, color: AppColors.accentGold, size: 20),
+                        child: Icon(Icons.star, color: DonateEditorUIConfig.accentGold, size: 20),
                       ),
                     IconButton(
                       icon: const Icon(Icons.edit, size: 20),
@@ -222,7 +243,7 @@ class _DonateEditorState extends State<DonateEditor> {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: AppColors.darkGreen,
+              color: DonateEditorUIConfig.darkGreen,
             ),
           ),
           const SizedBox(height: 20),
@@ -242,7 +263,7 @@ class _DonateEditorState extends State<DonateEditor> {
           style: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: AppColors.textMedium,
+            color: DonateEditorUIConfig.textMedium,
           ),
         ),
         const SizedBox(height: 8),

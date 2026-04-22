@@ -1,13 +1,66 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: about_screen.dart
+/// PURPOSE: A descriptive page providing the narrative background, mission,
+///          vision, and values of the Hunarmand Kashmir platform. Uses a 
+///          layered scrollable design with sections for story, team, and CTA.
+/// CONNECTIONS:
+///   - USED BY: main.dart (MainNavigator)
+///   - DEPENDS ON: models/content_model.dart (TeamMember)
+///   - DEPENDS ON: providers/dynamic_content_provider.dart (reads AppContent)
+///   - SYNCED WITH: admin/editors/about_editor.dart
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme/app_theme.dart';
-import '../widgets/common_widgets.dart';
+import '../widgets/layout/page_header.dart';
+import '../widgets/layout/app_footer.dart';
+import '../widgets/common/responsive_grid.dart';
 import '../utils/responsive.dart';
 
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../providers/dynamic_content_provider.dart';
 import '../models/content_model.dart';
+
+
+// ─── ABOUTUICONFIG ──────────────────────────────
+/// Isolated UI configuration specific to about_screen.dart.
+class AboutUIConfig {
+  // Brand Colors used locally
+  static const Color accentGold = Color(0xFFF5A623);
+  static const Color darkGreen = Color(0xFF0D3320);
+  static const Color mediumGreen = Color(0xFF1A4A2E);
+  static const Color offWhite = Color(0xFFF8F6F0);
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textMedium = Color(0xFF555555);
+  static const Color white = Color(0xFFFFFFFF);
+
+  // Dimensions, Spacing & Typography
+  static const double cardIconSize = 60.0;
+  static const double cardPadding = 24.0;
+  static const double fontBodyLarge = 26.0;
+  static const double fontBodyMedium = 14.0;
+  static const double fontDisplayDesktop = 92.0;
+  static const double fontDisplayTablet = 86.0;
+  static const double fontHeadlineLarge = 38.0;
+  static const double fontHeadlineMedium = 32.0;
+  static const double fontLabelSmall = 12.0;
+  static const double iconSizeMedium = 28.0;
+  static const double maxContentWidth = 1200.0;
+  static const double paddingButtonLargeH = 50.0;
+  static const double paddingButtonSmallV = 22.0;
+  static const double paddingHeroMobile = 44.0;
+  static const double paddingSectionVertical = 64.0;
+  static const double radiusLarge = 30.0;
+  static const double radiusMedium = 20.0;
+  static const double radiusSmall = 12.0;
+  static const double spacerDisplay = 32.0;
+  static const double spacerExtraLarge = 48.0;
+  static const double spacerLarge = 24.0;
+  static const double spacerMedium = 16.0;
+  static const double spacerSmall = 8.0;
+}
+
 
 /// A descriptive page providing the narrative background, mission, and vision of the platform.
 /// Uses a layered scrollable design with distinct sections for story, values, and action.
@@ -55,28 +108,25 @@ class AboutScreen extends StatelessWidget {
 
   /// Builds the 'Story' section which combines narrative text with visual identifiers.
   Widget _buildStorySection(BuildContext context, String headline, String text) {
-    // Evaluating device class for layout transformation (Row vs Column)
     final isDesktop = Responsive.isDesktop(context);
     final hPad = Responsive.contentPaddingH(context);
  
     return Container(
-      color: AppColors.white,
+      color: AboutUIConfig.white,
       child: Center(
         child: ConstrainedBox(
-          // Constraining width for massive screens to maintain readability
-          constraints:
-              const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+          constraints: const BoxConstraints(maxWidth: AboutUIConfig.maxContentWidth),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 56),
-            // Choosing horizontal Row for desktop, vertical Column for mobile
+            padding: EdgeInsets.symmetric(
+              horizontal: hPad, 
+              vertical: AboutUIConfig.paddingSectionVertical,
+            ),
             child: isDesktop
                 ? Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Story text takes up the majority of the space
                       Expanded(flex: 3, child: _buildStoryText(headline, text)),
-                      const SizedBox(width: 48), // Deep gap for clarity
-                      // Right column for visual decorative elements
+                      const SizedBox(width: AboutUIConfig.spacerExtraLarge),
                       Expanded(flex: 2, child: _buildRightColumn()),
                     ],
                   )
@@ -84,7 +134,7 @@ class AboutScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildStoryText(headline, text),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AboutUIConfig.spacerDisplay),
                       _buildRightColumn(),
                     ],
                   ),
@@ -99,30 +149,25 @@ class AboutScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Primary section headline
         Text(
           headline,
           style: GoogleFonts.playfairDisplay(
-            color: AppColors.darkGreen,
-            fontSize: 26,
+            color: AboutUIConfig.darkGreen,
+            fontSize: AboutUIConfig.fontDisplayTablet,
             fontWeight: FontWeight.bold,
             height: 1.3,
           ),
         ),
-        // Visual gap
-        const SizedBox(height: 18),
-        // Narrative story body
+        const SizedBox(height: AboutUIConfig.spacerMedium + 2),
         Text(
           text,
           style: GoogleFonts.poppins(
-            color: AppColors.textMedium,
-            fontSize: 14,
+            color: AboutUIConfig.textMedium,
+            fontSize: AboutUIConfig.fontBodyMedium,
             height: 1.7,
           ),
         ),
-        // Gap before quote
-        const SizedBox(height: 24),
-        // Impactful mission highlight
+        const SizedBox(height: AboutUIConfig.spacerLarge),
         _buildQuoteBlock(),
       ],
     );
@@ -141,17 +186,16 @@ class AboutScreen extends StatelessWidget {
   /// A stylized blockquote for emphasizing the platform's core directive.
   Widget _buildQuoteBlock() {
     return Container(
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(AboutUIConfig.cardPadding - 2),
       decoration: const BoxDecoration(
-        // Gold accent border to denote importance
-        border: Border(left: BorderSide(color: AppColors.accentGold, width: 4)),
-        color: AppColors.offWhite,
+        border: Border(left: BorderSide(color: AboutUIConfig.accentGold, width: 4)),
+        color: AboutUIConfig.offWhite,
       ),
       child: Text(
         '"At Hunarmand Kashmir, we don\'t just teach skills—we open doors, restore confidence, and help build futures rooted in dignity, independence, and global opportunity."',
         style: GoogleFonts.poppins(
-          color: AppColors.darkGreen,
-          fontSize: 13,
+          color: AboutUIConfig.darkGreen,
+          fontSize: AboutUIConfig.fontLabelSmall + 1,
           fontStyle: FontStyle.italic,
           height: 1.7,
         ),
@@ -167,55 +211,57 @@ class AboutScreen extends StatelessWidget {
   /// Builds the 'Mission, Vision & Values' section with a 3-column grid.
   Widget _buildMissionVisionSection(
       BuildContext context, String mission, String vision, String values) {
-    // Standard horizontal content padding
     final hPad = Responsive.contentPaddingH(context);
-    // Core foundational data points
     final items = [
       {
-        'icon': '🎯',
+        'icon': Icons.track_changes_outlined,
+        'iconColor': AboutUIConfig.accentGold,
         'title': 'Our Mission',
         'desc': mission,
       },
       {
-        'icon': '👁️',
+        'icon': Icons.favorite_border_rounded,
+        'iconColor': AboutUIConfig.darkGreen,
         'title': 'Our Vision',
         'desc': vision,
       },
       {
-        'icon': '🤝',
+        'icon': Icons.people_outline_rounded,
+        'iconColor': AboutUIConfig.accentGold,
         'title': 'Community',
         'desc': values,
       },
     ];
  
     return Container(
-      color: AppColors.offWhite, // Background shift for distinct sectioning
+      color: AboutUIConfig.offWhite,
       child: Center(
         child: ConstrainedBox(
-          constraints:
-              const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+          constraints: const BoxConstraints(maxWidth: AboutUIConfig.maxContentWidth),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 64),
+            padding: EdgeInsets.symmetric(
+              horizontal: hPad, 
+              vertical: AboutUIConfig.paddingSectionVertical,
+            ),
             child: Column(
               children: [
-                // Section title
                 Text(
                   'Mission, Vision & Values',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.playfairDisplay(
-                    color: AppColors.darkGreen,
-                    fontSize: Responsive.isDesktop(context) ? 32.0 : 24.0,
+                    color: AboutUIConfig.darkGreen,
+                    fontSize: Responsive.isDesktop(context) 
+                        ? AboutUIConfig.fontDisplayDesktop 
+                        : AboutUIConfig.fontDisplayTablet,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                // Gap
-                const SizedBox(height: 36),
-                // Displaying values in an adaptive responsive grid
+                const SizedBox(height: AboutUIConfig.spacerExtraLarge - 12),
                 ResponsiveCardGrid(
                   mobileCols: 1,
                   tabletCols: 2,
                   desktopCols: 3,
-                  children: items.map((item) => _missionCard(item)).toList(),
+                  children: items.map((item) => MissionCard(item: item)).toList(),
                 ),
               ],
             ),
@@ -225,43 +271,43 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  /// Maps data map into a stylized MissionCard widget.
-  Widget _missionCard(Map<String, String> item) {
-    return MissionCard(item: item);
-  }
-
   /// Builds a section highlighting the core team and mentors.
   Widget _buildTeamSection(BuildContext context, List<TeamMember> members) {
     final hPad = Responsive.contentPaddingH(context);
     final isDesktop = Responsive.isDesktop(context);
 
     return Container(
-      color: AppColors.white,
+      color: AboutUIConfig.white,
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+          constraints: const BoxConstraints(maxWidth: AboutUIConfig.maxContentWidth),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 64),
+            padding: EdgeInsets.symmetric(
+              horizontal: hPad, 
+              vertical: AboutUIConfig.paddingSectionVertical,
+            ),
             child: Column(
               children: [
                 Text(
                   'Voices of Guidance',
                   style: GoogleFonts.playfairDisplay(
-                    color: AppColors.darkGreen,
-                    fontSize: isDesktop ? 32.0 : 24.0,
+                    color: AboutUIConfig.darkGreen,
+                    fontSize: isDesktop 
+                        ? AboutUIConfig.fontDisplayDesktop 
+                        : AboutUIConfig.fontDisplayTablet,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AboutUIConfig.spacerSmall + 4),
                 Text(
                   'Our dedicated mentors and instructors bringing world-class expertise to Kashmir.',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
-                    color: AppColors.textMedium,
-                    fontSize: 14,
+                    color: AboutUIConfig.textMedium,
+                    fontSize: AboutUIConfig.fontBodyMedium,
                   ),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: AboutUIConfig.spacerExtraLarge),
                 ResponsiveCardGrid(
                   mobileCols: 1,
                   tabletCols: 3,
@@ -280,36 +326,31 @@ class AboutScreen extends StatelessWidget {
   Widget _buildCtaSection(BuildContext context) {
     final hPad = Responsive.contentPaddingH(context);
     return Container(
-      color: AppColors.white,
+      color: AboutUIConfig.white,
       child: Center(
         child: ConstrainedBox(
-          constraints:
-              const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+          constraints: const BoxConstraints(maxWidth: AboutUIConfig.maxContentWidth),
           child: Padding(
-            padding: EdgeInsets.fromLTRB(hPad, 12, hPad, 40),
-            // The signature primary color CTA container
+            padding: EdgeInsets.fromLTRB(hPad, AboutUIConfig.spacerSmall + 4, hPad, AboutUIConfig.paddingButtonLargeH),
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 44),
+              padding: const EdgeInsets.symmetric(horizontal: AboutUIConfig.spacerDisplay, vertical: AboutUIConfig.paddingHeroMobile),
               decoration: BoxDecoration(
-                color: AppColors.darkGreen,
-                borderRadius: BorderRadius.circular(20),
+                color: AboutUIConfig.darkGreen,
+                borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium),
               ),
               child: Column(
                 children: [
-                  // Conversational headline
                   Text(
                     'Be Part of the Change',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.playfairDisplay(
-                      color: AppColors.white,
-                      fontSize: 26,
+                      color: AboutUIConfig.white,
+                      fontSize: AboutUIConfig.fontHeadlineLarge - 2,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  // Gap
-                  const SizedBox(height: 12),
-                  // Persuasive secondary text
+                  const SizedBox(height: AboutUIConfig.spacerSmall + 4),
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 520),
                     child: Text(
@@ -317,30 +358,32 @@ class AboutScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         color: Colors.white70,
-                        fontSize: 14,
+                        fontSize: AboutUIConfig.fontBodyMedium,
                         height: 1.6,
                       ),
                     ),
                   ),
-                  // Gap before button
-                  const SizedBox(height: 28),
-                  // Primary action portal
+                  const SizedBox(height: AboutUIConfig.spacerLarge + 4),
                   MouseRegion(
                     cursor: SystemMouseCursors.click,
                     child: OutlinedButton(
                       onPressed: () => context.read<AppState>().navigate('contact'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.white,
-                        side: const BorderSide(color: AppColors.white),
+                        foregroundColor: AboutUIConfig.white,
+                        side: const BorderSide(color: AboutUIConfig.white),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 14),
+                          horizontal: AboutUIConfig.paddingButtonLargeH, 
+                          vertical: AboutUIConfig.paddingButtonSmallV + 2,
+                        ),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30)),
+                            borderRadius: BorderRadius.circular(AboutUIConfig.radiusLarge)),
                       ),
                       child: Text(
                         'Contact Us Today',
                         style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w600, fontSize: 15),
+                            fontWeight: FontWeight.w600, 
+                            fontSize: AboutUIConfig.fontBodyLarge - 1,
+                        ),
                       ),
                     ),
                   ),
@@ -354,45 +397,42 @@ class AboutScreen extends StatelessWidget {
   }
 }
 
-/// An interactive card used to display foundational values with hover effects.
-class MissionCard extends StatefulWidget {
-  final Map<String, String> item;
+// ─── MISSION CARD ────────────────────────────────────────────────────────────
 
-  // Constructor taking the data for the card
+/// MissionCard - Displays core values with interactive hover effects.
+class MissionCard extends StatefulWidget {
+  final Map<String, Object> item;
+
   const MissionCard({super.key, required this.item});
 
   @override
-  // Creating mutable state for interaction response
   State<MissionCard> createState() => _MissionCardState();
 }
 
 class _MissionCardState extends State<MissionCard> {
-  // Tracking mouse hover state for visual feedback
   bool _isHovered = false;
 
   @override
-  // Building the interactive value card
   Widget build(BuildContext context) {
+    final IconData icon = (widget.item['icon'] as IconData?) ?? Icons.star_outline;
+    final Color iconColor = (widget.item['iconColor'] as Color?) ?? AboutUIConfig.accentGold;
+
     return RepaintBoundary(
       child: MouseRegion(
         cursor: SystemMouseCursors.basic,
-        // Updating hover state
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),
-        // Animated main container with lift effect
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeOutCubic,
-          // Moving upward when hovered
           transform: Matrix4.identity()..translate(0.0, _isHovered ? -6.0 : 0.0),
           decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(16),
-            // Deepening the shadow on hover for depth
+            color: AboutUIConfig.white,
+            borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium - 4),
             boxShadow: [
               BoxShadow(
                 color: _isHovered
-                    ? AppColors.darkGreen.withOpacity(0.08)
+                    ? AboutUIConfig.darkGreen.withOpacity(0.08)
                     : Colors.black.withOpacity(0.04),
                 blurRadius: _isHovered ? 20 : 10,
                 offset: Offset(0, _isHovered ? 12 : 4),
@@ -400,16 +440,14 @@ class _MissionCardState extends State<MissionCard> {
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium - 4),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 250),
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(AboutUIConfig.cardPadding),
               decoration: BoxDecoration(
-                // Color-switching top accent border for visual hierarchy
                 border: Border(
                   top: BorderSide(
-                    color:
-                        _isHovered ? AppColors.darkGreen : AppColors.accentGold,
+                    color: _isHovered ? AboutUIConfig.darkGreen : AboutUIConfig.accentGold,
                     width: 3,
                   ),
                   left: BorderSide(color: Colors.grey.shade100),
@@ -420,32 +458,42 @@ class _MissionCardState extends State<MissionCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Icon glyph with expressive scale-up on hover
-                  AnimatedScale(
-                    scale: _isHovered ? 1.15 : 1.0,
+                  // Icon container with subtle tinted background
+                  AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    child: Text(widget.item['icon']!,
-                        style: const TextStyle(fontSize: 32)),
-                  ),
-                  // Gap
-                  const SizedBox(height: 14),
-                  // Bold value title
-                  Text(
-                    widget.item['title']!,
-                    style: GoogleFonts.poppins(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textDark,
+                    width: AboutUIConfig.cardIconSize - 12,
+                    height: AboutUIConfig.cardIconSize - 12,
+                    decoration: BoxDecoration(
+                      color: iconColor.withOpacity(_isHovered ? 0.15 : 0.08),
+                      borderRadius: BorderRadius.circular(AboutUIConfig.radiusSmall + 2),
+                    ),
+                    child: Center(
+                      child: AnimatedScale(
+                        scale: _isHovered ? 1.15 : 1.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: Icon(
+                          icon,
+                          color: _isHovered ? AboutUIConfig.darkGreen : iconColor,
+                          size: AboutUIConfig.iconSizeMedium + 4,
+                        ),
+                      ),
                     ),
                   ),
-                  // Gap
-                  const SizedBox(height: 10),
-                  // Narrative description of the value point
+                  const SizedBox(height: AboutUIConfig.spacerMedium - 2),
                   Text(
-                    widget.item['desc']!,
+                    '${widget.item['title']}',
                     style: GoogleFonts.poppins(
-                      color: AppColors.textMedium,
-                      fontSize: 13,
+                      fontSize: AboutUIConfig.fontHeadlineMedium - 5,
+                      fontWeight: FontWeight.w700,
+                      color: AboutUIConfig.textDark,
+                    ),
+                  ),
+                  const SizedBox(height: AboutUIConfig.spacerSmall + 2),
+                  Text(
+                    '${widget.item['desc']}',
+                    style: GoogleFonts.poppins(
+                      color: AboutUIConfig.textMedium,
+                      fontSize: AboutUIConfig.fontLabelSmall + 1,
                       height: 1.6,
                     ),
                   ),
@@ -460,7 +508,9 @@ class _MissionCardState extends State<MissionCard> {
 }
 
 /// A decorative visual component styled as a brand workshop identifier card.
-/// An interactive card displaying a team member's profile.
+// ─── TEAM CARD ───────────────────────────────────────────────────────────────
+
+/// TeamCard - Displays a team member's profile with hover animation.
 class TeamCard extends StatefulWidget {
   final TeamMember member;
   const TeamCard({super.key, required this.member});
@@ -479,17 +529,17 @@ class _TeamCardState extends State<TeamCard> {
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AboutUIConfig.cardPadding),
         decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: AboutUIConfig.white,
+          borderRadius: BorderRadius.circular(AboutUIConfig.radiusSmall + 4),
           border: Border.all(
-            color: _isHovered ? AppColors.darkGreen : Colors.grey.shade100,
+            color: _isHovered ? AboutUIConfig.darkGreen : Colors.grey.shade100,
           ),
           boxShadow: [
             BoxShadow(
               color: _isHovered
-                  ? AppColors.darkGreen.withOpacity(0.08)
+                  ? AboutUIConfig.darkGreen.withOpacity(0.08)
                   : Colors.black.withOpacity(0.04),
               blurRadius: _isHovered ? 15 : 8,
               offset: Offset(0, _isHovered ? 8 : 4),
@@ -503,7 +553,7 @@ class _TeamCardState extends State<TeamCard> {
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.accentGold, width: 2),
+                border: Border.all(color: AboutUIConfig.accentGold, width: 2),
               ),
               child: ClipOval(
                 child: widget.member.imageUrl.startsWith('http')
@@ -516,19 +566,19 @@ class _TeamCardState extends State<TeamCard> {
                     : Center(
                         child: Text(
                           widget.member.imageUrl,
-                          style: const TextStyle(fontSize: 32),
+                          style: const TextStyle(fontSize: AboutUIConfig.spacerDisplay),
                         ),
                       ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AboutUIConfig.spacerMedium),
             Text(
               widget.member.name,
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: AppColors.darkGreen,
+                fontSize: AboutUIConfig.fontBodyLarge,
+                color: AboutUIConfig.darkGreen,
               ),
             ),
             const SizedBox(height: 4),
@@ -536,8 +586,8 @@ class _TeamCardState extends State<TeamCard> {
               widget.member.role,
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: AppColors.accentGold,
+                fontSize: AboutUIConfig.fontBodyMedium - 1,
+                color: AboutUIConfig.accentGold,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -548,54 +598,48 @@ class _TeamCardState extends State<TeamCard> {
   }
 }
 
+// ─── WORKSHOP CARD ───────────────────────────────────────────────────────────
+
+/// WorkshopCard - A decorative branded container emphasizing skill-powered design.
 class WorkshopCard extends StatefulWidget {
-  // Constructor
   const WorkshopCard({super.key});
 
   @override
-  // Handle interaction state
   State<WorkshopCard> createState() => _WorkshopCardState();
 }
 
 class _WorkshopCardState extends State<WorkshopCard> {
-  // Store mouse hover state
   bool _isHovered = false;
 
   @override
-  // Draw the high-impact visual card
   Widget build(BuildContext context) {
     return RepaintBoundary(
       child: MouseRegion(
-        // Toggle interaction state
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),
-        // Primary container with branded gradient
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           width: double.infinity,
-          height: 240, // Fixed height for visual consistency
+          height: 240,
           decoration: BoxDecoration(
-            // Shift gradient direction/intensity on hover
             gradient: LinearGradient(
               colors: _isHovered
-                  ? [AppColors.mediumGreen, AppColors.darkGreen]
-                  : [AppColors.darkGreen, AppColors.mediumGreen],
+                  ? [AboutUIConfig.mediumGreen, AboutUIConfig.darkGreen]
+                  : [AboutUIConfig.darkGreen, AboutUIConfig.mediumGreen],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(20),
-            // Persistent gold border to denote premium quality
+            borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium),
             border: Border.all(
               color: _isHovered
-                  ? AppColors.accentGold
-                  : AppColors.accentGold.withOpacity(0.5),
+                  ? AboutUIConfig.accentGold
+                  : AboutUIConfig.accentGold.withOpacity(0.5),
               width: _isHovered ? 3 : 2,
             ),
-            // Glow effect on hover
             boxShadow: [
               if (_isHovered)
                 BoxShadow(
-                  color: AppColors.accentGold.withOpacity(0.3),
+                  color: AboutUIConfig.accentGold.withOpacity(0.3),
                   blurRadius: 20,
                   spreadRadius: 2,
                 )
@@ -604,41 +648,36 @@ class _WorkshopCardState extends State<WorkshopCard> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Central emblem with highlighted backdrop
               AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AboutUIConfig.radiusSmall),
                 decoration: BoxDecoration(
                   color: _isHovered
-                      ? AppColors.accentGold.withOpacity(0.2)
-                      : AppColors.white.withOpacity(0.1),
+                      ? AboutUIConfig.accentGold.withOpacity(0.2)
+                      : AboutUIConfig.white.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.workspace_premium,
-                    color: AppColors.accentGold, size: 48),
+                    color: AboutUIConfig.accentGold, size: AboutUIConfig.spacerExtraLarge),
               ),
-              // Gap
-              const SizedBox(height: 16),
-              // Stylized 'badge' metadata text
+              const SizedBox(height: AboutUIConfig.spacerMedium),
               Text(
                 'POWERED BY SKILLS',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
-                  color: AppColors.accentGold,
+                  color: AboutUIConfig.accentGold,
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 2.5,
                 ),
               ),
-              // Gap
-              const SizedBox(height: 8),
-              // Stylized brand text with letter spacing
+              const SizedBox(height: AboutUIConfig.spacerSmall),
               Text(
                 'hunARMAND\namdesigns',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
-                  color: AppColors.white,
-                  fontSize: 22,
+                  color: AboutUIConfig.white,
+                  fontSize: AboutUIConfig.fontHeadlineMedium,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.5,
                 ),

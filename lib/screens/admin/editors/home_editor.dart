@@ -1,9 +1,29 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: home_editor.dart
+/// PURPOSE: Admin interface for configuring the homepage hero messaging 
+///          and the primary value propositions ('Features') of the platform.
+/// CONNECTIONS:
+///   - USED BY: admin_dashboard_screen.dart
+///   - MUTATES: AppContent via dynamic_content_provider.dart
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/dynamic_content_provider.dart';
 import '../../../models/content_model.dart';
-import '../../../theme/app_theme.dart';
+
+
+// ─── HOMEEDITORUICONFIG ──────────────────────────────
+/// Isolated UI configuration specific to home_editor.dart.
+class HomeEditorUIConfig {
+  // Brand Colors used locally
+  static const Color darkGreen = Color(0xFF0D3320);
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textMedium = Color(0xFF555555);
+
+}
+
 
 class HomeEditor extends StatefulWidget {
   const HomeEditor({super.key});
@@ -43,7 +63,7 @@ class _HomeEditorState extends State<HomeEditor> {
             style: GoogleFonts.poppins(
               fontSize: 28,
               fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
+              color: HomeEditorUIConfig.textDark,
             ),
           ),
           const SizedBox(height: 24),
@@ -87,7 +107,7 @@ class _HomeEditorState extends State<HomeEditor> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.darkGreen,
+              backgroundColor: HomeEditorUIConfig.darkGreen,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
             ),
@@ -113,7 +133,7 @@ class _HomeEditorState extends State<HomeEditor> {
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textDark,
+                color: HomeEditorUIConfig.textDark,
               ),
             ),
             TextButton.icon(
@@ -232,7 +252,7 @@ class _HomeEditorState extends State<HomeEditor> {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: AppColors.darkGreen,
+              color: HomeEditorUIConfig.darkGreen,
             ),
           ),
           const SizedBox(height: 20),
@@ -251,7 +271,7 @@ class _HomeEditorState extends State<HomeEditor> {
           style: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: AppColors.textMedium,
+            color: HomeEditorUIConfig.textMedium,
           ),
         ),
         const SizedBox(height: 8),

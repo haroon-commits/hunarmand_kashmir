@@ -1,36 +1,51 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: gallery_screen.dart
+/// PURPOSE: A visual showcase of platform events, workshops, and facilities.
+///          Displays an interactive, responsive grid of image assets.
+/// CONNECTIONS:
+///   - USED BY: main.dart (MainNavigator)
+///   - DEPENDS ON: models/content_model.dart (GalleryImage)
+///   - SYNCED WITH: admin/editors/gallery_editor.dart
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../theme/app_theme.dart';
-import '../widgets/common_widgets.dart';
+import '../widgets/layout/page_header.dart';
+import '../widgets/layout/app_footer.dart';
 import '../utils/responsive.dart';
 import '../providers/dynamic_content_provider.dart';
 import '../models/content_model.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-/// A stateful page displaying a categorized visual journey of the mission's impact.
-/// Includes category filtering and interactive hover states for individual gallery items.
-class GalleryScreen extends StatefulWidget {
-  const GalleryScreen({super.key});
 
-  @override
-  State<GalleryScreen> createState() => _GalleryScreenState();
+// ─── GALLERYUICONFIG ──────────────────────────────
+/// Isolated UI configuration specific to gallery_screen.dart.
+class GalleryUIConfig {
+  // Brand Colors used locally
+  static const Color accentGold = Color(0xFFF5A623);
+  static const Color darkGreen = Color(0xFF0D3320);
+  static const Color mediumGreen = Color(0xFF1A4A2E);
+  static const Color textMedium = Color(0xFF555555);
+  static const Color white = Color(0xFFFFFFFF);
+
+  // Dimensions, Spacing & Typography
+  static const double cardIconSize = 60.0;
+  static const double fontBodyLarge = 26.0;
+  static const double fontLabelSmall = 12.0;
+  static const double gridSpacing = 16.0;
+  static const double iconSizeLarge = 38.0;
+  static const double paddingSectionVertical = 64.0;
+  static const double radiusSmall = 12.0;
+  static const double spacerExtraLarge = 48.0;
+  static const double spacerMedium = 16.0;
+  static const double spacerSmall = 8.0;
 }
 
-class _GalleryScreenState extends State<GalleryScreen> {
-  String selectedCategory = 'All';
-  final categories = ['All', 'Classes', 'Events', 'Students', 'Campus'];
 
-  Future<void> _launchInstagram() async {
-    final url = Uri.parse('https://instagram.com/hunarmandkashmir');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to open Instagram')),
-      );
-    }
-  }
+/// A visually rich gallery page displaying a masonry-style journey of the mission's impact.
+/// Uses a Pinterest-inspired staggered 3-column layout that mirrors the reference design.
+class GalleryScreen extends StatelessWidget {
+  const GalleryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,146 +56,29 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
         return CustomScrollView(
           slivers: [
-            // Hero section
+            // Hero header
             SliverGreenPageHeader(
               title: content.galleryHeroTitle,
               subtitle: content.galleryHeroDescription,
             ),
-            
-            // Category filters
+
+            // Masonry gallery grid
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.only(top: 28, bottom: 24),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.symmetric(horizontal: hPad),
-                  child: Row(
-                    children: categories.map((cat) {
-                      final isSelected = cat == selectedCategory;
-                      return MouseRegion(
-                        cursor: SystemMouseCursors.click,
-                        child: GestureDetector(
-                          onTap: () => setState(() => selectedCategory = cat),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            margin: const EdgeInsets.only(right: 10),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 18, vertical: 9),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? AppColors.darkGreen
-                                  : AppColors.offWhite,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: isSelected
-                                    ? AppColors.darkGreen
-                                    : Colors.grey.shade200,
-                              ),
-                            ),
-                            child: Text(
-                              cat,
-                              style: GoogleFonts.poppins(
-                                color: isSelected
-                                    ? AppColors.white
-                                    : AppColors.textMedium,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: hPad,
+                  vertical: GalleryUIConfig.paddingSectionVertical,
                 ),
+                child: _MasonryGallery(images: content.galleryImages),
               ),
             ),
 
-            // Gallery Grid
-            SliverPadding(
-              padding: EdgeInsets.symmetric(horizontal: hPad),
-              sliver: SliverResponsiveCardGrid(
-                mobileCols: 2,
-                tabletCols: 3,
-                desktopCols: 4,
-                spacing: 14,
-                children: content.galleryImages
-                    .map((item) => GalleryCardWidget(item: item))
-                    .toList(),
-              ),
+            // Gold divider accent before footer
+            const SliverToBoxAdapter(
+              child: _GoldDividerBar(),
             ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 28)),
-
-            // Instagram CTA
-            SliverToBoxAdapter(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints:
-                      const BoxConstraints(maxWidth: Responsive.maxContentWidth),
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 32),
-                    child: Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: AppColors.offWhite,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade200),
-                      ),
-                      child: Column(
-                        children: [
-                          const Icon(Icons.photo_library_outlined,
-                              color: AppColors.darkGreen, size: 40),
-                          const SizedBox(height: 14),
-                          Text(
-                            'More photos coming soon!',
-                            style: GoogleFonts.poppins(
-                              color: AppColors.textDark,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 480),
-                            child: Text(
-                              'Follow us on Instagram @hunarmandkashmir for the latest updates from our campus.',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                color: AppColors.textMedium,
-                                fontSize: 13,
-                                height: 1.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                          SizedBox(
-                            width: Responsive.isTabletOrDesktop(context)
-                                ? 300
-                                : double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: _launchInstagram,
-                              icon: const Icon(Icons.camera_alt_outlined, size: 17),
-                              label: Text(
-                                'Follow on Instagram',
-                                style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.w600),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.darkGreen,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25)),
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            // Global site footer
             const SliverToBoxAdapter(child: AppFooter()),
           ],
         );
@@ -189,6 +87,158 @@ class _GalleryScreenState extends State<GalleryScreen> {
   }
 }
 
+// ─── Gold Divider Bar ─────────────────────────────────────────────────────────
+
+/// A thin horizontal gold accent bar that visually separates the gallery content
+/// from the dark footer, matching the reference design's amber/gold top border.
+class _GoldDividerBar extends StatelessWidget {
+  const _GoldDividerBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 3,
+      width: double.infinity,
+      color: GalleryUIConfig.accentGold,
+    );
+  }
+}
+
+// ─── Masonry Gallery ──────────────────────────────────────────────────────────
+
+/// _MasonryGallery - A Pinterest-style staggered 3-column grid.
+/// Distributes images across 3 columns with varying aspect ratios to create
+/// an organic, editorial look matching the reference screenshots.
+class _MasonryGallery extends StatelessWidget {
+  final List<GalleryImage> images;
+
+  const _MasonryGallery({required this.images});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDesktop = Responsive.isDesktop(context);
+    final isTablet = Responsive.isTablet(context);
+
+    if (images.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    if (!isDesktop && !isTablet) {
+      // Mobile: simple 2-column uniform grid
+      return _buildTwoColumnGrid(images);
+    }
+
+    // Desktop / Tablet: 3-column masonry
+    return _buildMasonryGrid(images);
+  }
+
+  /// Distributes images into 3 columns with staggered heights for the masonry effect.
+  Widget _buildMasonryGrid(List<GalleryImage> images) {
+    // Assign images to 3 columns in a round-robin fashion.
+    // The aspect ratios alternate to create visual rhythm.
+    final List<GalleryImage> col1 = [];
+    final List<GalleryImage> col2 = [];
+    final List<GalleryImage> col3 = [];
+
+    for (int i = 0; i < images.length; i++) {
+      if (i % 3 == 0) col1.add(images[i]);
+      else if (i % 3 == 1) col2.add(images[i]);
+      else col3.add(images[i]);
+    }
+
+    // Alternating aspect ratios per column to create height variation
+    final col1Ratios  = [1.1, 1.1, 1.1];   // Left: squat/medium
+    final col2Ratios  = [1.6, 1.0, 1.0];   // Middle: tall on top, medium below
+    final col3Ratios  = [1.1, 1.4, 1.0];   // Right: varied
+
+    const spacing = GalleryUIConfig.gridSpacing;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: _buildColumn(col1, col1Ratios, spacing)),
+        const SizedBox(width: spacing),
+        Expanded(child: _buildColumn(col2, col2Ratios, spacing)),
+        const SizedBox(width: spacing),
+        Expanded(child: _buildColumn(col3, col3Ratios, spacing)),
+      ],
+    );
+  }
+
+  /// Builds a single masonry column with optional staggered aspect ratios.
+  Widget _buildColumn(
+    List<GalleryImage> items,
+    List<double> aspectRatios,
+    double spacing,
+  ) {
+    return Column(
+      children: [
+        for (int i = 0; i < items.length; i++) ...[
+          if (i > 0) SizedBox(height: spacing),
+          AspectRatio(
+            aspectRatio: i < aspectRatios.length ? aspectRatios[i] : 1.1,
+            child: GalleryCardWidget(item: items[i]),
+          ),
+        ],
+      ],
+    );
+  }
+
+  /// Simple 2-column grid for mobile screens.
+  Widget _buildTwoColumnGrid(List<GalleryImage> images) {
+    final List<Widget> col1 = [];
+    final List<Widget> col2 = [];
+    const spacing = GalleryUIConfig.gridSpacing - 2.0;
+
+    for (int i = 0; i < images.length; i++) {
+      final card = Padding(
+        padding: EdgeInsets.only(bottom: spacing),
+        child: AspectRatio(
+          aspectRatio: 1.0,
+          child: GalleryCardWidget(item: images[i]),
+        ),
+      );
+      if (i.isEven) col1.add(card);
+      else col2.add(card);
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: Column(children: col1)),
+        const SizedBox(width: GalleryUIConfig.gridSpacing - 2),
+        Expanded(child: Column(children: col2)),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: GalleryUIConfig.spacerExtraLarge),
+        child: Column(
+          children: [
+            const Icon(Icons.photo_library_outlined,
+                color: GalleryUIConfig.darkGreen,
+                size: GalleryUIConfig.cardIconSize),
+            const SizedBox(height: GalleryUIConfig.spacerMedium),
+            Text(
+              'Gallery coming soon',
+              style: GoogleFonts.poppins(
+                color: GalleryUIConfig.textMedium,
+                fontSize: GalleryUIConfig.fontBodyLarge,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Gallery Card ─────────────────────────────────────────────────────────────
+
+/// GalleryCardWidget - An individual image tile with hover overlay.
 class GalleryCardWidget extends StatefulWidget {
   final GalleryImage item;
   const GalleryCardWidget({super.key, required this.item});
@@ -210,110 +260,128 @@ class _GalleryCardWidgetState extends State<GalleryCardWidget> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOutCubic,
-          transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
           decoration: BoxDecoration(
-            color: AppColors.mediumGreen,
-            borderRadius: BorderRadius.circular(14),
+            color: GalleryUIConfig.mediumGreen,
+            borderRadius: BorderRadius.circular(GalleryUIConfig.radiusSmall + 2),
             boxShadow: [
               if (_isHovered)
                 BoxShadow(
-                  color: AppColors.darkGreen.withOpacity(0.3),
-                  blurRadius: 15,
-                  spreadRadius: 2,
+                  color: GalleryUIConfig.darkGreen.withOpacity(0.25),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
                 )
+              else
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
             ],
           ),
-          child: Stack(
-            fit: StackFit.expand, // Make the image fill the entire card
-            children: [
-              // The main gallery image
-              ClipRRect(
-                borderRadius: BorderRadius.circular(14),
-                child: Image.network(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(GalleryUIConfig.radiusSmall + 2),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Main image
+                Image.network(
                   widget.item.imageUrl,
                   fit: BoxFit.cover,
-                  // Loading state purely using built-in loadingBuilder
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Container(
-                      color: Colors.grey.shade200,
+                      color: Colors.grey.shade100,
                       child: const Center(
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: AppColors.darkGreen,
+                          color: GalleryUIConfig.darkGreen,
                         ),
                       ),
                     );
                   },
                   errorBuilder: (context, error, stackTrace) => Container(
                     color: Colors.grey.shade100,
-                    child: const Icon(Icons.broken_image_outlined,
-                        color: Colors.grey, size: 32),
-                  ),
-                ),
-              ),
-
-              // Bottom label overlay (gradient for legibility)
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(12, 24, 12, 12),
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(14),
-                      bottomRight: Radius.circular(14),
-                    ),
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        Colors.black.withOpacity(0.8),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                  child: Text(
-                    widget.item.label,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      color: AppColors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-              AnimatedOpacity(
-                duration: const Duration(milliseconds: 250),
-                opacity: _isHovered ? 1.0 : 0.0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.darkGreen.withOpacity(0.85),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Center(
-                    child: Row(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.touch_app_outlined,
-                            color: AppColors.accentGold, size: 20),
-                        const SizedBox(width: 8),
+                        Icon(Icons.image_outlined,
+                            color: Colors.grey.shade400,
+                            size: GalleryUIConfig.iconSizeLarge),
+                        const SizedBox(height: GalleryUIConfig.spacerSmall),
                         Text(
-                          'View',
+                          'Image unavailable',
                           style: GoogleFonts.poppins(
-                            color: AppColors.accentGold,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
+                            color: Colors.grey.shade400,
+                            fontSize: GalleryUIConfig.fontLabelSmall,
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
+
+                // Bottom label gradient overlay
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(10, 20, 10, 8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.7),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                    child: Text(
+                      widget.item.label,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        color: GalleryUIConfig.white,
+                        fontSize: GalleryUIConfig.fontLabelSmall - 1,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Hover overlay
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 250),
+                  opacity: _isHovered ? 1.0 : 0.0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: GalleryUIConfig.darkGreen.withOpacity(0.82),
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.zoom_in_rounded,
+                            color: GalleryUIConfig.accentGold,
+                            size: GalleryUIConfig.iconSizeLarge,
+                          ),
+                          const SizedBox(height: GalleryUIConfig.spacerSmall),
+                          Text(
+                            'View',
+                            style: GoogleFonts.poppins(
+                              color: GalleryUIConfig.accentGold,
+                              fontWeight: FontWeight.w700,
+                              fontSize: GalleryUIConfig.fontLabelSmall + 2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

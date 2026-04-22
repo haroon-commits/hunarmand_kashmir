@@ -1,8 +1,28 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: global_editor.dart
+/// PURPOSE: Admin interface for managing site-wide branding configurations 
+///          such as titles, visual logos, and global footer disclaimers.
+/// CONNECTIONS:
+///   - USED BY: admin_dashboard_screen.dart
+///   - MUTATES: AppContent via dynamic_content_provider.dart
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/dynamic_content_provider.dart';
-import '../../../theme/app_theme.dart';
+
+
+// ─── GLOBALEDITORUICONFIG ──────────────────────────────
+/// Isolated UI configuration specific to global_editor.dart.
+class GlobalEditorUIConfig {
+  // Brand Colors used locally
+  static const Color darkGreen = Color(0xFF0D3320);
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textMedium = Color(0xFF555555);
+
+}
+
 
 class GlobalEditor extends StatefulWidget {
   const GlobalEditor({super.key});
@@ -43,7 +63,7 @@ class _GlobalEditorState extends State<GlobalEditor> {
             style: GoogleFonts.poppins(
               fontSize: 28,
               fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
+              color: GlobalEditorUIConfig.textDark,
             ),
           ),
           const SizedBox(height: 24),
@@ -91,7 +111,7 @@ class _GlobalEditorState extends State<GlobalEditor> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.darkGreen,
+              backgroundColor: GlobalEditorUIConfig.darkGreen,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
             ),
@@ -118,7 +138,7 @@ class _GlobalEditorState extends State<GlobalEditor> {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: AppColors.darkGreen,
+              color: GlobalEditorUIConfig.darkGreen,
             ),
           ),
           const SizedBox(height: 20),
@@ -138,7 +158,7 @@ class _GlobalEditorState extends State<GlobalEditor> {
           style: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: AppColors.textMedium,
+            color: GlobalEditorUIConfig.textMedium,
           ),
         ),
         const SizedBox(height: 8),

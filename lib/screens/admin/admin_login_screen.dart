@@ -1,8 +1,29 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: admin_login_screen.dart
+/// PURPOSE: Authentication gateway protecting administrative capabilities.
+///          Verifies credentials before granting access to the dashboard.
+/// CONNECTIONS:
+///   - USED BY: main.dart (when admin selected but unauthenticated)
+///   - DEPENDS ON: providers/admin_provider.dart
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../providers/admin_provider.dart';
-import '../../theme/app_theme.dart';
+
+
+// ─── ADMINLOGINUICONFIG ──────────────────────────────
+/// Isolated UI configuration specific to admin_login_screen.dart.
+class AdminLoginUIConfig {
+  // Brand Colors used locally
+  static const Color darkGreen = Color(0xFF0D3320);
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textLight = Color(0xFF888888);
+  static const Color white = Color(0xFFFFFFFF);
+
+}
+
 
 class AdminLoginScreen extends StatelessWidget {
   const AdminLoginScreen({super.key});
@@ -10,13 +31,13 @@ class AdminLoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AdminLoginUIConfig.white,
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 400),
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AdminLoginUIConfig.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -32,7 +53,7 @@ class AdminLoginScreen extends StatelessWidget {
               Text(
                 'ہنرمند کشمیر',
                 style: GoogleFonts.amiriQuran(
-                  color: AppColors.darkGreen,
+                  color: AdminLoginUIConfig.darkGreen,
                   fontSize: 48,
                 ),
               ),
@@ -42,7 +63,7 @@ class AdminLoginScreen extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
+                  color: AdminLoginUIConfig.textDark,
                 ),
               ),
               const SizedBox(height: 8),
@@ -51,7 +72,7 @@ class AdminLoginScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 14,
-                  color: AppColors.textLight,
+                  color: AdminLoginUIConfig.textLight,
                 ),
               ),
               const SizedBox(height: 32),
@@ -60,7 +81,7 @@ class AdminLoginScreen extends StatelessWidget {
                   context.read<AdminProvider>().loginAsGuest();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.darkGreen,
+                  backgroundColor: AdminLoginUIConfig.darkGreen,
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(

@@ -1,11 +1,58 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: donate_screen.dart
+/// PURPOSE: A page dedicated to highlighting the impact of contributions and 
+///          facilitating user donations through selectable funding tiers.
+/// CONNECTIONS:
+///   - USED BY: main.dart (MainNavigator)
+///   - DEPENDS ON: models/content_model.dart (DonationTier)
+///   - SYNCED WITH: admin/editors/donate_editor.dart
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme/app_theme.dart';
-import '../widgets/common_widgets.dart';
-import '../utils/responsive.dart';
+import '../widgets/layout/app_footer.dart';
+import '../widgets/common/responsive_grid.dart';
+import '../widgets/cards/donation_tier_card.dart';
 import 'package:provider/provider.dart';
 import '../providers/dynamic_content_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+
+// ─── DONATEUICONFIG ──────────────────────────────
+/// Isolated UI configuration specific to donate_screen.dart.
+class DonateUIConfig {
+  // Brand Colors used locally
+  static const Color accentGold = Color(0xFFF5A623);
+  static const Color darkGreen = Color(0xFF0D3320);
+  static const Color mediumGreen = Color(0xFF1A4A2E);
+  static const Color offWhite = Color(0xFFF8F6F0);
+  static const Color successGreen = Color(0xFF27AE60);
+  static const Color tealAccent = Color(0xFF4ECDC4);
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textMedium = Color(0xFF555555);
+  static const Color white = Color(0xFFFFFFFF);
+
+  // Dimensions, Spacing & Typography
+  static const double cardPadding = 24.0;
+  static const double fontBodyLarge = 26.0;
+  static const double fontDisplayDesktop = 92.0;
+  static const double fontDisplayMobile = 82.0;
+  static const double fontHeadlineMedium = 32.0;
+  static const double fontHeadlineSmall = 28.0;
+  static const double fontLabelLarge = 14.0;
+  static const double fontLabelSmall = 12.0;
+  static const double maxContentWidth = 1200.0;
+  static const double paddingButtonSmallV = 22.0;
+  static const double paddingHeroMobile = 44.0;
+  static const double radiusExtraSmall = 8.0;
+  static const double radiusLarge = 30.0;
+  static const double radiusMedium = 20.0;
+  static const double radiusSmall = 12.0;
+  static const double spacerDisplay = 32.0;
+  static const double spacerMedium = 16.0;
+  static const double spacerSmall = 8.0;
+}
+
 
 /// A dedicated page for facilitating charitable contributions and sponsorships.
 /// Highlights the platform's social impact, transparency of funds, and provides pathways for direct giving.
@@ -62,22 +109,23 @@ class DonateScreen extends StatelessWidget {
   Widget _buildHero(BuildContext context, String title, String description) {
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(color: AppColors.darkGreen), // Branded dark base
+      decoration: const BoxDecoration(color: DonateUIConfig.darkGreen),
       child: Center(
         child: ConstrainedBox(
-          // Respecting readability constraints for large displays
-          constraints: const BoxConstraints(maxWidth: Responsive.maxContentWidth),
+          constraints: const BoxConstraints(maxWidth: DonateUIConfig.maxContentWidth),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 36, 24, 48),
+            padding: const EdgeInsets.fromLTRB(
+              DonateUIConfig.cardPadding, 
+              DonateUIConfig.spacerDisplay, 
+              DonateUIConfig.cardPadding, 
+              DonateUIConfig.paddingHeroMobile,
+            ),
             child: Column(
               children: [
-                // Contextual micro-tag
                 _supportTag(),
-                const SizedBox(height: 20),
-                // Emotive primary headline
+                const SizedBox(height: DonateUIConfig.spacerMedium + 4),
                 _heroTitle(title),
-                const SizedBox(height: 16),
-                // Explanatory body text
+                const SizedBox(height: DonateUIConfig.spacerMedium),
                 _heroDescription(description),
               ],
             ),
@@ -89,26 +137,31 @@ class DonateScreen extends StatelessWidget {
 
   /// Helper to build the stylistic 'Support the Mission' badge.
   Widget _supportTag() => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(
+          horizontal: DonateUIConfig.spacerMedium, 
+          vertical: DonateUIConfig.spacerSmall - 2,
+        ),
         decoration: BoxDecoration(
-          // Gold accent for importance
-          border: Border.all(color: AppColors.accentGold.withOpacity(0.5)),
-          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: DonateUIConfig.accentGold.withOpacity(0.5)),
+          borderRadius: BorderRadius.circular(DonateUIConfig.radiusLarge),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.favorite, color: AppColors.accentGold, size: 14),
-            const SizedBox(width: 6),
-            Text(
-              'Support the Mission',
-              style: GoogleFonts.poppins(
-                color: AppColors.accentGold,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            const Icon(Icons.favorite, color: DonateUIConfig.accentGold, size: DonateUIConfig.radiusMedium - 2),
+            const SizedBox(width: DonateUIConfig.spacerSmall - 2),
+            childText('Support the Mission', color: DonateUIConfig.accentGold, size: DonateUIConfig.fontLabelSmall),
           ],
+        ),
+      );
+
+  /// Minimal text helper
+  Widget childText(String text, {required Color color, required double size}) => Text(
+        text,
+        style: GoogleFonts.poppins(
+          color: color,
+          fontSize: size,
+          fontWeight: FontWeight.w600,
         ),
       );
 
@@ -117,8 +170,8 @@ class DonateScreen extends StatelessWidget {
         title,
         textAlign: TextAlign.center,
         style: GoogleFonts.playfairDisplay(
-          color: AppColors.white,
-          fontSize: 32,
+          color: DonateUIConfig.white,
+          fontSize: DonateUIConfig.fontDisplayDesktop - 8,
           fontWeight: FontWeight.bold,
           height: 1.3,
         ),
@@ -130,7 +183,7 @@ class DonateScreen extends StatelessWidget {
         textAlign: TextAlign.center,
         style: GoogleFonts.poppins(
           color: Colors.white70,
-          fontSize: 12,
+          fontSize: DonateUIConfig.fontLabelSmall + 1,
           height: 1.7,
         ),
       );
@@ -139,7 +192,6 @@ class DonateScreen extends StatelessWidget {
   
   /// Builds a section highlighting qualitative areas where funds create change.
   Widget _buildImpactCards(BuildContext context) {
-    // Definitive investment outcomes
     final impacts = [
       Impact(
         icon: '📖',
@@ -162,12 +214,11 @@ class DonateScreen extends StatelessWidget {
     ];
 
     return Container(
-      color: AppColors.white,
-      padding: const EdgeInsets.all(20),
+      color: DonateUIConfig.white,
+      padding: const EdgeInsets.all(DonateUIConfig.cardPadding - 4),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: Responsive.maxContentWidth),
-          // Adaptive layout grid for impact cards
+          constraints: const BoxConstraints(maxWidth: DonateUIConfig.maxContentWidth),
           child: ResponsiveCardGrid(
             mobileCols: 1,
             tabletCols: 3,
@@ -188,23 +239,21 @@ class DonateScreen extends StatelessWidget {
   
   /// Builds a detailed section with accountability data and progress bars for fund allocation.
   Widget _buildTransparencySection() {
-    // Strategic fund usage distribution data
     final fundUsage = [
       FundUsage(
           label: 'Student Scholarships & Training',
           percent: 70,
-          color: AppColors.darkGreen),
+          color: DonateUIConfig.darkGreen),
       FundUsage(
           label: 'Infrastructure & Tools',
           percent: 20,
-          color: AppColors.accentGold),
+          color: DonateUIConfig.accentGold),
       FundUsage(
           label: 'Community Outreach & Operations',
           percent: 10,
-          color: AppColors.tealAccent),
+          color: DonateUIConfig.tealAccent),
     ];
 
-    // Policy points ensuring ethical spending
     final notes = [
       '100% of student scholarship funds go directly to training costs.',
       'Regular impact reports sent to all donors.',
@@ -213,59 +262,55 @@ class DonateScreen extends StatelessWidget {
     ];
 
     return Container(
-      color: AppColors.offWhite, // Visual section break
-      padding: const EdgeInsets.all(20),
+      color: DonateUIConfig.offWhite,
+      padding: const EdgeInsets.all(DonateUIConfig.cardPadding - 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Section header emphasizing trust
           Text(
             'Our Promise of Transparency',
             style: GoogleFonts.playfairDisplay(
-              color: AppColors.darkGreen,
-              fontSize: 20,
+              color: DonateUIConfig.darkGreen,
+              fontSize: DonateUIConfig.fontHeadlineSmall + 4,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 10),
-          // Subtle descriptive text
+          const SizedBox(height: DonateUIConfig.spacerSmall),
           Text(
             'Every rupee is accounted for with ethical allocation.',
             style: GoogleFonts.poppins(
-              color: AppColors.textMedium,
-              fontSize: 12,
+              color: DonateUIConfig.textMedium,
+              fontSize: DonateUIConfig.fontLabelSmall + 1,
               height: 1.6,
             ),
           ),
-          const SizedBox(height: 16),
-          // Mapping policy points into checked list items
+          const SizedBox(height: DonateUIConfig.spacerMedium),
           ...notes.map((note) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Icon(Icons.check_circle_outline,
-                        color: AppColors.successGreen, size: 16),
-                    const SizedBox(width: 8),
+                        color: DonateUIConfig.successGreen, size: DonateUIConfig.spacerMedium),
+                    const SizedBox(width: DonateUIConfig.spacerSmall),
                     Expanded(
                       child: Text(
                         note,
                         style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            color: AppColors.textMedium,
+                            fontSize: DonateUIConfig.fontLabelSmall + 1,
+                            color: DonateUIConfig.textMedium,
                             height: 1.4),
                       ),
                     ),
                   ],
                 ),
               )),
-          const SizedBox(height: 20),
-          // A raised surface displaying the quantitative data
+          const SizedBox(height: DonateUIConfig.spacerMedium + 4),
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(DonateUIConfig.spacerMedium + 2),
             decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(14),
+              color: DonateUIConfig.white,
+              borderRadius: BorderRadius.circular(DonateUIConfig.radiusSmall + 2),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.04),
@@ -276,7 +321,6 @@ class DonateScreen extends StatelessWidget {
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              // Mapping data into progress indicator rows
               children: fundUsage.map((item) => _fundUsageRow(item)).toList(),
             ),
           ),
@@ -288,28 +332,26 @@ class DonateScreen extends StatelessWidget {
   /// Helper to build a labeled progress bar representing a specific budget allocation.
   Widget _fundUsageRow(FundUsage item) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.only(bottom: DonateUIConfig.spacerMedium - 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Row with label and percentage readout
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(item.label,
                   style: GoogleFonts.poppins(
-                      fontSize: 11, color: AppColors.textMedium)),
+                      fontSize: DonateUIConfig.fontLabelSmall - 1, color: DonateUIConfig.textMedium)),
               Text('${item.percent}%',
                   style: GoogleFonts.poppins(
-                      fontSize: 12,
+                      fontSize: DonateUIConfig.fontLabelSmall + 1,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textDark)),
+                      color: DonateUIConfig.textDark)),
             ],
           ),
-          const SizedBox(height: 6),
-          // Stylized visual progress bar
+          const SizedBox(height: DonateUIConfig.spacerSmall - 2),
           ClipRRect(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(DonateUIConfig.radiusExtraSmall),
             child: LinearProgressIndicator(
               value: item.percent / 100,
               backgroundColor: Colors.grey.shade200,
@@ -327,39 +369,38 @@ class DonateScreen extends StatelessWidget {
   /// Builds the 'Ways to Contribute' section listing specific sponsorship levels.
   Widget _buildDonationTiers(BuildContext context, List<dynamic> tiers) {
     return Container(
-      color: AppColors.white,
-      padding: const EdgeInsets.all(20),
+      color: DonateUIConfig.white,
+      padding: const EdgeInsets.all(DonateUIConfig.cardPadding - 4),
       child: Column(
         children: [
-          // Section headline
           Text(
             'Ways to Contribute',
             textAlign: TextAlign.center,
             style: GoogleFonts.playfairDisplay(
-              color: AppColors.darkGreen,
-              fontSize: 22,
+              color: DonateUIConfig.darkGreen,
+              fontSize: DonateUIConfig.fontHeadlineMedium,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 6),
-          // Secondary text reinforcing inclusivity of all donor amounts
+          const SizedBox(height: DonateUIConfig.spacerSmall - 2),
           Text(
             'Every amount counts towards building a skilled Kashmir.',
             textAlign: TextAlign.center,
             style:
-                GoogleFonts.poppins(color: AppColors.textMedium, fontSize: 12),
+                GoogleFonts.poppins(
+                  color: DonateUIConfig.textMedium, 
+                  fontSize: DonateUIConfig.fontLabelSmall + 1,
+                ),
           ),
-          const SizedBox(height: 20),
-          // Mapping global data tiers into specialized interactive cards
+          const SizedBox(height: DonateUIConfig.spacerMedium + 4),
           ...tiers.map((tier) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.only(bottom: DonateUIConfig.spacerMedium),
                 child: DonationTierCard(
                   icon: tier.icon,
                   title: tier.title,
                   amount: tier.amount,
                   description: tier.description,
                   isPopular: tier.popular,
-                  // Triggering the fulfillment instruction dialog on interaction
                   onTap: () =>
                       _showDonateDialog(context, tier.title, tier.amount),
                 ),
@@ -374,49 +415,44 @@ class DonateScreen extends StatelessWidget {
   /// Builds a prominent instructions block for fulfillment via direct bank transfer.
   Widget _buildBankTransferSection(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.all(DonateUIConfig.cardPadding - 4),
+      padding: const EdgeInsets.all(DonateUIConfig.cardPadding),
       decoration: BoxDecoration(
-        color: AppColors.darkGreen, // Signature contrast block
-        borderRadius: BorderRadius.circular(16),
+        color: DonateUIConfig.darkGreen,
+        borderRadius: BorderRadius.circular(DonateUIConfig.radiusSmall + 4),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Direct instruction title
           Text(
             'Direct Bank Transfer',
             style: GoogleFonts.poppins(
-              color: AppColors.white,
-              fontSize: 16,
+              color: DonateUIConfig.white,
+              fontSize: DonateUIConfig.fontLabelLarge + 2,
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 6),
-          // Operational flowchart summary
+          const SizedBox(height: DonateUIConfig.spacerSmall - 2),
           Text(
             'Transfer directly and share receipt via WhatsApp.',
             style: GoogleFonts.poppins(
-                color: Colors.white70, fontSize: 11, height: 1.5),
+                color: Colors.white70, fontSize: DonateUIConfig.fontLabelSmall - 1, height: 1.5),
           ),
-          const SizedBox(height: 16),
-          // Centered bank details container
+          const SizedBox(height: DonateUIConfig.spacerMedium),
           _bankInfoCard(),
-          const SizedBox(height: 16),
+          const SizedBox(height: DonateUIConfig.spacerMedium),
           const Divider(color: Colors.white12),
-          const SizedBox(height: 8),
-          // Inspirational philosophical quote on charity
+          const SizedBox(height: DonateUIConfig.spacerSmall),
           Text(
             '"Charity does not decrease wealth."',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              color: AppColors.accentGold,
-              fontSize: 12,
+              color: DonateUIConfig.accentGold,
+              fontSize: DonateUIConfig.fontLabelSmall + 1,
               fontStyle: FontStyle.italic,
             ),
           ),
-          const SizedBox(height: 16),
-          // Path to personal assistance
+          const SizedBox(height: DonateUIConfig.spacerMedium),
           _primaryButton(
               context, 'Contact Finance Team', () => _launchWhatsApp(context)),
         ],
@@ -426,7 +462,6 @@ class DonateScreen extends StatelessWidget {
 
   /// Builds a stylistic card containing the Trust's bank account identification data.
   Widget _bankInfoCard() {
-    // Current organizational account metadata
     final bankDetails = {
       'Account Name:': 'Hunarmand Kashmir Trust',
       'Account No:': '1234 5678 9012',
@@ -435,13 +470,12 @@ class DonateScreen extends StatelessWidget {
     };
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(DonateUIConfig.spacerMedium),
       decoration: BoxDecoration(
-        color: AppColors.mediumGreen, // Subtle value shift for internal card
-        borderRadius: BorderRadius.circular(10),
+        color: DonateUIConfig.mediumGreen,
+        borderRadius: BorderRadius.circular(DonateUIConfig.radiusExtraSmall + 2),
       ),
       child: Column(
-        // Mapping data entries into paired rows
         children: bankDetails.entries
             .map((entry) => _bankRow(entry.key, entry.value))
             .toList(),
@@ -455,21 +489,22 @@ class DonateScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          // Field key
           Text(
             label,
             style: GoogleFonts.poppins(
-              color: AppColors.accentGold,
-              fontSize: 11,
+              color: DonateUIConfig.accentGold,
+              fontSize: DonateUIConfig.fontLabelSmall - 1,
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(width: 8),
-          // Field value (The actually essential data)
+          const SizedBox(width: DonateUIConfig.spacerSmall + 2),
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.poppins(color: Colors.white70, fontSize: 11),
+              style: GoogleFonts.poppins(
+                color: Colors.white70, 
+                fontSize: DonateUIConfig.fontLabelSmall - 1,
+              ),
             ),
           ),
         ],
@@ -483,56 +518,54 @@ class DonateScreen extends StatelessWidget {
   void _showDonateDialog(BuildContext context, String title, String amount) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent, // Custom rounded container looks better
+      backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        padding: const EdgeInsets.all(DonateUIConfig.cardPadding),
+        decoration: BoxDecoration(
+          color: DonateUIConfig.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(DonateUIConfig.cardPadding)),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min, // Modal wraps content height
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Drawer handle indicator
             Container(
-              width: 40,
+              width: DonateUIConfig.spacerDisplay + 8,
               height: 4,
               decoration: BoxDecoration(
                   color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2)),
+                  borderRadius: BorderRadius.circular(DonateUIConfig.radiusExtraSmall)),
             ),
-            const SizedBox(height: 20),
-            // Confirming the user's intent
+            const SizedBox(height: DonateUIConfig.spacerMedium + 4),
             Text(
               'Donate: $title',
               style: GoogleFonts.playfairDisplay(
-                color: AppColors.darkGreen,
-                fontSize: 20,
+                color: DonateUIConfig.darkGreen,
+                fontSize: DonateUIConfig.fontHeadlineSmall + 4,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
-            // Highlighting the financial target
+            const SizedBox(height: DonateUIConfig.spacerSmall),
             Text(
               amount,
               style: GoogleFonts.poppins(
-                color: AppColors.accentGold,
-                fontSize: 28,
+                color: DonateUIConfig.accentGold,
+                fontSize: DonateUIConfig.fontDisplayMobile + 6,
                 fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(height: 20),
-            // Giving logical 'Next Steps'
+            const SizedBox(height: DonateUIConfig.spacerMedium + 4),
             Text(
               'Transfer to the account above and share receipt via WhatsApp.',
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                  color: AppColors.textMedium, fontSize: 13, height: 1.6),
+                  color: DonateUIConfig.textMedium, 
+                  fontSize: DonateUIConfig.fontLabelSmall + 1, 
+                  height: 1.6,
+              ),
             ),
-            const SizedBox(height: 20),
-            // Direct conversational bridge
+            const SizedBox(height: DonateUIConfig.spacerMedium + 4),
             _primaryButton(ctx, 'Chat on WhatsApp', () => _launchWhatsApp(ctx)),
-            const SizedBox(height: 8),
+            const SizedBox(height: DonateUIConfig.spacerSmall),
           ],
         ),
       ),
@@ -549,13 +582,16 @@ class DonateScreen extends StatelessWidget {
         child: ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.successGreen, // Encouraging color choice
+            backgroundColor: DonateUIConfig.successGreen,
             shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-            padding: const EdgeInsets.symmetric(vertical: 14),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(DonateUIConfig.radiusLarge - 5)),
+            padding: const EdgeInsets.symmetric(vertical: DonateUIConfig.paddingButtonSmallV + 2),
           ),
           child: Text(label,
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w700)),
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w700, 
+                fontSize: DonateUIConfig.fontLabelSmall + 1,
+              )),
         ),
       ),
     );
@@ -608,24 +644,21 @@ class _ImpactCardState extends State<ImpactCard> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeOutCubic,
-          // Shift upward when hovered
           transform: Matrix4.identity()..translate(0.0, _isHovered ? -4.0 : 0.0),
-          margin: const EdgeInsets.only(bottom: 14),
-          padding: const EdgeInsets.all(18),
+          margin: const EdgeInsets.only(bottom: DonateUIConfig.spacerMedium - 2),
+          padding: const EdgeInsets.all(DonateUIConfig.spacerMedium + 2),
           decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(14),
-            // Border color shift based on interaction
+            color: DonateUIConfig.white,
+            borderRadius: BorderRadius.circular(DonateUIConfig.radiusSmall + 2),
             border: Border.all(
               color: _isHovered
-                  ? AppColors.accentGold.withOpacity(0.5)
+                  ? DonateUIConfig.accentGold.withOpacity(0.5)
                   : Colors.grey.shade200,
             ),
-            // Depth modulation on hover
             boxShadow: [
               BoxShadow(
                 color: _isHovered
-                    ? AppColors.darkGreen.withOpacity(0.08)
+                    ? DonateUIConfig.darkGreen.withOpacity(0.08)
                     : Colors.black.withOpacity(0.02),
                 blurRadius: _isHovered ? 15 : 4,
                 offset: Offset(0, _isHovered ? 8 : 2),
@@ -640,25 +673,23 @@ class _ImpactCardState extends State<ImpactCard> {
                 scale: _isHovered ? 1.15 : 1.0,
                 duration: const Duration(milliseconds: 200),
                 child:
-                    Text(widget.impact.icon, style: const TextStyle(fontSize: 28)),
+                    Text(widget.impact.icon, style: const TextStyle(fontSize: DonateUIConfig.fontDisplayMobile + 6)),
               ),
-              const SizedBox(height: 10),
-              // Bold impact area title
+              const SizedBox(height: DonateUIConfig.spacerSmall + 2),
               Text(
                 widget.impact.title,
                 style: GoogleFonts.poppins(
-                  fontSize: 15,
+                  fontSize: DonateUIConfig.fontBodyLarge - 1,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
+                  color: DonateUIConfig.textDark,
                 ),
               ),
               const SizedBox(height: 6),
-              // Narrative description of fund outcomes in this area
               Text(
                 widget.impact.description,
                 style: GoogleFonts.poppins(
-                  color: AppColors.textMedium,
-                  fontSize: 12,
+                  color: DonateUIConfig.textMedium,
+                  fontSize: DonateUIConfig.fontLabelSmall + 1,
                   height: 1.5,
                 ),
               ),

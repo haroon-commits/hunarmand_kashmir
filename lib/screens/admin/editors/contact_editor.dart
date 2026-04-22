@@ -1,8 +1,28 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: contact_editor.dart
+/// PURPOSE: Admin interface for modifying official contact credentials and 
+///          physical address mappings displayed to the public.
+/// CONNECTIONS:
+///   - USED BY: admin_dashboard_screen.dart
+///   - MUTATES: AppContent via dynamic_content_provider.dart
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/dynamic_content_provider.dart';
-import '../../../theme/app_theme.dart';
+
+
+// ─── CONTACTEDITORUICONFIG ──────────────────────────────
+/// Isolated UI configuration specific to contact_editor.dart.
+class ContactEditorUIConfig {
+  // Brand Colors used locally
+  static const Color darkGreen = Color(0xFF0D3320);
+  static const Color textDark = Color(0xFF1A1A1A);
+  static const Color textMedium = Color(0xFF555555);
+
+}
+
 
 class ContactEditor extends StatefulWidget {
   const ContactEditor({super.key});
@@ -40,7 +60,7 @@ class _ContactEditorState extends State<ContactEditor> {
             style: GoogleFonts.poppins(
               fontSize: 28,
               fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
+              color: ContactEditorUIConfig.textDark,
             ),
           ),
           const SizedBox(height: 24),
@@ -75,7 +95,7 @@ class _ContactEditorState extends State<ContactEditor> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.darkGreen,
+              backgroundColor: ContactEditorUIConfig.darkGreen,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
             ),
@@ -102,7 +122,7 @@ class _ContactEditorState extends State<ContactEditor> {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: AppColors.darkGreen,
+              color: ContactEditorUIConfig.darkGreen,
             ),
           ),
           const SizedBox(height: 20),
@@ -122,7 +142,7 @@ class _ContactEditorState extends State<ContactEditor> {
           style: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: AppColors.textMedium,
+            color: ContactEditorUIConfig.textMedium,
           ),
         ),
         const SizedBox(height: 8),

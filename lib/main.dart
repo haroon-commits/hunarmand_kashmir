@@ -1,9 +1,20 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: main.dart
+/// PURPOSE: The primary entry point for the Hunarmand Kashmir Flutter application.
+///          Initializes Firebase, global state providers, and sets up the root
+///          MaterialApp with global theming and main navigation routing.
+/// CONNECTIONS:
+///   - USED BY: System / Flutter Engine
+///   - DEPENDS ON: providers/* (all state providers)
+///   - DEPENDS ON: theme/app_theme.dart (global UI theme)
+///   - DEPENDS ON: screens/* (all primary screens)
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart'; // Importing standard Flutter material components
-import 'package:hunarmand_kashmir/widgets/common_widgets.dart' // Importing custom widgets from our widgets folder
-    show
-        HunarmandDrawer,
-        HunarmandAppBar,
-        HunarmandSplash; // Specifically importing the essentials
+import 'widgets/nav/hunarmand_drawer.dart';
+import 'widgets/feedback/splash_screen.dart';
+import 'widgets/nav/hunarmand_app_bar.dart';
+import 'widgets/layout/app_footer.dart';
 import 'package:provider/provider.dart'; // Importing provider for global state management
 import 'package:google_fonts/google_fonts.dart'; // Importing Google Fonts for high-quality typography
 import 'theme/app_theme.dart'; // Importing our application's design system and theme
@@ -22,12 +33,26 @@ import 'package:firebase_core/firebase_core.dart'; // Importing Firebase Core
 import 'firebase_options.dart'; // Importing generated Firebase options
 import 'utils/responsive.dart'; // Importing the responsive utility for layout detection
 
+
+// ─── MAINUICONFIG ──────────────────────────────
+/// Isolated UI configuration specific to main.dart.
+class MainUIConfig {
+  // Brand Colors used locally
+  static const Color accentGold = Color(0xFFF5A623);
+  static const Color darkGreen = Color(0xFF0D3320);
+  static const Color lightTeal = Color(0xFFE8F5F3);
+  static const Color textLight = Color(0xFF888888);
+  static const Color white = Color(0xFFFFFFFF);
+
+}
+
+
 /// The entry point of the Flutter application.
 /// This function initializes the application state and runs the root widget.
 void main() async {
   // Ensure that Flutter bindings are initialized before Firebase
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initializing Firebase with the generated options for the current platform
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -137,7 +162,7 @@ class MainNavigator extends StatelessWidget {
         // The Scaffold provides the standard visual structural layout of the page
         return Scaffold(
           // Setting a consistent white background across the entire app
-          backgroundColor: AppColors.white,
+          backgroundColor: MainUIConfig.white,
           // Conditionally showing the sidebar drawer for mobile navigation
           drawer: isTabletOrDesktop
               ? null // No drawer on desktop/tablet as we have a top bar
@@ -171,7 +196,7 @@ class MainNavigator extends StatelessWidget {
     // Returning a standard AppBar with specific styling
     return AppBar(
       // Setting a dark green background for high contrast
-      backgroundColor: AppColors.darkGreen,
+      backgroundColor: MainUIConfig.darkGreen,
       // Building the leading icon (hamburger menu)
       leading: Builder(
         // Using a nested builder to get the correct context for Scaffold.of()
@@ -183,7 +208,7 @@ class MainNavigator extends StatelessWidget {
             // Open the navigation drawer when tapped
             onTap: () => Scaffold.of(context).openDrawer(),
             // Displaying the menu icon in white
-            child: const Icon(Icons.menu, color: AppColors.white),
+            child: const Icon(Icons.menu, color: MainUIConfig.white),
           ),
         ),
       ),
@@ -198,17 +223,17 @@ class MainNavigator extends StatelessWidget {
                 errorBuilder: (context, error, stackTrace) => Text(
                   provider.content.logoText,
                   style: GoogleFonts.amiriQuran(
-                    color: AppColors.accentGold,
+                    color: MainUIConfig.accentGold,
                     fontSize: 22,
-                  ),
+                  ).apply(fontFamilyFallback: const ['Noto Naskh Arabic', 'Noto Color Emoji']),
                 ),
               )
             : Text(
                 provider.content.logoText,
                 style: GoogleFonts.amiriQuran(
-                  color: AppColors.accentGold,
+                  color: MainUIConfig.accentGold,
                   fontSize: 22,
-                ),
+                ).apply(fontFamilyFallback: const ['Noto Naskh Arabic', 'Noto Color Emoji']),
               ),
       ),
       // Aligning the title to the center of the bar
@@ -231,7 +256,7 @@ class MainNavigator extends StatelessWidget {
               // Border and rounded corners for a premium feel
               decoration: BoxDecoration(
                 // Gold border matching the branding
-                border: Border.all(color: AppColors.accentGold),
+                border: Border.all(color: MainUIConfig.accentGold),
                 // Smoothly rounded edges
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -241,14 +266,14 @@ class MainNavigator extends StatelessWidget {
                 children: [
                   // Heart icon representing support/donation
                   const Icon(Icons.favorite,
-                      color: AppColors.accentGold, size: 13),
+                      color: MainUIConfig.accentGold, size: 13),
                   // Small horizontal gap
                   const SizedBox(width: 4),
                   // Label for the button using Poppins font
                   Text(
                     'Donate',
                     style: GoogleFonts.poppins(
-                      color: AppColors.accentGold, // Consistent gold color
+                      color: MainUIConfig.accentGold, // Consistent gold color
                       fontSize: 11, // Small but legible on mobile
                       fontWeight: FontWeight.w600, // Bold weight for emphasis
                     ),
@@ -303,7 +328,7 @@ class MainNavigator extends StatelessWidget {
     // Wrapping everything in a visual container with shadow
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white, // Clean white background
+        color: MainUIConfig.white, // Clean white background
         boxShadow: [
           // Adding a soft shadow for depth effect
           BoxShadow(
@@ -340,7 +365,7 @@ class MainNavigator extends StatelessWidget {
                     // Highlighting the active item with a light teal background
                     decoration: isActive
                         ? BoxDecoration(
-                            color: AppColors.lightTeal, // Subtle highlight
+                            color: MainUIConfig.lightTeal, // Subtle highlight
                             borderRadius:
                                 BorderRadius.circular(16), // Rounded pill shape
                           )
@@ -370,8 +395,8 @@ class MainNavigator extends StatelessWidget {
                           item['label'] as String,
                           style: GoogleFonts.poppins(
                             color: isActive
-                                ? AppColors.darkGreen // Matching icon color
-                                : AppColors.textLight, // Matching icon color
+                                ? MainUIConfig.darkGreen // Matching icon color
+                                : MainUIConfig.textLight, // Matching icon color
                             fontSize: 10, // Small text for mobile navigation
                             fontWeight: isActive
                                 ? FontWeight.w700

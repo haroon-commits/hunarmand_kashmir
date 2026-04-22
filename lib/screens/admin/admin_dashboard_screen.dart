@@ -1,8 +1,17 @@
+/// ═══════════════════════════════════════════════════════════════════════
+/// FILE: admin_dashboard_screen.dart
+/// PURPOSE: Central control panel for authenticated staff to manage website 
+///          content. Maps to individual data editors for each platform section.
+/// CONNECTIONS:
+///   - USED BY: main.dart (when admin authenticated)
+///   - DEPENDS ON: providers/admin_provider.dart
+///   - ROUTES TO: All screens/admin/editors/*
+/// ═══════════════════════════════════════════════════════════════════════
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../providers/admin_provider.dart';
-import '../../theme/app_theme.dart';
 import 'editors/home_editor.dart';
 import 'editors/courses_editor.dart';
 import 'editors/global_editor.dart';
@@ -10,6 +19,17 @@ import 'editors/about_editor.dart';
 import 'editors/gallery_editor.dart';
 import 'editors/donate_editor.dart';
 import 'editors/contact_editor.dart';
+
+
+// ─── ADMINDASHBOARDUICONFIG ──────────────────────────────
+/// Isolated UI configuration specific to admin_dashboard_screen.dart.
+class AdminDashboardUIConfig {
+  // Brand Colors used locally
+  static const Color accentGold = Color(0xFFF5A623);
+  static const Color darkGreen = Color(0xFF0D3320);
+
+}
+
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -39,14 +59,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           // Sidebar
           Container(
             width: 250,
-            color: AppColors.darkGreen,
+            color: AdminDashboardUIConfig.darkGreen,
             child: Column(
               children: [
                 const SizedBox(height: 40),
                 Text(
                   'Admin Panel',
                   style: GoogleFonts.poppins(
-                    color: AppColors.accentGold,
+                    color: AdminDashboardUIConfig.accentGold,
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                   ),
@@ -88,11 +108,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget _buildNavItem(int index, IconData icon, String label) {
     final isSelected = _selectedIndex == index;
     return ListTile(
-      leading: Icon(icon, color: isSelected ? AppColors.accentGold : Colors.white70),
+      leading: Icon(icon, color: isSelected ? AdminDashboardUIConfig.accentGold : Colors.white70),
       title: Text(
         label,
         style: GoogleFonts.poppins(
-          color: isSelected ? AppColors.accentGold : Colors.white70,
+          color: isSelected ? AdminDashboardUIConfig.accentGold : Colors.white70,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         ),
       ),
