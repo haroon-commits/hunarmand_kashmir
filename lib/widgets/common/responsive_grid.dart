@@ -86,35 +86,40 @@ class ResponsiveCardGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cols = Responsive.gridCols(
-      context,
-      mobileCols: mobileCols,
-      tabletCols: tabletCols,
-      desktopCols: desktopCols,
-    );
-
-    if (cols == 1) {
-      return Column(
-        children: children
-            .map((child) => Padding(
-                  padding: EdgeInsets.only(bottom: spacing),
-                  child: child,
-                ))
-            .toList(),
-      );
-    }
-
-    return Wrap(
-      spacing: spacing,
-      runSpacing: spacing,
-      children: children.map((child) {
-        return SizedBox(
-          width: (MediaQuery.of(context).size.width - 
-                 (Responsive.contentPaddingH(context) * 2) - 
-                 (spacing * (cols - 1))) / cols,
-          child: child,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cols = Responsive.gridCols(
+          context,
+          mobileCols: mobileCols,
+          tabletCols: tabletCols,
+          desktopCols: desktopCols,
         );
-      }).toList(),
+
+        if (cols == 1) {
+          return Column(
+            children: children
+                .map((child) => Padding(
+                      padding: EdgeInsets.only(bottom: spacing),
+                      child: child,
+                    ))
+                .toList(),
+          );
+        }
+
+        final availableWidth = constraints.maxWidth;
+        final itemWidth = (availableWidth - (spacing * (cols - 1))) / cols;
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: children.map((child) {
+            return SizedBox(
+              width: itemWidth,
+              child: child,
+            );
+          }).toList(),
+        );
+      },
     );
   }
 }

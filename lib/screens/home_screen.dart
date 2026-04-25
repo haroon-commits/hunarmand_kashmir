@@ -143,7 +143,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 slide: _heroSlide,
                 headline: content.heroHeadline,
                 subheadline: content.heroSubheadline,
-                logoText: content.logoText,
               ),
             ),
             // The philosophical mission section ('Why us?')
@@ -180,7 +179,6 @@ class _HeroSection extends StatelessWidget {
   final Animation<Offset> slide;
   final String headline;
   final String subheadline;
-  final String logoText;
 
   const _HeroSection({
     required this.controller,
@@ -188,7 +186,6 @@ class _HeroSection extends StatelessWidget {
     required this.slide,
     required this.headline,
     required this.subheadline,
-    required this.logoText,
   });
 
   @override
@@ -248,20 +245,17 @@ class _HeroSection extends StatelessWidget {
                     position: slide,
                     child: Column(
                       children: [
-                        Text(
-                          logoText,
-                          style: GoogleFonts.amiriQuran(
-                            color: HomeUIConfig.accentGold,
-                            fontSize: titleSize,
-                            height: 1.3,
-                          ),
-                          textAlign: TextAlign.center,
+                        // Brand logo image in hero
+                        Image.asset(
+                          'assets/images/main_logo.png',
+                          height: titleSize * 0.7, // Proportional to hero text size
+                          fit: BoxFit.contain,
                         ),
                         const SizedBox(height: HomeUIConfig.spacerLarge),
                         Text(
                           headline,
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.playfairDisplay(
+                          style: GoogleFonts.inter(
                             color: HomeUIConfig.white,
                             fontSize: subtitleSize,
                             fontWeight: FontWeight.bold,
@@ -275,7 +269,7 @@ class _HeroSection extends StatelessWidget {
                           child: Text(
                             subheadline,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.inter(
                               color: HomeUIConfig.white70,
                               fontSize: bodySize,
                               height: 1.7,
@@ -353,7 +347,7 @@ class _WhySectionSliver extends StatelessWidget {
                   Text(
                     title,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.inter(
                       color: HomeUIConfig.darkGreen,
                       fontSize: titleSize,
                       fontWeight: FontWeight.bold,
@@ -376,7 +370,7 @@ class _WhySectionSliver extends StatelessWidget {
                     child: Text(
                       description,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.inter(
                         color: HomeUIConfig.textMedium,
                         fontSize: HomeUIConfig.fontBodyMedium,
                         height: 1.7,
@@ -437,7 +431,7 @@ class _CoursesSectionSliver extends StatelessWidget {
                 children: [
                   Text(
                     'OUR PROGRAMS',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                       color: HomeUIConfig.accentGold,
                       fontSize: HomeUIConfig.fontLabelSmall - 1,
                       fontWeight: FontWeight.w700,
@@ -487,7 +481,7 @@ class _CoursesSectionSliver extends StatelessWidget {
                         ),
                         child: Text(
                           'View All Courses →',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.inter(
                             fontWeight: FontWeight.w600,
                             fontSize: HomeUIConfig.fontLabelLarge,
                           ),
@@ -535,7 +529,7 @@ class _CtaSection extends StatelessWidget {
                 Text(
                   title,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.inter(
                     color: HomeUIConfig.white,
                     fontSize: HomeUIConfig.fontHeadlineLarge,
                     fontWeight: FontWeight.bold,
@@ -548,7 +542,7 @@ class _CtaSection extends StatelessWidget {
                   child: Text(
                     description,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                       color: HomeUIConfig.white70,
                       fontSize: HomeUIConfig.fontBodyMedium,
                       height: 1.6,
@@ -591,7 +585,7 @@ class _SectionHeader extends StatelessWidget {
         Expanded(
           child: Text(
             title,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.inter(
               color: HomeUIConfig.darkGreen,
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
@@ -608,7 +602,7 @@ class _SectionHeader extends StatelessWidget {
               children: [
                 Text(
                   'View all',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.inter(
                     color: HomeUIConfig.darkGreen,
                     fontSize: HomeUIConfig.fontBodyMedium - 1,
                     fontWeight: FontWeight.w600,
@@ -659,7 +653,7 @@ class _PrimaryButton extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.inter(
           fontWeight: FontWeight.w700,
           fontSize:
               large ? HomeUIConfig.fontBodyLarge : HomeUIConfig.fontBodyMedium,
@@ -699,7 +693,7 @@ class _SecondaryButton extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               color: HomeUIConfig.white,
               fontWeight: FontWeight.w600,
               fontSize: large

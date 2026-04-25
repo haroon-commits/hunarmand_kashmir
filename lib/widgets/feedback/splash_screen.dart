@@ -19,10 +19,9 @@ class SplashUIConfig {
   static const Color white = Color(0xFFFFFFFF);
 
   // Dimensions, Spacing & Typography
-  static const double fontHero = 132.0;
+  static const double logoHeight = 160.0;
   static const double fontLabelLarge = 14.0;
   static const String logoEnglishFallback = 'Hunarmand Kashmir';
-  static const String logoUrduFallback = 'ہنرمند';
   static const double spacerExtraLarge = 48.0;
   static const double spacerSmall = 8.0;
 }
@@ -40,20 +39,17 @@ class HunarmandSplash extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Urdu Branded Logo Text
-            Text(
-              SplashUIConfig.logoUrduFallback,
-              style: GoogleFonts.amiriQuran(
-                color: SplashUIConfig.accentGold,
-                fontSize: SplashUIConfig.fontHero,
-                fontWeight: FontWeight.bold,
-              ).apply(fontFamilyFallback: const ['Noto Naskh Arabic', 'Noto Color Emoji']),
+            // Brand logo image (local asset)
+            Image.asset(
+              'assets/images/main_logo.png',
+              height: SplashUIConfig.logoHeight, // 160px large logo on splash
+              fit: BoxFit.contain,
             ),
             const SizedBox(height: SplashUIConfig.spacerSmall + 4),
             // English Tagline
             Text(
               SplashUIConfig.logoEnglishFallback,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 color: SplashUIConfig.white.withOpacity(0.7),
                 fontSize: SplashUIConfig.fontLabelLarge,
                 letterSpacing: 2,

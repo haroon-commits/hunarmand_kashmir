@@ -151,7 +151,7 @@ class AboutScreen extends StatelessWidget {
       children: [
         Text(
           headline,
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.inter(
             color: AboutUIConfig.darkGreen,
             fontSize: AboutUIConfig.fontDisplayTablet,
             fontWeight: FontWeight.bold,
@@ -161,7 +161,7 @@ class AboutScreen extends StatelessWidget {
         const SizedBox(height: AboutUIConfig.spacerMedium + 2),
         Text(
           text,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.inter(
             color: AboutUIConfig.textMedium,
             fontSize: AboutUIConfig.fontBodyMedium,
             height: 1.7,
@@ -193,7 +193,7 @@ class AboutScreen extends StatelessWidget {
       ),
       child: Text(
         '"At Hunarmand Kashmir, we don\'t just teach skills—we open doors, restore confidence, and help build futures rooted in dignity, independence, and global opportunity."',
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.inter(
           color: AboutUIConfig.darkGreen,
           fontSize: AboutUIConfig.fontLabelSmall + 1,
           fontStyle: FontStyle.italic,
@@ -248,7 +248,7 @@ class AboutScreen extends StatelessWidget {
                 Text(
                   'Mission, Vision & Values',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.inter(
                     color: AboutUIConfig.darkGreen,
                     fontSize: Responsive.isDesktop(context) 
                         ? AboutUIConfig.fontDisplayDesktop 
@@ -290,7 +290,7 @@ class AboutScreen extends StatelessWidget {
               children: [
                 Text(
                   'Voices of Guidance',
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.inter(
                     color: AboutUIConfig.darkGreen,
                     fontSize: isDesktop 
                         ? AboutUIConfig.fontDisplayDesktop 
@@ -302,7 +302,7 @@ class AboutScreen extends StatelessWidget {
                 Text(
                   'Our dedicated mentors and instructors bringing world-class expertise to Kashmir.',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.inter(
                     color: AboutUIConfig.textMedium,
                     fontSize: AboutUIConfig.fontBodyMedium,
                   ),
@@ -344,7 +344,7 @@ class AboutScreen extends StatelessWidget {
                   Text(
                     'Be Part of the Change',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.inter(
                       color: AboutUIConfig.white,
                       fontSize: AboutUIConfig.fontHeadlineLarge - 2,
                       fontWeight: FontWeight.bold,
@@ -356,7 +356,7 @@ class AboutScreen extends StatelessWidget {
                     child: Text(
                       'Whether you are a student looking to learn, or a professional looking to mentor, there is a place for you at Hunarmand Kashmir.',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.inter(
                         color: Colors.white70,
                         fontSize: AboutUIConfig.fontBodyMedium,
                         height: 1.6,
@@ -380,7 +380,7 @@ class AboutScreen extends StatelessWidget {
                       ),
                       child: Text(
                         'Contact Us Today',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.inter(
                             fontWeight: FontWeight.w600, 
                             fontSize: AboutUIConfig.fontBodyLarge - 1,
                         ),
@@ -482,7 +482,7 @@ class _MissionCardState extends State<MissionCard> {
                   const SizedBox(height: AboutUIConfig.spacerMedium - 2),
                   Text(
                     '${widget.item['title']}',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                       fontSize: AboutUIConfig.fontHeadlineMedium - 5,
                       fontWeight: FontWeight.w700,
                       color: AboutUIConfig.textDark,
@@ -491,7 +491,7 @@ class _MissionCardState extends State<MissionCard> {
                   const SizedBox(height: AboutUIConfig.spacerSmall + 2),
                   Text(
                     '${widget.item['desc']}',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                       color: AboutUIConfig.textMedium,
                       fontSize: AboutUIConfig.fontLabelSmall + 1,
                       height: 1.6,
@@ -575,7 +575,7 @@ class _TeamCardState extends State<TeamCard> {
             Text(
               widget.member.name,
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 fontWeight: FontWeight.bold,
                 fontSize: AboutUIConfig.fontBodyLarge,
                 color: AboutUIConfig.darkGreen,
@@ -585,7 +585,7 @@ class _TeamCardState extends State<TeamCard> {
             Text(
               widget.member.role,
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 fontSize: AboutUIConfig.fontBodyMedium - 1,
                 color: AboutUIConfig.accentGold,
                 fontWeight: FontWeight.w500,
@@ -664,7 +664,7 @@ class _WorkshopCardState extends State<WorkshopCard> {
               Text(
                 'POWERED BY SKILLS',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.inter(
                   color: AboutUIConfig.accentGold,
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
@@ -675,7 +675,7 @@ class _WorkshopCardState extends State<WorkshopCard> {
               Text(
                 'hunARMAND\namdesigns',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.inter(
                   color: AboutUIConfig.white,
                   fontSize: AboutUIConfig.fontHeadlineMedium,
                   fontWeight: FontWeight.w700,

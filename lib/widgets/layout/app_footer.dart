@@ -135,9 +135,8 @@ class AppFooter extends StatelessWidget {
     );
   }
 
-  /// Branding column for the footer showing Urdu logo text and description.
+  /// Branding column for the footer showing the logo image and description.
   /// Uses Consumer to listen to DynamicContentProvider for real-time updates.
-  /// When admin edits logoText or footerDescription, this rebuilds automatically.
   Widget _buildLogoColumn(BuildContext context) {
     return Consumer<DynamicContentProvider>(
       builder: (context, provider, _) {
@@ -145,19 +144,17 @@ class AppFooter extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start, // Left-aligned content
           children: [
-            // Urdu branding text in signature gold AmiriQuran font
-            Text(
-              content.logoText, // e.g., 'ہنرمند' from Firestore
-              style: GoogleFonts.amiriQuran(
-                color: AppFooterUIConfig.accentGold, // Gold branding color
-                fontSize: AppFooterUIConfig.fontHeadlineLarge + 2, // 30px prominent size
-              ),
+            // Brand logo asset image
+            Image.asset(
+              'assets/images/main_logo.png', // Local brand logo
+              height: 64, // Comfortable logo size in footer
+              fit: BoxFit.contain,
             ),
             const SizedBox(height: AppFooterUIConfig.spacerSmall + 2), // 10px gap
             // Footer description: short brand narrative
             Text(
               content.footerDescription, // Full description from Firestore
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 color: Colors.white54, // Semi-transparent for secondary importance
                 fontSize: AppFooterUIConfig.fontLabelSmall, // 12px small text
                 height: 1.7, // Generous line height for readability
@@ -178,7 +175,7 @@ class AppFooter extends StatelessWidget {
         // Section header in gold
         Text(
           'Quick Links', // Section title
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.inter(
             color: AppFooterUIConfig.accentGold, // Gold accent for section headers
             fontSize: AppFooterUIConfig.fontBodyMedium, // 14px
             fontWeight: FontWeight.w700, // Bold section title
@@ -207,7 +204,7 @@ class AppFooter extends StatelessWidget {
             // Section header in gold
             Text(
               'Get in Touch', // Section title
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 color: AppFooterUIConfig.accentGold, // Gold accent
                 fontSize: AppFooterUIConfig.fontBodyMedium, // 14px
                 fontWeight: FontWeight.w700, // Bold section title
@@ -239,7 +236,7 @@ class AppFooter extends StatelessWidget {
         // Copyright text on the left
         Text(
           '© 2026 Hunarmand Kashmir. All rights reserved.', // Copyright notice
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.inter(
             color: Colors.white38, // Very subtle color for non-critical info
             fontSize: AppFooterUIConfig.fontLabelSmall - 1, // 11px tiny text
           ),
@@ -257,7 +254,7 @@ class AppFooter extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 16), // 16px gap before social icons
                   child: Text(
                     'Admin Portal', // Discreet admin access label
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                       color: Colors.white24, // Very low contrast (intentionally hidden)
                       fontSize: AppFooterUIConfig.fontLabelSmall - 2, // 10px tiny text
                       fontWeight: FontWeight.w500, // Medium weight
@@ -290,7 +287,7 @@ class AppFooter extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 4), // 4px vertical spacing between links
           child: Text(
             label, // Link display text (e.g., 'Our Story', 'All Courses')
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               color: Colors.white70, // Semi-transparent white for secondary links
               fontSize: AppFooterUIConfig.fontLabelSmall, // 12px small link text
             ),
@@ -311,7 +308,7 @@ class AppFooter extends StatelessWidget {
         Expanded(
           child: Text(
             text, // Contact information string (address, phone, or email)
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               color: Colors.white70, // Semi-transparent white
               fontSize: AppFooterUIConfig.fontLabelSmall - 1, // 11px tiny text
               height: 1.4, // Comfortable line height for multi-line addresses

@@ -283,7 +283,7 @@ class AppContent {
   final String appTitle;
 
   /// Branding text shown in the primary logo area (Urdu: 'ہنرمند').
-  /// Displayed via GoogleFonts.amiriQuran in app bars and footers.
+  /// The Urdu branding text (legacy field, kept for Firestore compatibility).
   final String logoText;
 
   /// Optional URL for a graphical logo image.

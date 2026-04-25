@@ -136,7 +136,7 @@ class CoursesScreen extends StatelessWidget {
                   child: Text(
                     'Your Learning, Your Choice',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.inter(
                       color: CoursesUIConfig.darkGreen,
                       fontSize: Responsive.isDesktop(context) 
                           ? CoursesUIConfig.fontDisplayDesktop - 2
@@ -151,7 +151,7 @@ class CoursesScreen extends StatelessWidget {
                   child: Text(
                     'Choose the location and schedule that fits your routine.',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                         color: CoursesUIConfig.textMedium, 
                         fontSize: CoursesUIConfig.fontBodyMedium,
                     ),
@@ -262,7 +262,7 @@ class CoursesScreen extends StatelessWidget {
           const SizedBox(height: CoursesUIConfig.spacerMedium - 4),
           Text(
             title,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: CoursesUIConfig.fontBodyLarge - 1,
               fontWeight: FontWeight.w700,
               color: CoursesUIConfig.darkGreen,
@@ -271,7 +271,7 @@ class CoursesScreen extends StatelessWidget {
           const SizedBox(height: CoursesUIConfig.spacerSmall - 2),
           Text(
             location,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: CoursesUIConfig.fontLabelSmall, 
               color: CoursesUIConfig.textMedium, 
               height: 1.4,
@@ -286,7 +286,7 @@ class CoursesScreen extends StatelessWidget {
             ),
             child: Text(
               timing,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 fontSize: CoursesUIConfig.fontLabelSmall - 1,
                 fontWeight: FontWeight.w600,
                 color: accentColor,
@@ -320,7 +320,7 @@ class CoursesScreen extends StatelessWidget {
                 Text(
                   'Courses & Fees',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.inter(
                     color: CoursesUIConfig.darkGreen,
                     fontSize: Responsive.isDesktop(context) 
                         ? CoursesUIConfig.fontDisplayDesktop - 2
@@ -413,7 +413,7 @@ class CoursesScreen extends StatelessWidget {
               Expanded(
                 child: Text(
                   course.title ?? '',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.inter(
                     fontSize: CoursesUIConfig.fontBodyLarge - 1,
                     fontWeight: FontWeight.w700,
                     color: CoursesUIConfig.textDark,
@@ -429,7 +429,7 @@ class CoursesScreen extends StatelessWidget {
                 ),
                 child: Text(
                   numberLabel,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.inter(
                     fontSize: CoursesUIConfig.fontLabelSmall + 2,
                     fontWeight: FontWeight.w800,
                     color: CoursesUIConfig.darkGreen.withOpacity(0.4),
@@ -440,7 +440,7 @@ class CoursesScreen extends StatelessWidget {
           ),
           subtitle: Text(
             '${course.duration ?? ''}  •  ${course.fee ?? ''}',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: CoursesUIConfig.fontLabelSmall,
               color: CoursesUIConfig.accentGold,
               fontWeight: FontWeight.w600,
@@ -461,7 +461,7 @@ class CoursesScreen extends StatelessWidget {
                   const SizedBox(height: CoursesUIConfig.spacerSmall + 2),
                   Text(
                     course.description ?? '',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                       color: CoursesUIConfig.textMedium,
                       fontSize: CoursesUIConfig.fontLabelSmall + 1,
                       height: 1.5,
@@ -470,7 +470,7 @@ class CoursesScreen extends StatelessWidget {
                   const SizedBox(height: CoursesUIConfig.spacerMedium - 2),
                   Text(
                     'Topics Covered:',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                       fontSize: CoursesUIConfig.fontLabelSmall + 1,
                       fontWeight: FontWeight.w700,
                       color: CoursesUIConfig.textDark,
@@ -488,7 +488,7 @@ class CoursesScreen extends StatelessWidget {
                           Expanded(
                             child: Text(
                               topic ?? '',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.inter(
                                   fontSize: CoursesUIConfig.fontLabelSmall + 1, 
                                   color: CoursesUIConfig.textMedium,
                               ),
@@ -518,14 +518,14 @@ class CoursesScreen extends StatelessWidget {
                           children: [
                             Text(
                               'Course Fee',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.inter(
                                 fontSize: CoursesUIConfig.fontLabelSmall - 1,
                                 color: CoursesUIConfig.textMedium,
                               ),
                             ),
                             Text(
                               course.fee ?? '',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.inter(
                                 fontSize: CoursesUIConfig.fontHeadlineSmall,
                                 fontWeight: FontWeight.w800,
                                 color: CoursesUIConfig.darkGreen,
@@ -538,14 +538,14 @@ class CoursesScreen extends StatelessWidget {
                           children: [
                             Text(
                               'Duration',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.inter(
                                 fontSize: CoursesUIConfig.fontLabelSmall - 1,
                                 color: CoursesUIConfig.textMedium,
                               ),
                             ),
                             Text(
                               course.duration ?? '',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.inter(
                                 fontSize: CoursesUIConfig.fontBodyMedium,
                                 fontWeight: FontWeight.w700,
                                 color: CoursesUIConfig.accentGold,
@@ -620,7 +620,7 @@ class CoursesScreen extends StatelessWidget {
                 Text(
                   'Early Bird Discounts',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.inter(
                     color: CoursesUIConfig.darkGreen,
                     fontSize: Responsive.isDesktop(context) 
                         ? CoursesUIConfig.fontHeadlineLarge
@@ -634,7 +634,7 @@ class CoursesScreen extends StatelessWidget {
                   child: Text(
                     'Limited seats available — total seats are only 20. Discounts are applied from highest to lowest on a first-come, first-served basis.',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                       color: CoursesUIConfig.textMedium, 
                       fontSize: CoursesUIConfig.fontLabelSmall + 1, 
                       height: 1.5,
@@ -667,7 +667,7 @@ class CoursesScreen extends StatelessWidget {
                               Text(
                                 d['students'] as String,
                                 textAlign: TextAlign.center,
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.inter(
                                   fontSize: 10,
                                   color: CoursesUIConfig.textMedium,
                                   fontWeight: FontWeight.w600,
@@ -677,7 +677,7 @@ class CoursesScreen extends StatelessWidget {
                               Text(
                                 d['off'] as String,
                                 textAlign: TextAlign.center,
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.inter(
                                   fontSize: CoursesUIConfig.fontBodyLarge,
                                   color: CoursesUIConfig.darkGreen,
                                   fontWeight: FontWeight.w800,
@@ -702,7 +702,7 @@ class CoursesScreen extends StatelessWidget {
                     children: [
                       Text(
                         'Important Notes',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.inter(
                           fontWeight: FontWeight.w700,
                           fontSize: CoursesUIConfig.fontLabelLarge,
                           color: CoursesUIConfig.textDark,
@@ -735,7 +735,7 @@ class CoursesScreen extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                   fontSize: 12, color: CoursesUIConfig.textMedium),
             ),
           ),
@@ -776,7 +776,7 @@ class CoursesScreen extends StatelessWidget {
                     children: [
                       Text(
                         'Support for Orphans',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.inter(
                           color: CoursesUIConfig.white,
                           fontSize: CoursesUIConfig.fontBodyLarge,
                           fontWeight: FontWeight.w700,
@@ -785,7 +785,7 @@ class CoursesScreen extends StatelessWidget {
                       const SizedBox(height: 5),
                       RichText(
                         text: TextSpan(
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.inter(
                               color: Colors.white70, 
                               fontSize: CoursesUIConfig.fontLabelSmall + 1,
                           ),
@@ -832,7 +832,7 @@ class CoursesScreen extends StatelessWidget {
               children: [
                 Text(
                   'Ready to Start?',
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.inter(
                     color: CoursesUIConfig.white,
                     fontSize: CoursesUIConfig.fontDisplayMobile + 2,
                     fontWeight: FontWeight.bold,
@@ -842,7 +842,7 @@ class CoursesScreen extends StatelessWidget {
                 Text(
                   'Secure your spot in the upcoming batch.',
                   style:
-                      GoogleFonts.poppins(
+                      GoogleFonts.inter(
                         color: Colors.white70, 
                         fontSize: CoursesUIConfig.fontLabelSmall + 1,
                       ),
@@ -883,7 +883,7 @@ class CoursesScreen extends StatelessWidget {
       ),
       child: Text(label,
           style:
-              GoogleFonts.poppins(
+              GoogleFonts.inter(
                 fontWeight: FontWeight.w700, 
                 fontSize: CoursesUIConfig.fontLabelSmall + 1,
               )),
@@ -903,7 +903,7 @@ class CoursesScreen extends StatelessWidget {
       ),
       child: Text(label,
           style:
-              GoogleFonts.poppins(
+              GoogleFonts.inter(
                 fontWeight: FontWeight.w600, 
                 fontSize: CoursesUIConfig.fontLabelSmall + 1,
               )),

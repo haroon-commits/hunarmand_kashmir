@@ -62,13 +62,24 @@
       transition: opacity 0.4s ease-out;
     }
 
-    .logo-text {
-      color: #F5A623;
-      font-size: 48px;
-      font-family: serif;
-      margin-bottom: 24px;
+    .logo-img {
+      height: 160px;
+      margin-bottom: 0;
       opacity: 0;
       animation: fadeIn 1s ease-out forwards;
+    }
+
+    .tagline {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 2px;
+      font-weight: 500;
+      margin-top: 12px;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeIn 1s ease-out forwards;
+      animation-delay: 0.1s;
     }
 
     .spinner {
@@ -106,7 +117,8 @@
 
 <body>
   <div id="loading-indicator">
-    <div class="logo-text">ہنرمند </div>
+    <img src="assets/images/main_logo.png" alt="Hunarmand Kashmir Logo" class="logo-img">
+    <div class="tagline">Hunarmand Kashmir</div>
     <div class="spinner"></div>
   </div>
 

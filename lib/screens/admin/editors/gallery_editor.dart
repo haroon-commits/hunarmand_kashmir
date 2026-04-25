@@ -53,7 +53,7 @@ class _GalleryEditorState extends State<GalleryEditor> {
         children: [
           Text(
             'Gallery Screen Editor',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: 28,
               fontWeight: FontWeight.w700,
               color: GalleryEditorUIConfig.textDark,
@@ -104,7 +104,7 @@ class _GalleryEditorState extends State<GalleryEditor> {
           children: [
             Text(
               'Gallery Images',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: GalleryEditorUIConfig.textDark,
@@ -260,7 +260,7 @@ class _GalleryEditorState extends State<GalleryEditor> {
         children: [
           Text(
             title,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: GalleryEditorUIConfig.darkGreen,
@@ -280,7 +280,7 @@ class _GalleryEditorState extends State<GalleryEditor> {
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.inter(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: GalleryEditorUIConfig.textMedium,

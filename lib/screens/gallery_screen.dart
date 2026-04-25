@@ -224,7 +224,7 @@ class _MasonryGallery extends StatelessWidget {
             const SizedBox(height: GalleryUIConfig.spacerMedium),
             Text(
               'Gallery coming soon',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 color: GalleryUIConfig.textMedium,
                 fontSize: GalleryUIConfig.fontBodyLarge,
               ),
@@ -310,7 +310,7 @@ class _GalleryCardWidgetState extends State<GalleryCardWidget> {
                         const SizedBox(height: GalleryUIConfig.spacerSmall),
                         Text(
                           'Image unavailable',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.inter(
                             color: Colors.grey.shade400,
                             fontSize: GalleryUIConfig.fontLabelSmall,
                           ),
@@ -340,7 +340,7 @@ class _GalleryCardWidgetState extends State<GalleryCardWidget> {
                     child: Text(
                       widget.item.label,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.inter(
                         color: GalleryUIConfig.white,
                         fontSize: GalleryUIConfig.fontLabelSmall - 1,
                         fontWeight: FontWeight.w600,
@@ -369,7 +369,7 @@ class _GalleryCardWidgetState extends State<GalleryCardWidget> {
                           const SizedBox(height: GalleryUIConfig.spacerSmall),
                           Text(
                             'View',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.inter(
                               color: GalleryUIConfig.accentGold,
                               fontWeight: FontWeight.w700,
                               fontSize: GalleryUIConfig.fontLabelSmall + 2,

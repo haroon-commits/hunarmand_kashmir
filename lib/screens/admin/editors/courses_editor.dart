@@ -41,7 +41,7 @@ class CoursesEditor extends StatelessWidget {
           children: [
             Text(
               'Courses Management',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 fontSize: 28,
                 fontWeight: FontWeight.w700,
                 color: CoursesEditorUIConfig.textDark,
@@ -79,7 +79,7 @@ class CoursesEditor extends StatelessWidget {
                           color: CoursesEditorUIConfig.darkGreen, size: 20),
                     ),
                   ),
-                  title: Text(course.title, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                  title: Text(course.title, style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
                   subtitle: Text(course.fee),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -152,7 +152,7 @@ class CoursesEditor extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Curriculum Topics',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.inter(
                               fontWeight: FontWeight.w600, fontSize: 14)),
                       TextButton.icon(
                         onPressed: () {

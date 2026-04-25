@@ -59,7 +59,7 @@ class _AboutEditorState extends State<AboutEditor> {
         children: [
           Text(
             'About Screen Editor',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: 28,
               fontWeight: FontWeight.w700,
               color: AboutEditorUIConfig.textDark,
@@ -123,7 +123,7 @@ class _AboutEditorState extends State<AboutEditor> {
           children: [
             Text(
               'Team Members',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: AboutEditorUIConfig.textDark,
@@ -246,7 +246,7 @@ class _AboutEditorState extends State<AboutEditor> {
         children: [
           Text(
             title,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: AboutEditorUIConfig.darkGreen,
@@ -266,7 +266,7 @@ class _AboutEditorState extends State<AboutEditor> {
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.inter(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: AboutEditorUIConfig.textMedium,

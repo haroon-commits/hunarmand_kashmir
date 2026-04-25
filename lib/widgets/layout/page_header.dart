@@ -120,7 +120,7 @@ class GreenPageHeader extends StatelessWidget {
                 Text(
                   title, // Title string passed from parent screen
                   textAlign: TextAlign.center, // Centered for visual impact
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.inter(
                     color: PageHeaderUIConfig.white, // White text on dark background
                     fontSize: titleSize, // Adaptive font size (42/34/28px)
                     fontWeight: FontWeight.bold, // Bold for heading emphasis
@@ -134,7 +134,7 @@ class GreenPageHeader extends StatelessWidget {
                   child: Text(
                     subtitle, // Subtitle string passed from parent screen
                     textAlign: TextAlign.center, // Centered below the title
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                       color: Colors.white70, // Semi-transparent for secondary emphasis
                       fontSize: subSize, // Adaptive font size (17/16/15px)
                       height: 1.6, // Generous line height for readability

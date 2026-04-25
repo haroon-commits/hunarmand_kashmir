@@ -9,15 +9,14 @@
 ///   - READS FROM: providers/dynamic_content_provider.dart → logoPath, logoText
 ///   - WRITES TO: providers/app_state.dart → navigate() for page switching
 ///   - DEPENDS ON: utils/responsive.dart → Responsive.isDesktop() for layout decisions
-///   - DEPENDS ON: google_fonts → GoogleFonts.amiriQuran (Urdu), GoogleFonts.poppins (Latin)
+///   - DEPENDS ON: utils/responsive.dart → Responsive.isDesktop() for layout decisions
 /// ═══════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart'; // Flutter core for AppBar, Scaffold, Widget, etc.
-import 'package:google_fonts/google_fonts.dart'; // Google Fonts for premium Poppins and AmiriQuran typography
+import 'package:google_fonts/google_fonts.dart'; // Google Fonts for premium Inter typography
 import 'package:provider/provider.dart'; // Provider package for Consumer and context.read state access
 import '../../utils/responsive.dart'; // Responsive: breakpoint utilities (isDesktop, contentPaddingH)
 import '../../providers/app_state.dart'; // AppState: provides navigate() for page switching
-import '../../providers/dynamic_content_provider.dart'; // DynamicContentProvider: provides logoPath, logoText
 
 
 // ─── APPBARUICONFIG ──────────────────────────────
@@ -129,55 +128,20 @@ class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  /// Builds the dynamic branding element (Logo Image or Urdu Text).
-  /// Uses Consumer to listen for changes to DynamicContentProvider.
-  /// When admin updates the logo via GlobalEditor, this rebuilds automatically.
-  ///
-  /// LOGIC:
-  ///   - If provider.content.logoPath is a valid URL → show Image.network()
-  ///   - If logoPath is null/empty OR image fails to load → show Urdu text branding
-  ///   - Tapping the logo navigates to the home page
+  /// Builds the branding logo using the local asset image.
+  /// Tapping navigates to the home page.
   Widget _buildBranding(BuildContext context, bool isDesktop) {
-    return Consumer<DynamicContentProvider>(
-      // Consumer listens to DynamicContentProvider for logo updates
-      builder: (context, provider, _) => MouseRegion(
-        cursor: SystemMouseCursors.click, // Changes cursor to pointer on hover
-        child: GestureDetector(
-          // Tapping the logo/brand text navigates back to the home screen
-          // Uses context.read (not watch) because this is an event handler, not a builder
-          onTap: () => context.read<AppState>().navigate('home'),
-          child: provider.content.logoPath != null &&
-                  provider.content.logoPath!.isNotEmpty
-              // Branch 1: Logo image URL exists → show network image
-              ? Image.network(
-                  provider.content.logoPath!, // URL from Firestore via DynamicContentProvider
-                  height: isDesktop
-                      ? AppBarUIConfig.iconSizeLarge + 8 // 40px on desktop
-                      : AppBarUIConfig.iconSizeLarge, // 32px on mobile/tablet
-                  fit: BoxFit.contain, // Scale to fit without cropping
-                  // If the image URL is broken or unreachable, fall back to text branding
-                  errorBuilder: (context, error, stackTrace) =>
-                      _brandingText(provider.content.logoText, isDesktop),
-                )
-              // Branch 2: No logo URL → show Urdu text branding
-              : _brandingText(provider.content.logoText, isDesktop),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click, // Changes cursor to pointer on hover
+      child: GestureDetector(
+        onTap: () => context.read<AppState>().navigate('home'),
+        child: Image.asset(
+          'assets/images/main_logo.png', // Local brand logo (green+gold calligraphy)
+          height: isDesktop
+              ? AppBarUIConfig.iconSizeLarge + 16 // 54px on desktop
+              : AppBarUIConfig.iconSizeLarge + 4, // 42px on mobile/tablet
+          fit: BoxFit.contain, // Scale to fit without distortion
         ),
-      ),
-    );
-  }
-
-  /// Helper for building the stylized Urdu branding text using [GoogleFonts.amiriQuran].
-  /// Renders the logoText (e.g., 'ہنرمند') in the signature gold color.
-  /// Called when no logo image is available or when the image fails to load.
-  Widget _brandingText(String text, bool isDesktop) {
-    return Text(
-      text, // The Urdu branding string from DynamicContentProvider.content.logoText
-      style: GoogleFonts.amiriQuran(
-        color: AppBarUIConfig.accentGold, // Signature gold color for branding emphasis
-        fontSize: isDesktop
-            ? AppBarUIConfig.fontLabelLarge + 4 // 18px on desktop for prominence
-            : AppBarUIConfig.fontLabelLarge, // 14px on mobile for compact branding
-        fontWeight: FontWeight.bold, // Bold weight for readability
       ),
     );
   }
@@ -212,7 +176,7 @@ class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
               : null, // No decoration for inactive items
           child: Text(
             label, // Display text for the nav link
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               // Active items are fully white; inactive items are semi-transparent
               color: isActive ? AppBarUIConfig.white : Colors.white70,
               fontSize: AppBarUIConfig.fontBodyMedium, // 14px consistent nav text size
@@ -253,7 +217,7 @@ class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
               const SizedBox(width: AppBarUIConfig.spacerSmall / 2), // 4px gap between icon and text
               Text(
                 'Donate', // Button label
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.inter(
                   color: AppBarUIConfig.accentGold, // Gold text to match the outline
                   fontSize: AppBarUIConfig.fontLabelSmall, // 12px compact button text
                   fontWeight: FontWeight.w600, // Semi-bold for legibility
@@ -286,7 +250,7 @@ class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           child: Text(
             'Join Now', // Primary CTA label
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               color: AppBarUIConfig.darkGreen, // Dark green text on white background
               fontSize: AppBarUIConfig.fontLabelSmall, // 12px compact button text
               fontWeight: FontWeight.w700, // Bold for maximum emphasis

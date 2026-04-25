@@ -46,7 +46,7 @@ class SectionLabel extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.inter(
             color: SectionLabelUIConfig.accentGold,
             fontSize: SectionLabelUIConfig.fontLabelSmall - 1,
             fontWeight: FontWeight.w700,

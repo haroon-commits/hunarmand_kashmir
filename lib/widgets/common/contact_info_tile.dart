@@ -65,7 +65,7 @@ class ContactInfoTile extends StatelessWidget {
           children: [
             Text(
               label,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 fontSize: ContactInfoTileUIConfig.fontBodyMedium,
                 fontWeight: FontWeight.w700,
                 color: ContactInfoTileUIConfig.textDark,
@@ -73,7 +73,7 @@ class ContactInfoTile extends StatelessWidget {
             ),
             Text(
               value,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 fontSize: ContactInfoTileUIConfig.fontLabelSmall,
                 color: ContactInfoTileUIConfig.textMedium,
               ),

@@ -123,7 +123,7 @@ class _DonationTierCardState extends State<DonationTierCard> {
                   const SizedBox(height: DonationTierCardUIConfig.spacerSmall + 4),
                   Text(
                     widget.title,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                       fontSize: DonationTierCardUIConfig.fontBodyLarge,
                       fontWeight: FontWeight.w700,
                       color: DonationTierCardUIConfig.textDark,
@@ -132,7 +132,7 @@ class _DonationTierCardState extends State<DonationTierCard> {
                   const SizedBox(height: 6),
                   Text(
                     widget.amount,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                       fontSize: DonationTierCardUIConfig.fontHeadlineMedium,
                       fontWeight: FontWeight.w800,
                       color: DonationTierCardUIConfig.accentGold,
@@ -142,7 +142,7 @@ class _DonationTierCardState extends State<DonationTierCard> {
                   Text(
                     widget.description,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                       fontSize: DonationTierCardUIConfig.fontLabelSmall - 1,
                       color: DonationTierCardUIConfig.textMedium,
                       height: 1.5,
@@ -168,7 +168,7 @@ class _DonationTierCardState extends State<DonationTierCard> {
                       ),
                       child: Text(
                         'Donate Now',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.inter(
                           fontWeight: FontWeight.w700, 
                           fontSize: DonationTierCardUIConfig.fontBodyMedium,
                         ),
@@ -192,7 +192,7 @@ class _DonationTierCardState extends State<DonationTierCard> {
               ),
               child: Text(
                 'MOST POPULAR',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.inter(
                   color: DonationTierCardUIConfig.darkGreen,
                   fontSize: 9,
                   fontWeight: FontWeight.w800,

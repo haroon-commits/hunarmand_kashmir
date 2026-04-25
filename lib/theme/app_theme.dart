@@ -6,11 +6,11 @@
 /// CONNECTIONS:
 ///   - USED BY: main.dart → MaterialApp(theme: AppTheme.theme)
 ///   - USED BY: Every widget/screen file → references AppColors.* for consistent styling
-///   - DEPENDS ON: google_fonts package → GoogleFonts.poppins, playfairDisplay
+///   - DEPENDS ON: google_fonts package → GoogleFonts.inter
 /// ═══════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart'; // Flutter core for Color, ThemeData, etc.
-import 'package:google_fonts/google_fonts.dart'; // Google Fonts for premium typography (Poppins, Playfair Display)
+import 'package:google_fonts/google_fonts.dart'; // Google Fonts for premium typography (Inter)
 
 // ─── THEME UI CONFIGURATION ──────────────────────────────────────────────────
 /// Default UI metrics used by the global theme.
@@ -127,41 +127,41 @@ class AppTheme {
       ),
 
       // Typography Configuration - Sets the global text theme using Google Fonts.
-      // GoogleFonts.poppinsTextTheme() creates a base theme with Poppins,
+      // GoogleFonts.interTextTheme() creates a base theme with Inter (sans-serif),
       // then .copyWith() overrides specific text styles with custom sizing and colors.
-      textTheme: GoogleFonts.poppinsTextTheme().copyWith(
+      textTheme: GoogleFonts.interTextTheme().copyWith(
         // displayLarge: Used for major hero headings (rare, reserved for impact)
-        displayLarge: GoogleFonts.playfairDisplay(
-          fontSize: ThemeUIConfig.fontDisplay, 
+        displayLarge: GoogleFonts.inter(
+          fontSize: ThemeUIConfig.fontDisplay,
           fontWeight: FontWeight.bold, // Maximum emphasis
           color: AppColors.white, // White on dark hero backgrounds
         ),
         // headlineLarge: Used for section titles (e.g., 'Why Hunarmand Kashmir?')
-        headlineLarge: GoogleFonts.playfairDisplay(
-          fontSize: ThemeUIConfig.fontHeadlineLarge, 
+        headlineLarge: GoogleFonts.inter(
+          fontSize: ThemeUIConfig.fontHeadlineLarge,
           fontWeight: FontWeight.bold, // Bold weight for section headers
           color: AppColors.darkGreen, // Brand green for section titles
         ),
         // headlineMedium: Used for card titles and sub-section headers
-        headlineMedium: GoogleFonts.playfairDisplay(
-          fontSize: ThemeUIConfig.fontHeadlineMedium, 
+        headlineMedium: GoogleFonts.inter(
+          fontSize: ThemeUIConfig.fontHeadlineMedium,
           fontWeight: FontWeight.bold, // Bold weight
           color: AppColors.darkGreen, // Consistent brand color
         ),
         // bodyLarge: Primary body text style with comfortable line height
-        bodyLarge: GoogleFonts.poppins(
-          fontSize: ThemeUIConfig.fontBodyLarge, 
+        bodyLarge: GoogleFonts.inter(
+          fontSize: ThemeUIConfig.fontBodyLarge,
           color: AppColors.textMedium, // Medium grey for readability
           height: 1.6, // Generous line spacing for long-form text
         ),
         // bodyMedium: Secondary body text style for smaller content
-        bodyMedium: GoogleFonts.poppins(
-          fontSize: ThemeUIConfig.fontBodyMedium, 
+        bodyMedium: GoogleFonts.inter(
+          fontSize: ThemeUIConfig.fontBodyMedium,
           color: AppColors.textMedium, // Medium grey for readability
         ),
         // labelLarge: Used for button labels, navigation items, and badges
-        labelLarge: GoogleFonts.poppins(
-          fontSize: ThemeUIConfig.fontLabelLarge, 
+        labelLarge: GoogleFonts.inter(
+          fontSize: ThemeUIConfig.fontLabelLarge,
           fontWeight: FontWeight.w600, // Semi-bold for button emphasis
           color: AppColors.white, // White for dark button backgrounds
         ),
@@ -174,7 +174,7 @@ class AppTheme {
         foregroundColor: AppColors.white, // White icons and text by default
         elevation: 0, // Flat design: no shadow under the app bar
         // Default title text style for app bar titles
-        titleTextStyle: GoogleFonts.poppins(
+        titleTextStyle: GoogleFonts.inter(
           fontSize: 18, // Title font size
           fontWeight: FontWeight.w600, // Semi-bold
           color: AppColors.white, // White text on dark background
@@ -197,8 +197,8 @@ class AppTheme {
             borderRadius: BorderRadius.circular(ThemeUIConfig.radiusLarge), // 30px radius
           ),
           // Default button text style
-          textStyle: GoogleFonts.poppins(
-            fontSize: ThemeUIConfig.fontLabelLarge, 
+          textStyle: GoogleFonts.inter(
+            fontSize: ThemeUIConfig.fontLabelLarge,
             fontWeight: FontWeight.w600, // Semi-bold for legibility
           ),
         ),
@@ -225,7 +225,7 @@ class AppTheme {
           borderSide: const BorderSide(color: AppColors.darkGreen, width: 1.5), // Green focus ring
         ),
         // Hint text styling for placeholder text inside empty fields
-        hintStyle: GoogleFonts.poppins(
+        hintStyle: GoogleFonts.inter(
           color: AppColors.textLight, // Light grey hint color
           fontSize: ThemeUIConfig.fontBodyMedium, // 14px to match body text
         ),

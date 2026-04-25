@@ -161,7 +161,7 @@ class _CourseCardState extends State<CourseCard> {
                           // Course title
                           Text(
                             widget.title, // Course name (e.g., 'AI Mastery')
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.inter(
                               fontSize: CourseCardUIConfig.fontLabelLarge + 2, // 16px
                               fontWeight: FontWeight.w700, // Bold heading
                               color: CourseCardUIConfig.textDark, // Dark text
@@ -170,7 +170,7 @@ class _CourseCardState extends State<CourseCard> {
                           // Course duration in gold accent
                           Text(
                             widget.duration, // Duration (e.g., '3 Months')
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.inter(
                               fontSize: CourseCardUIConfig.fontLabelSmall, // 12px
                               color: CourseCardUIConfig.accentGold, // Gold accent
                               fontWeight: FontWeight.w600, // Semi-bold
@@ -186,7 +186,7 @@ class _CourseCardState extends State<CourseCard> {
                 // ── DESCRIPTION ──
                 Text(
                   widget.description, // Course description text
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.inter(
                     fontSize: CourseCardUIConfig.fontBodyMedium, // 14px body text
                     color: CourseCardUIConfig.textMedium, // Medium grey
                     height: 1.5, // Comfortable line height
@@ -202,7 +202,7 @@ class _CourseCardState extends State<CourseCard> {
                     Flexible(
                       child: Text(
                         widget.fee, // Fee (e.g., 'Rs. 8,000')
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.inter(
                           fontSize: CourseCardUIConfig.fontHeadlineMedium - 4, // 18px
                           fontWeight: FontWeight.w800, // Extra-bold for price emphasis
                           color: CourseCardUIConfig.darkGreen, // Brand green for financial info
@@ -235,10 +235,11 @@ class _CourseCardState extends State<CourseCard> {
                             : [], // No shadow at rest
                       ),
                       child: Row(
+                        mainAxisSize: MainAxisSize.min, // Prevents overflow in spaceBetween layout
                         children: [
                           Text(
                             'Apply', // Button label
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.inter(
                               fontSize: CourseCardUIConfig.fontLabelSmall, // 12px
                               fontWeight: FontWeight.w700, // Bold
                               // Hover effect #4: Text color inverts on hover

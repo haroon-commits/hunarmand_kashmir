@@ -2,7 +2,7 @@
 /// FILE: feature_card.dart
 /// PURPOSE: An interactive card widget showcasing platform selling points
 ///          (features). Implements hover animations including elevation lift,
-///          border glow, icon shadow, and a hidden "Learn more" CTA reveal.
+///          border glow, and icon shadow.
 /// CONNECTIONS:
 ///   - USED BY: screens/home_screen.dart → _WhySectionSliver builds one FeatureCard per Feature
 ///   - DATA SOURCE: models/content_model.dart → Feature (icon, title, description)
@@ -46,7 +46,6 @@ class FeatureCardUIConfig {
 ///   2. Border transitions from grey to semi-transparent gold
 ///   3. Shadow deepens and moves further down
 ///   4. Icon container gains a drop shadow
-///   5. "Learn more" CTA text fades in from 0% to 100% opacity
 ///
 /// PERFORMANCE: Wrapped in RepaintBoundary to isolate animation repaints
 ///              from the rest of the widget tree, preventing unnecessary redraws.
@@ -157,7 +156,7 @@ class _FeatureCardState extends State<FeatureCard> {
               // ── Title Text ──
               Text(
                 widget.title, // Feature title from constructor
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.inter(
                   fontSize: FeatureCardUIConfig.fontLabelLarge + 2, // 16px title size
                   fontWeight: FontWeight.w700, // Bold for heading emphasis
                   color: FeatureCardUIConfig.textDark, // Dark text for readability
@@ -168,36 +167,10 @@ class _FeatureCardState extends State<FeatureCard> {
               // ── Description Text ──
               Text(
                 widget.description, // Feature description from constructor
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.inter(
                   fontSize: FeatureCardUIConfig.fontBodyMedium, // 14px body text
                   color: FeatureCardUIConfig.textMedium, // Medium grey for secondary text
                   height: 1.55, // Comfortable line height
-                ),
-              ),
-              const SizedBox(height: FeatureCardUIConfig.spacerMedium), // 16px gap
-
-              // ── CTA Indicator (appears on hover) ──
-              // Hover effect #5: "Learn more" text fades in on hover
-              AnimatedOpacity(
-                opacity: _isHovered ? 1.0 : 0.0, // Visible on hover, hidden at rest
-                duration: const Duration(milliseconds: 250), // Smooth fade transition
-                child: Row(
-                  children: [
-                    Text(
-                      'Learn more', // CTA text
-                      style: GoogleFonts.poppins(
-                        color: FeatureCardUIConfig.accentGold, // Gold accent for CTA
-                        fontSize: FeatureCardUIConfig.fontBodyMedium, // 14px
-                        fontWeight: FontWeight.w600, // Semi-bold for emphasis
-                      ),
-                    ),
-                    const SizedBox(width: FeatureCardUIConfig.spacerSmall / 2), // 4px gap
-                    const Icon(
-                      Icons.arrow_forward, // Forward arrow icon
-                      color: FeatureCardUIConfig.accentGold, // Gold matching the text
-                      size: FeatureCardUIConfig.iconSizeSmall, // 14px small icon
-                    ),
-                  ],
                 ),
               ),
             ],

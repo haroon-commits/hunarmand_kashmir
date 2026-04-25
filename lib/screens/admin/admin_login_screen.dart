@@ -50,17 +50,16 @@ class AdminLoginScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'ہنرمند کشمیر',
-                style: GoogleFonts.amiriQuran(
-                  color: AdminLoginUIConfig.darkGreen,
-                  fontSize: 48,
-                ),
+              // Brand logo image
+              Image.asset(
+                'assets/images/main_logo.png',
+                height: 80, // Compact logo for login card
+                fit: BoxFit.contain,
               ),
               const SizedBox(height: 16),
               Text(
                 'Admin Portal',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.inter(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
                   color: AdminLoginUIConfig.textDark,
@@ -70,7 +69,7 @@ class AdminLoginScreen extends StatelessWidget {
               Text(
                 'Manage your website content efficiently',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.inter(
                   fontSize: 14,
                   color: AdminLoginUIConfig.textLight,
                 ),
@@ -90,7 +89,7 @@ class AdminLoginScreen extends StatelessWidget {
                 ),
                 child: Text(
                   'Login as Guest',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.inter(
                     fontWeight: FontWeight.w600,
                   ),
                 ),

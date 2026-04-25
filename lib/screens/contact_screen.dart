@@ -185,7 +185,7 @@ class _ContactScreenState extends State<ContactScreen> {
         children: [
           Text(
             'Visit Our Campus',
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.inter(
               color: ContactUIConfig.darkGreen,
               fontSize: ContactUIConfig.fontHeadlineMedium,
               fontWeight: FontWeight.bold,
@@ -194,7 +194,7 @@ class _ContactScreenState extends State<ContactScreen> {
           const SizedBox(height: ContactUIConfig.spacerSmall + 2),
           Text(
             'Our doors are always open for students and parents. Come see our labs, meet mentors, and feel the energy of innovation.',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               color: ContactUIConfig.textMedium,
               fontSize: ContactUIConfig.fontLabelSmall + 1,
               height: 1.6,
@@ -246,7 +246,7 @@ class _ContactScreenState extends State<ContactScreen> {
         children: [
           Text(
             'Send us a message',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: ContactUIConfig.radiusMedium,
               fontWeight: FontWeight.w700,
               color: ContactUIConfig.textDark,
@@ -285,7 +285,7 @@ class _ContactScreenState extends State<ContactScreen> {
                 onPressed: _submit,
                 icon: const Icon(Icons.send_outlined, size: 18),
                 label: Text('Submit Application',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.inter(
                       fontWeight: FontWeight.w700,
                       fontSize: ContactUIConfig.fontLabelLarge + 1,
                     )),
@@ -321,7 +321,7 @@ class _ContactScreenState extends State<ContactScreen> {
           const SizedBox(height: ContactUIConfig.spacerMedium + 2),
           Text(
             'Application Submitted!',
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.inter(
               color: ContactUIConfig.darkGreen,
               fontSize: Responsive.isDesktop(context)
                   ? ContactUIConfig.fontDisplayMobile + 2
@@ -333,7 +333,7 @@ class _ContactScreenState extends State<ContactScreen> {
           Text(
             'We have received your application. Our team will contact you within 24 hours. JazakAllah Khair!',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               color: ContactUIConfig.textMedium,
               fontSize: ContactUIConfig.fontLabelSmall + 2,
               height: 1.6,
@@ -353,7 +353,7 @@ class _ContactScreenState extends State<ContactScreen> {
                       BorderRadius.circular(ContactUIConfig.radiusLarge - 5)),
             ),
             child: Text('Submit Another',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -367,7 +367,7 @@ class _ContactScreenState extends State<ContactScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
                 fontSize: ContactUIConfig.fontLabelSmall + 1,
                 fontWeight: FontWeight.w600,
                 color: ContactUIConfig.textDark)),
@@ -391,7 +391,7 @@ class _ContactScreenState extends State<ContactScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Interested Course',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
                 fontSize: ContactUIConfig.fontLabelSmall + 1,
                 fontWeight: FontWeight.w600,
                 color: ContactUIConfig.textDark)),
@@ -409,7 +409,7 @@ class _ContactScreenState extends State<ContactScreen> {
             child: DropdownButton<String>(
               value: _selectedCourse,
               isExpanded: true,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                   fontSize: ContactUIConfig.fontLabelSmall + 1,
                   color: ContactUIConfig.textDark),
               items: _courses
@@ -429,7 +429,7 @@ class _ContactScreenState extends State<ContactScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Message',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
                 fontSize: ContactUIConfig.fontLabelSmall + 1,
                 fontWeight: FontWeight.w600,
                 color: ContactUIConfig.textDark)),
@@ -449,7 +449,7 @@ class _ContactScreenState extends State<ContactScreen> {
     if (_nameController.text.isEmpty || _phoneController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Please fill in all required fields.',
-            style: GoogleFonts.poppins()),
+            style: GoogleFonts.inter()),
         backgroundColor: Colors.red.shade600,
       ));
       return;
@@ -527,7 +527,7 @@ class _AnimatedTextFieldState extends State<_AnimatedTextField> {
         controller: widget.controller,
         keyboardType: widget.keyboardType,
         maxLines: widget.maxLines,
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.inter(
             fontSize: ContactUIConfig.fontLabelSmall + 1,
             color: ContactUIConfig.textDark),
         decoration: InputDecoration(
@@ -611,7 +611,7 @@ class _MapPreviewWidgetState extends State<MapPreviewWidget>
               Text(
                 'SCO Software Technology Park\nMirpur, AJK',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.inter(
                     color: ContactUIConfig.white,
                     fontSize: ContactUIConfig.fontLabelSmall,
                     fontWeight: FontWeight.w600,

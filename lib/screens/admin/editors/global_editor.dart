@@ -60,7 +60,7 @@ class _GlobalEditorState extends State<GlobalEditor> {
         children: [
           Text(
             'Global Settings',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: 28,
               fontWeight: FontWeight.w700,
               color: GlobalEditorUIConfig.textDark,
@@ -135,7 +135,7 @@ class _GlobalEditorState extends State<GlobalEditor> {
         children: [
           Text(
             title,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: GlobalEditorUIConfig.darkGreen,
@@ -155,7 +155,7 @@ class _GlobalEditorState extends State<GlobalEditor> {
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.inter(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: GlobalEditorUIConfig.textMedium,

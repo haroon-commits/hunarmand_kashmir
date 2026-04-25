@@ -53,7 +53,7 @@ class _DonateEditorState extends State<DonateEditor> {
         children: [
           Text(
             'Donate Screen Editor',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: 28,
               fontWeight: FontWeight.w700,
               color: DonateEditorUIConfig.textDark,
@@ -98,7 +98,7 @@ class _DonateEditorState extends State<DonateEditor> {
           children: [
             Text(
               'Recurring Tiers',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: DonateEditorUIConfig.textDark,
@@ -240,7 +240,7 @@ class _DonateEditorState extends State<DonateEditor> {
         children: [
           Text(
             title,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: DonateEditorUIConfig.darkGreen,
@@ -260,7 +260,7 @@ class _DonateEditorState extends State<DonateEditor> {
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.inter(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: DonateEditorUIConfig.textMedium,

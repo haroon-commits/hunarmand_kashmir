@@ -65,7 +65,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 const SizedBox(height: 40),
                 Text(
                   'Admin Panel',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.inter(
                     color: AdminDashboardUIConfig.accentGold,
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -84,7 +84,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   leading: const Icon(Icons.logout, color: Colors.white70),
                   title: Text(
                     'Logout',
-                    style: GoogleFonts.poppins(color: Colors.white70),
+                    style: GoogleFonts.inter(color: Colors.white70),
                   ),
                   onTap: () => context.read<AdminProvider>().logout(),
                 ),
@@ -111,7 +111,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       leading: Icon(icon, color: isSelected ? AdminDashboardUIConfig.accentGold : Colors.white70),
       title: Text(
         label,
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.inter(
           color: isSelected ? AdminDashboardUIConfig.accentGold : Colors.white70,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         ),

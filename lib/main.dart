@@ -212,32 +212,14 @@ class MainNavigator extends StatelessWidget {
           ),
         ),
       ),
-      // Setting the title with custom Kashmiri-style typography
-      title: Consumer<DynamicContentProvider>(
-        builder: (context, provider, _) => provider.content.logoPath != null &&
-                provider.content.logoPath!.isNotEmpty
-            ? Image.network(
-                provider.content.logoPath!,
-                height: 32,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => Text(
-                  provider.content.logoText,
-                  style: GoogleFonts.amiriQuran(
-                    color: MainUIConfig.accentGold,
-                    fontSize: 22,
-                  ).apply(fontFamilyFallback: const ['Noto Naskh Arabic', 'Noto Color Emoji']),
-                ),
-              )
-            : Text(
-                provider.content.logoText,
-                style: GoogleFonts.amiriQuran(
-                  color: MainUIConfig.accentGold,
-                  fontSize: 22,
-                ).apply(fontFamilyFallback: const ['Noto Naskh Arabic', 'Noto Color Emoji']),
-              ),
+      // Brand logo using local asset
+      title: Image.asset(
+        'assets/images/main_logo.png', // Static brand logo
+        height: 38,
+        fit: BoxFit.contain,
       ),
-      // Aligning the title to the center of the bar
-      centerTitle: true,
+      // Aligning title to the left to prevent overflow with the action button
+      centerTitle: false,
       // Action buttons displayed on the right side of the app bar
       actions: [
         MouseRegion(
@@ -269,13 +251,16 @@ class MainNavigator extends StatelessWidget {
                       color: MainUIConfig.accentGold, size: 13),
                   // Small horizontal gap
                   const SizedBox(width: 4),
-                  // Label for the button using Poppins font
-                  Text(
-                    'Donate',
-                    style: GoogleFonts.poppins(
-                      color: MainUIConfig.accentGold, // Consistent gold color
-                      fontSize: 11, // Small but legible on mobile
-                      fontWeight: FontWeight.w600, // Bold weight for emphasis
+                  // Label for the button using Inter font
+                  Flexible(
+                    child: Text(
+                      'Donate',
+                      style: GoogleFonts.inter(
+                        color: MainUIConfig.accentGold, // Consistent gold color
+                        fontSize: 11, // Small but legible on mobile
+                        fontWeight: FontWeight.w600, // Bold weight for emphasis
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -390,10 +375,10 @@ class MainNavigator extends StatelessWidget {
                         ),
                         // Dynamic vertical gap
                         const SizedBox(height: 2),
-                        // Displaying the section label
+                         // Displaying the section label
                         Text(
                           item['label'] as String,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.inter(
                             color: isActive
                                 ? MainUIConfig.darkGreen // Matching icon color
                                 : MainUIConfig.textLight, // Matching icon color

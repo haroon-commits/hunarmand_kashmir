@@ -8,11 +8,11 @@
 ///   - USED BY: main.dart → MainNavigator Scaffold drawer (mobile/tablet only)
 ///   - READS FROM: providers/dynamic_content_provider.dart → logoPath, logoText, appTitle
 ///   - WRITES TO: providers/app_state.dart → navigate() for page switching
-///   - DEPENDS ON: google_fonts → GoogleFonts.amiriQuran, GoogleFonts.poppins
+///   - DEPENDS ON: google_fonts → GoogleFonts.inter
 /// ═══════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart'; // Flutter core for Drawer, ListTile, ElevatedButton, etc.
-import 'package:google_fonts/google_fonts.dart'; // Google Fonts for AmiriQuran (Urdu) and Poppins (Latin) typography
+import 'package:google_fonts/google_fonts.dart'; // Google Fonts for Inter (Latin) typography
 import 'package:provider/provider.dart'; // Provider for Consumer and context.read state access
 import '../../providers/app_state.dart'; // AppState: navigate() for global page switching
 import '../../providers/dynamic_content_provider.dart'; // DynamicContentProvider: logoPath, logoText, appTitle
@@ -82,38 +82,27 @@ class HunarmandDrawer extends StatelessWidget {
     );
   }
 
-  /// Builds the header section of the drawer with dynamic logo and title.
-  /// Uses Consumer<DynamicContentProvider> to listen for logo/title changes.
-  /// The header has a slightly lighter green (mediumGreen) background to
-  /// visually separate it from the navigation links below.
+  /// Builds the header section of the drawer with static logo and title.
   Widget _buildDrawerHeader(BuildContext context) {
     return DrawerHeader(
       // Slightly lighter green background to distinguish header from nav items
       decoration: const BoxDecoration(color: AppDrawerUIConfig.mediumGreen),
       child: Center(
-        // Consumer listens to DynamicContentProvider for real-time branding updates
         child: Consumer<DynamicContentProvider>(
           builder: (context, provider, _) => Column(
             mainAxisAlignment: MainAxisAlignment.center, // Vertically center the content
             children: [
-              // Logo display: image if URL exists, otherwise Urdu text
-              provider.content.logoPath != null && provider.content.logoPath!.isNotEmpty
-                  ? Image.network(
-                      provider.content.logoPath!, // Logo URL from Firestore
-                      height: AppDrawerUIConfig.iconSizeHero + 2, // 50px logo height
-                      fit: BoxFit.contain, // Scale to fit without cropping
-                      // If image fails, fall back to Urdu text branding
-                      errorBuilder: (context, error, stackTrace) =>
-                          _drawerLogoText(provider.content.logoText),
-                    )
-                  : _drawerLogoText(provider.content.logoText), // No URL → show text
-
-              const SizedBox(height: AppDrawerUIConfig.spacerSmall), // 8px gap between logo and title
-
-              // App title text below the logo (e.g., 'Hunarmand Kashmir')
+              // Static asset logo
+              Image.asset(
+                'assets/images/main_logo.png', // Local brand logo
+                height: AppDrawerUIConfig.iconSizeHero + 2, // 50px logo height
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: AppDrawerUIConfig.spacerSmall), // 8px gap
+              // App title text below the logo
               Text(
                 provider.content.appTitle, // Title from Firestore via DynamicContentProvider
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.inter(
                   color: Colors.white70, // Semi-transparent white for subtitle feel
                   fontSize: AppDrawerUIConfig.fontBodyMedium, // 14px body text size
                 ),
@@ -121,19 +110,6 @@ class HunarmandDrawer extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  /// Helper for drawer-specific branding text in Urdu script.
-  /// Uses AmiriQuran font for authentic Arabic/Urdu calligraphy styling.
-  /// Called when no logo image URL is available or when the image fails to load.
-  Widget _drawerLogoText(String text) {
-    return Text(
-      text, // Urdu branding text (e.g., 'ہنرمند') from DynamicContentProvider
-      style: GoogleFonts.amiriQuran(
-        color: AppDrawerUIConfig.accentGold, // Signature gold for branding emphasis
-        fontSize: 28, // Fixed 28px size for drawer header prominence
       ),
     );
   }
@@ -155,7 +131,7 @@ class HunarmandDrawer extends StatelessWidget {
       ),
       title: Text(
         label, // Navigation label text
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.inter(
           color: AppDrawerUIConfig.white, // White text on dark background
           fontSize: AppDrawerUIConfig.fontBodyMedium, // 14px body text size
           fontWeight: FontWeight.w500, // Medium weight for readability
@@ -196,7 +172,7 @@ class HunarmandDrawer extends StatelessWidget {
           ),
           child: Text(
             'Join Now', // CTA label encouraging enrollment
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w700), // Bold for emphasis
+            style: GoogleFonts.inter(fontWeight: FontWeight.w700), // Bold for emphasis
           ),
         ),
       ),

@@ -57,7 +57,7 @@ class _ContactEditorState extends State<ContactEditor> {
         children: [
           Text(
             'Contact Screen Editor',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: 28,
               fontWeight: FontWeight.w700,
               color: ContactEditorUIConfig.textDark,
@@ -119,7 +119,7 @@ class _ContactEditorState extends State<ContactEditor> {
         children: [
           Text(
             title,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: ContactEditorUIConfig.darkGreen,
@@ -139,7 +139,7 @@ class _ContactEditorState extends State<ContactEditor> {
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.inter(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: ContactEditorUIConfig.textMedium,

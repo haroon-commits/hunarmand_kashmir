@@ -101,7 +101,7 @@ class DynamicContentProvider extends ChangeNotifier {
   /// Added a 5-second safety timeout to ensure the UI proceeds regardless of network.
   Future<void> _init() async {
     debugPrint('[INITIALIZATION] Starting DynamicContentProvider sync...');
-    
+
     // Start the Firestore listener
     _loadFromFirestore();
 
@@ -109,11 +109,12 @@ class DynamicContentProvider extends ChangeNotifier {
     // This prevents the user from being stuck on the splash screen indefinitely.
     Future.delayed(const Duration(seconds: 5), () {
       if (_isLoading) {
-        debugPrint('[INITIALIZATION] Timeout reached. Forcing splash screen removal.');
+        debugPrint(
+            '[INITIALIZATION] Timeout reached. Forcing splash screen removal.');
         _isLoading = false;
         // If content wasn't loaded yet, ensure we have defaults to render
         try {
-          _content; 
+          _content;
         } catch (_) {
           _content = _getDefaults();
         }
@@ -157,7 +158,8 @@ class DynamicContentProvider extends ChangeNotifier {
         }
         // Mark loading as complete so main.dart can hide the SplashScreen
         if (_isLoading) {
-          debugPrint('[INITIALIZATION] First Firestore snapshot received successfully.');
+          debugPrint(
+              '[INITIALIZATION] First Firestore snapshot received successfully.');
           _isLoading = false;
         }
         // Notify ALL listening widgets to rebuild with the new/updated content
@@ -197,51 +199,83 @@ class DynamicContentProvider extends ChangeNotifier {
       logoText: 'ہنرمند', // Urdu branding text (rendered with AmiriQuran font)
 
       // ── Home Screen: Hero Section ──
-      heroHeadline: 'Empowering Kashmir through Digital Excellence', // Main landing headline
-      heroSubheadline: 'Join the valley\'s premier skill-building initiative. Master modern technologies, build a global career, and transform your future with expert-led mentorship.', // Supporting narrative
+      heroHeadline:
+          'Empowering Kashmir through Digital Excellence', // Main landing headline
+      heroSubheadline:
+          'Join the valley\'s premier skill-building initiative. Master modern technologies, build a global career, and transform your future with expert-led mentorship.', // Supporting narrative
 
       // ── Courses: Master list of all offered courses ──
       // Each Course object maps to a CourseCard in home_screen.dart and courses_screen.dart
       courses: [
         Course(
           title: 'AI Mastery', // Course title displayed on card heading
-          description: 'Practical AI skills for real income. Learn to use AI tools to build products and earn online.', // Card body text
+          description:
+              'Practical AI skills for real income. Learn to use AI tools to build products and earn online.', // Card body text
           icon: '🤖', // Emoji rendered via dynamic_icon.dart
           duration: '3 Months', // Duration label
           fee: 'Rs. 8,000', // Fee label
-          topics: ['ChatGPT & Prompt Engineering', 'AI Image Generation', 'AI for Business', 'Freelancing with AI'], // Curriculum checklist
+          topics: [
+            'ChatGPT & Prompt Engineering',
+            'AI Image Generation',
+            'AI for Business',
+            'Freelancing with AI'
+          ], // Curriculum checklist
         ),
         Course(
           title: 'Graphic Design',
-          description: 'Professional design skills. Master the tools used by top designers worldwide.',
+          description:
+              'Professional design skills. Master the tools used by top designers worldwide.',
           icon: '🎨',
           duration: '3 Months',
           fee: 'Rs. 7,000',
-          topics: ['Adobe Photoshop', 'Adobe Illustrator', 'Canva Pro', 'Brand Identity Design'],
+          topics: [
+            'Adobe Photoshop',
+            'Adobe Illustrator',
+            'Canva Pro',
+            'Brand Identity Design'
+          ],
         ),
         Course(
           title: 'E-Commerce',
-          description: 'Build and scale online stores. Learn to sell products globally from Kashmir.',
+          description:
+              'Build and scale online stores. Learn to sell products globally from Kashmir.',
           icon: '🛍️',
           duration: '3 Months',
           fee: 'Rs. 6,000',
-          topics: ['Shopify Store Setup', 'Product Listing', 'Digital Marketing', 'Amazon FBA Basics'],
+          topics: [
+            'Shopify Store Setup',
+            'Product Listing',
+            'Digital Marketing',
+            'Amazon FBA Basics'
+          ],
         ),
         Course(
           title: 'Freelancing',
-          description: 'Work with global clients. Get your first international client within the first month.',
+          description:
+              'Work with global clients. Get your first international client within the first month.',
           icon: '💻',
           duration: '2 Months',
           fee: 'Rs. 5,000',
-          topics: ['Fiverr & Upwork Profile', 'Proposal Writing', 'Client Communication', 'Payment Methods'],
+          topics: [
+            'Fiverr & Upwork Profile',
+            'Proposal Writing',
+            'Client Communication',
+            'Payment Methods'
+          ],
         ),
         Course(
           title: 'Social Media Marketing',
-          description: 'Digital growth strategies. Help businesses grow their online presence.',
+          description:
+              'Digital growth strategies. Help businesses grow their online presence.',
           icon: '📢',
           duration: '3 Months',
           fee: 'Rs. 7,000',
-          topics: ['Content Strategy', 'Instagram & Facebook Ads', 'TikTok Marketing', 'Analytics & Reporting'],
+          topics: [
+            'Content Strategy',
+            'Instagram & Facebook Ads',
+            'TikTok Marketing',
+            'Analytics & Reporting'
+          ],
         ),
       ],
 
@@ -250,76 +284,141 @@ class DynamicContentProvider extends ChangeNotifier {
         Feature(
           icon: '👨‍🏫', // Emoji for the feature card icon
           title: 'Expert Mentorship', // Card heading
-          description: 'Learn from industry professionals who have worked globally.', // Card body
+          description:
+              'Learn from industry professionals who have worked globally.', // Card body
         ),
         Feature(
           icon: '🛠️',
           title: 'Practical Learning',
-          description: 'No boring theory. Work on real projects that build your portfolio.',
+          description:
+              'No boring theory. Work on real projects that build your portfolio.',
         ),
         Feature(
           icon: '🚀',
           title: 'Career Support',
-          description: 'From resume building to freelance gigs, we guide your career path.',
+          description:
+              'From resume building to freelance gigs, we guide your career path.',
         ),
       ],
 
       // ── Donation Tiers: Financial support levels for public donors ──
       donationTiers: [
-        DonationTier(title: 'Small Support', amount: '\$10', description: 'Helps one student with basic tools.', icon: '☕'),
-        DonationTier(title: 'Growth Pack', amount: '\$50', description: 'Covers training for one month.', icon: '🌱', popular: true), // Marked as 'MOST POPULAR' in UI
-        DonationTier(title: 'Future Builder', amount: '\$200', description: 'Full scholarship for one student.', icon: '🏢'),
+        DonationTier(
+            title: 'Small Support',
+            amount: '\$10',
+            description: 'Helps one student with basic tools.',
+            icon: '☕'),
+        DonationTier(
+            title: 'Growth Pack',
+            amount: '\$50',
+            description: 'Covers training for one month.',
+            icon: '🌱',
+            popular: true), // Marked as 'MOST POPULAR' in UI
+        DonationTier(
+            title: 'Future Builder',
+            amount: '\$200',
+            description: 'Full scholarship for one student.',
+            icon: '🏢'),
       ],
 
       // ── Team Members: Leadership profiles shown on About page ──
       teamMembers: [
-        TeamMember(name: 'Adnan Khan', role: 'Lead Mentor', imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80'),
-        TeamMember(name: 'Sarah Malik', role: 'Design Head', imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80'),
-        TeamMember(name: 'Omar Farooq', role: 'Web Instructor', imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80'),
+        TeamMember(
+            name: 'Adnan Khan',
+            role: 'Lead Mentor',
+            imageUrl:
+                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80'),
+        TeamMember(
+            name: 'Sarah Malik',
+            role: 'Design Head',
+            imageUrl:
+                'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80'),
+        TeamMember(
+            name: 'Omar Farooq',
+            role: 'Web Instructor',
+            imageUrl:
+                'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80'),
       ],
 
       // ── Footer & Contact ──
-      footerDescription: 'Empowering Youth. Empowering the youth of Kashmir through digital skills, fostering self-reliance, and building a future where talent meets opportunity.', // Footer branding narrative
-      contactAddress: 'SCO Software Technology Park, Mirpur', // Physical address
+      footerDescription:
+          'Empowering Youth. Empowering the youth of Kashmir through digital skills, fostering self-reliance, and building a future where talent meets opportunity.', // Footer branding narrative
+      contactAddress:
+          'SCO Software Technology Park, Mirpur', // Physical address
       contactPhone: '0313 884 0971', // Primary phone number
       contactEmail: 'salam@hunarmandkashmir.com', // Official email
 
       // ── About Page Content ──
-      aboutStoryHeadline: 'From Kashmir to Global Opportunities', // Story section heading
-      aboutStoryText: 'Hunarmand Kashmir was born from a simple yet powerful truth: talent is everywhere, but opportunity is not. For far too long, the brilliant minds of Kashmir have faced challenges—geographical isolation, limited infrastructure, and limited exposure to global industries.\n\nWe believe digital skills are the great equalizer. With the right training, mentorship, and access, a student from even the most remote areas of Kashmir can work with companies and clients across the world.', // Full story narrative
-      aboutMissionText: 'To bridge the skills gap in Kashmir by delivering world-class digital training that empowers 10,000 young people by 2030 to achieve financial independence with dignity and confidence.', // Mission statement
-      aboutVisionText: 'A self-reliant Kashmir where every young person has the skills to compete globally without leaving their homeland.', // Vision statement
-      aboutValuesText: 'We are more than an institute; we are a family. We support each other, share opportunities, and grow together as a skilled collective.', // Values narrative
+      aboutStoryHeadline:
+          'From Kashmir to Global Opportunities', // Story section heading
+      aboutStoryText:
+          'Hunarmand Kashmir was born from a simple yet powerful truth: talent is everywhere, but opportunity is not. For far too long, the brilliant minds of Kashmir have faced challenges—geographical isolation, limited infrastructure, and limited exposure to global industries.\n\nWe believe digital skills are the great equalizer. With the right training, mentorship, and access, a student from even the most remote areas of Kashmir can work with companies and clients across the world.', // Full story narrative
+      aboutMissionText:
+          'To bridge the skills gap in Kashmir by delivering world-class digital training that empowers 10,000 young people by 2030 to achieve financial independence with dignity and confidence.', // Mission statement
+      aboutVisionText:
+          'A self-reliant Kashmir where every young person has the skills to compete globally without leaving their homeland.', // Vision statement
+      aboutValuesText:
+          'We are more than an institute; we are a family. We support each other, share opportunities, and grow together as a skilled collective.', // Values narrative
 
       // ── Donate Page Hero ──
-      donateHeroTitle: 'Invest in Dignity, Not Dependency.', // Donate page headline
-      donateHeroDescription: 'Your contribution unlocks futures. Help empower youth in Kashmir to earn a livelihood and build self-reliant communities.', // Donate page description
+      donateHeroTitle:
+          'Invest in Dignity, Not Dependency.', // Donate page headline
+      donateHeroDescription:
+          'Your contribution unlocks futures. Help empower youth in Kashmir to earn a livelihood and build self-reliant communities.', // Donate page description
 
       // ── Contact Page Hero ──
       contactHeroTitle: 'Get in Touch', // Contact page headline
-      contactHeroDescription: 'Have questions? We are here to help you start your journey or discuss collaboration opportunities.', // Contact page description
+      contactHeroDescription:
+          'Have questions? We are here to help you start your journey or discuss collaboration opportunities.', // Contact page description
 
       // ── Home Page: Why Us Section ──
       homeWhyTitle: 'Why Hunarmand Kashmir?', // Why Us section headline
-      homeWhyDescription: 'We believe in "Skills over Degrees". In a rapidly changing world, we provide practical, hands-on training that the industry demands, right here in Mirpur.', // Why Us description
+      homeWhyDescription:
+          'We believe in "Skills over Degrees". In a rapidly changing world, we provide practical, hands-on training that the industry demands, right here in Mirpur.', // Why Us description
 
       // ── Home Page: Call-to-Action Section ──
       homeCtaTitle: 'Your Journey Begins Here', // CTA headline
-      homeCtaDescription: "Don't let lack of opportunity hold you back. Join Hunarmand Kashmir today and unlock a future of dignity, independence, and success.", // CTA description
+      homeCtaDescription:
+          "Don't let lack of opportunity hold you back. Join Hunarmand Kashmir today and unlock a future of dignity, independence, and success.", // CTA description
 
       // ── Gallery Page ──
       galleryHeroTitle: 'Moments of Hope', // Gallery page headline
-      galleryHeroDescription: 'Witness the journey of transformation. From Mirpur to Bhimber, empowering every corner of Kashmir.', // Gallery description
+      galleryHeroDescription:
+          'Witness the journey of transformation. From Mirpur to Bhimber, empowering every corner of Kashmir.', // Gallery description
       galleryImages: [
         // Each GalleryImage contains an Unsplash URL and descriptive label
-        GalleryImage(imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80', label: 'Web Development Lab'),
-        GalleryImage(imageUrl: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=80', label: 'Design Studio'),
-        GalleryImage(imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', label: 'Coding Workshop'),
-        GalleryImage(imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&q=80', label: 'Mentorship Session'),
-        GalleryImage(imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80', label: 'Team Graduation'),
-        GalleryImage(imageUrl: 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=800&q=80', label: 'Campus View'),
-        GalleryImage(imageUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80', label: 'Digital Skills Training'),
-        GalleryImage(imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80', label: 'Project Collaboration'),
+        GalleryImage(
+            imageUrl:
+                'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80',
+            label: 'Web Development Lab'),
+        GalleryImage(
+            imageUrl:
+                'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=80',
+            label: 'Design Studio'),
+        GalleryImage(
+            imageUrl:
+                'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80',
+            label: 'Coding Workshop'),
+        GalleryImage(
+            imageUrl:
+                'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&q=80',
+            label: 'Mentorship Session'),
+        GalleryImage(
+            imageUrl:
+                'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80',
+            label: 'Team Graduation'),
+        GalleryImage(
+            imageUrl:
+                'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=800&q=80',
+            label: 'Campus View'),
+        GalleryImage(
+            imageUrl:
+                'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80',
+            label: 'Digital Skills Training'),
+        GalleryImage(
+            imageUrl:
+                'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80',
+            label: 'Project Collaboration'),
       ],
     );
   }
@@ -402,7 +501,8 @@ class DynamicContentProvider extends ChangeNotifier {
   /// Updates the entire About Us narrative structure.
   /// CALLED BY: screens/admin/editors/about_editor.dart → 'Save' button
   /// AFFECTS: screens/about_screen.dart → story section, mission/vision cards, values card
-  void updateAbout(String headline, String story, String mission, String vision, String values) {
+  void updateAbout(String headline, String story, String mission, String vision,
+      String values) {
     _content = _content.copyWith(
       aboutStoryHeadline: headline, // New story section headline
       aboutStoryText: story, // New story narrative body
@@ -521,7 +621,8 @@ class DynamicContentProvider extends ChangeNotifier {
   /// CALLED BY: screens/admin/editors/courses_editor.dart → 'Update' button on course tile
   /// AFFECTS: The corresponding course card in courses_screen.dart and home_screen.dart
   void updateCourse(int index, Course course) {
-    _content.courses[index] = course; // Replace the course at the given position
+    _content.courses[index] =
+        course; // Replace the course at the given position
     saveContent(); // Persist and notify
   }
 

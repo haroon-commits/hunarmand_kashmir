@@ -158,7 +158,7 @@ class DonateScreen extends StatelessWidget {
   /// Minimal text helper
   Widget childText(String text, {required Color color, required double size}) => Text(
         text,
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.inter(
           color: color,
           fontSize: size,
           fontWeight: FontWeight.w600,
@@ -169,7 +169,7 @@ class DonateScreen extends StatelessWidget {
   Widget _heroTitle(String title) => Text(
         title,
         textAlign: TextAlign.center,
-        style: GoogleFonts.playfairDisplay(
+        style: GoogleFonts.inter(
           color: DonateUIConfig.white,
           fontSize: DonateUIConfig.fontDisplayDesktop - 8,
           fontWeight: FontWeight.bold,
@@ -181,7 +181,7 @@ class DonateScreen extends StatelessWidget {
   Widget _heroDescription(String description) => Text(
         description,
         textAlign: TextAlign.center,
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.inter(
           color: Colors.white70,
           fontSize: DonateUIConfig.fontLabelSmall + 1,
           height: 1.7,
@@ -269,7 +269,7 @@ class DonateScreen extends StatelessWidget {
         children: [
           Text(
             'Our Promise of Transparency',
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.inter(
               color: DonateUIConfig.darkGreen,
               fontSize: DonateUIConfig.fontHeadlineSmall + 4,
               fontWeight: FontWeight.bold,
@@ -278,7 +278,7 @@ class DonateScreen extends StatelessWidget {
           const SizedBox(height: DonateUIConfig.spacerSmall),
           Text(
             'Every rupee is accounted for with ethical allocation.',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               color: DonateUIConfig.textMedium,
               fontSize: DonateUIConfig.fontLabelSmall + 1,
               height: 1.6,
@@ -296,7 +296,7 @@ class DonateScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         note,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.inter(
                             fontSize: DonateUIConfig.fontLabelSmall + 1,
                             color: DonateUIConfig.textMedium,
                             height: 1.4),
@@ -340,10 +340,10 @@ class DonateScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(item.label,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.inter(
                       fontSize: DonateUIConfig.fontLabelSmall - 1, color: DonateUIConfig.textMedium)),
               Text('${item.percent}%',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.inter(
                       fontSize: DonateUIConfig.fontLabelSmall + 1,
                       fontWeight: FontWeight.w700,
                       color: DonateUIConfig.textDark)),
@@ -376,7 +376,7 @@ class DonateScreen extends StatelessWidget {
           Text(
             'Ways to Contribute',
             textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.inter(
               color: DonateUIConfig.darkGreen,
               fontSize: DonateUIConfig.fontHeadlineMedium,
               fontWeight: FontWeight.bold,
@@ -387,7 +387,7 @@ class DonateScreen extends StatelessWidget {
             'Every amount counts towards building a skilled Kashmir.',
             textAlign: TextAlign.center,
             style:
-                GoogleFonts.poppins(
+                GoogleFonts.inter(
                   color: DonateUIConfig.textMedium, 
                   fontSize: DonateUIConfig.fontLabelSmall + 1,
                 ),
@@ -426,7 +426,7 @@ class DonateScreen extends StatelessWidget {
         children: [
           Text(
             'Direct Bank Transfer',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               color: DonateUIConfig.white,
               fontSize: DonateUIConfig.fontLabelLarge + 2,
               fontWeight: FontWeight.w700,
@@ -435,7 +435,7 @@ class DonateScreen extends StatelessWidget {
           const SizedBox(height: DonateUIConfig.spacerSmall - 2),
           Text(
             'Transfer directly and share receipt via WhatsApp.',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
                 color: Colors.white70, fontSize: DonateUIConfig.fontLabelSmall - 1, height: 1.5),
           ),
           const SizedBox(height: DonateUIConfig.spacerMedium),
@@ -446,7 +446,7 @@ class DonateScreen extends StatelessWidget {
           Text(
             '"Charity does not decrease wealth."',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               color: DonateUIConfig.accentGold,
               fontSize: DonateUIConfig.fontLabelSmall + 1,
               fontStyle: FontStyle.italic,
@@ -491,7 +491,7 @@ class DonateScreen extends StatelessWidget {
         children: [
           Text(
             label,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.inter(
               color: DonateUIConfig.accentGold,
               fontSize: DonateUIConfig.fontLabelSmall - 1,
               fontWeight: FontWeight.w600,
@@ -501,7 +501,7 @@ class DonateScreen extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 color: Colors.white70, 
                 fontSize: DonateUIConfig.fontLabelSmall - 1,
               ),
@@ -538,7 +538,7 @@ class DonateScreen extends StatelessWidget {
             const SizedBox(height: DonateUIConfig.spacerMedium + 4),
             Text(
               'Donate: $title',
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.inter(
                 color: DonateUIConfig.darkGreen,
                 fontSize: DonateUIConfig.fontHeadlineSmall + 4,
                 fontWeight: FontWeight.bold,
@@ -547,7 +547,7 @@ class DonateScreen extends StatelessWidget {
             const SizedBox(height: DonateUIConfig.spacerSmall),
             Text(
               amount,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 color: DonateUIConfig.accentGold,
                 fontSize: DonateUIConfig.fontDisplayMobile + 6,
                 fontWeight: FontWeight.w800,
@@ -557,7 +557,7 @@ class DonateScreen extends StatelessWidget {
             Text(
               'Transfer to the account above and share receipt via WhatsApp.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                   color: DonateUIConfig.textMedium, 
                   fontSize: DonateUIConfig.fontLabelSmall + 1, 
                   height: 1.6,
@@ -588,7 +588,7 @@ class DonateScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: DonateUIConfig.paddingButtonSmallV + 2),
           ),
           child: Text(label,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.inter(
                 fontWeight: FontWeight.w700, 
                 fontSize: DonateUIConfig.fontLabelSmall + 1,
               )),
@@ -678,7 +678,7 @@ class _ImpactCardState extends State<ImpactCard> {
               const SizedBox(height: DonateUIConfig.spacerSmall + 2),
               Text(
                 widget.impact.title,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.inter(
                   fontSize: DonateUIConfig.fontBodyLarge - 1,
                   fontWeight: FontWeight.w700,
                   color: DonateUIConfig.textDark,
@@ -687,7 +687,7 @@ class _ImpactCardState extends State<ImpactCard> {
               const SizedBox(height: 6),
               Text(
                 widget.impact.description,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.inter(
                   color: DonateUIConfig.textMedium,
                   fontSize: DonateUIConfig.fontLabelSmall + 1,
                   height: 1.5,
