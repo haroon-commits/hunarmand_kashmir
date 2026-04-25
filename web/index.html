@@ -59,14 +59,11 @@
       align-items: center;
       background-color: #0D3320;
       z-index: 99999;
-      transition: opacity 0.4s ease-out;
     }
 
     .logo-img {
       height: 160px;
       margin-bottom: 0;
-      opacity: 0;
-      animation: fadeIn 1s ease-out forwards;
     }
 
     .tagline {
@@ -77,9 +74,6 @@
       font-weight: 500;
       margin-top: 12px;
       margin-bottom: 48px;
-      opacity: 0;
-      animation: fadeIn 1s ease-out forwards;
-      animation-delay: 0.1s;
     }
 
     .spinner {
@@ -132,10 +126,7 @@
         if (document.querySelector('flt-glass-pane')) {
           var loader = document.getElementById('loading-indicator');
           if (loader) {
-            loader.style.opacity = '0';
-            setTimeout(function () {
-              loader.remove();
-            }, 400);
+            loader.remove();
           }
           clearInterval(interval);
         }

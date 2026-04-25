@@ -17,6 +17,9 @@ import 'widgets/nav/hunarmand_app_bar.dart';
 import 'widgets/layout/app_footer.dart';
 import 'package:provider/provider.dart'; // Importing provider for global state management
 import 'package:google_fonts/google_fonts.dart'; // Importing Google Fonts for high-quality typography
+
+import 'utils/web_loader.dart' if (dart.library.html) 'utils/web_loader_web.dart';
+
 import 'theme/app_theme.dart'; // Importing our application's design system and theme
 import 'providers/app_state.dart'; // Importing the state management provider
 import 'screens/home_screen.dart'; // Importing the home screen class
@@ -144,10 +147,17 @@ class MainNavigator extends StatelessWidget {
       // Building the UI whenever any state notifies listeners
       builder: (context, appState, adminProvider, dynamicContent, _) {
         // If the dynamic content is still being fetched from Firestore,
-        // display the premium branded splash screen.
+        // we display a blank dark green container because the HTML loader 
+        // is still covering the screen!
         if (dynamicContent.isLoading) {
-          return const HunarmandSplash();
+          return Scaffold(backgroundColor: MainUIConfig.darkGreen, body: Container());
         }
+
+        // Data is fully loaded. We can now safely hide the HTML web loader 
+        // to reveal the app smoothly without any blink!
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          hideWebLoader();
+        });
 
         // Getting the current page identifier from global state
         final currentPage = appState.currentPage;
