@@ -1,6 +1,6 @@
 /// ═══════════════════════════════════════════════════════════════════════
 /// FILE: courses_editor.dart
-/// PURPOSE: Admin interface for complete CRUD operations on the curriculum 
+/// PURPOSE: Admin interface for complete CRUD operations on the curriculum
 ///          catalog, managing training programs and their constituent topics.
 /// CONNECTIONS:
 ///   - USED BY: admin_dashboard_screen.dart
@@ -12,7 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/dynamic_content_provider.dart';
 import '../../../models/content_model.dart';
-
+import '../../../widgets/utils/dynamic_icon.dart';
 
 // ─── COURSESEDITORUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to courses_editor.dart.
@@ -21,9 +21,7 @@ class CoursesEditorUIConfig {
   static const Color darkGreen = Color(0xFF0D3320);
   static const Color lightTeal = Color(0xFFE8F5F3);
   static const Color textDark = Color(0xFF1A1A1A);
-
 }
-
 
 class CoursesEditor extends StatelessWidget {
   const CoursesEditor({super.key});
@@ -33,34 +31,164 @@ class CoursesEditor extends StatelessWidget {
     final provider = context.watch<DynamicContentProvider>();
     final courses = provider.content.courses;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Courses Management',
-              style: GoogleFonts.inter(
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-                color: CoursesEditorUIConfig.textDark,
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Courses Management',
+                style: GoogleFonts.inter(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                  color: CoursesEditorUIConfig.textDark,
+                ),
               ),
-            ),
-            ElevatedButton.icon(
-              onPressed: () => _showCourseDialog(context),
-              icon: const Icon(Icons.add),
-              label: const Text('Add New Course'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CoursesEditorUIConfig.darkGreen,
-                foregroundColor: Colors.white,
+              ElevatedButton.icon(
+                onPressed: () => _showCourseDialog(context),
+                icon: const Icon(Icons.add),
+                label: const Text('Add New Course'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CoursesEditorUIConfig.darkGreen,
+                  foregroundColor: Colors.white,
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
-        Expanded(
-          child: ListView.builder(
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // ─── PAGE SECTION EDITOR ──────────────────────────────────────────
+          ExpansionTile(
+            title: const Text('Edit Page Sections',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle:
+                const Text('Learning Choice, Locations, and Orphan Support'),
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    _buildSectionHeader('Learning Choice Section'),
+                    TextField(
+                      decoration:
+                          const InputDecoration(labelText: 'Section Title'),
+                      controller: TextEditingController(
+                          text: provider.content.courseLearningChoiceTitle),
+                      onSubmitted: (val) => provider.updateContent(provider
+                          .content
+                          .copyWith(courseLearningChoiceTitle: val)),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      decoration: const InputDecoration(
+                          labelText: 'Section Description'),
+                      controller: TextEditingController(
+                          text:
+                              provider.content.courseLearningChoiceDescription),
+                      onSubmitted: (val) => provider.updateContent(provider
+                          .content
+                          .copyWith(courseLearningChoiceDescription: val)),
+                    ),
+                    const Divider(height: 32),
+                    _buildSectionHeader('Location 1 (Freelancing Hub)'),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: TextField(
+                            decoration:
+                                const InputDecoration(labelText: 'Icon'),
+                            controller: TextEditingController(
+                                text: provider.content.courseLocation1Icon),
+                            onSubmitted: (val) => provider.updateContent(
+                                provider.content
+                                    .copyWith(courseLocation1Icon: val)),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 3,
+                          child: TextField(
+                            decoration:
+                                const InputDecoration(labelText: 'Title'),
+                            controller: TextEditingController(
+                                text: provider.content.courseLocation1Title),
+                            onSubmitted: (val) => provider.updateContent(
+                                provider.content
+                                    .copyWith(courseLocation1Title: val)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      decoration:
+                          const InputDecoration(labelText: 'Address/Text'),
+                      controller: TextEditingController(
+                          text: provider.content.courseLocation1Text),
+                      onSubmitted: (val) => provider.updateContent(
+                          provider.content.copyWith(courseLocation1Text: val)),
+                    ),
+                    const Divider(height: 32),
+                    _buildSectionHeader('Orphan Support Card'),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: TextField(
+                            decoration:
+                                const InputDecoration(labelText: 'Icon'),
+                            controller: TextEditingController(
+                                text: provider.content.courseOrphanSupportIcon),
+                            onSubmitted: (val) => provider.updateContent(
+                                provider.content
+                                    .copyWith(courseOrphanSupportIcon: val)),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 3,
+                          child: TextField(
+                            decoration:
+                                const InputDecoration(labelText: 'Title'),
+                            controller: TextEditingController(
+                                text:
+                                    provider.content.courseOrphanSupportTitle),
+                            onSubmitted: (val) => provider.updateContent(
+                                provider.content
+                                    .copyWith(courseOrphanSupportTitle: val)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      decoration:
+                          const InputDecoration(labelText: 'Description'),
+                      maxLines: 2,
+                      controller: TextEditingController(
+                          text:
+                              provider.content.courseOrphanSupportDescription),
+                      onSubmitted: (val) => provider.updateContent(provider
+                          .content
+                          .copyWith(courseOrphanSupportDescription: val)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+          const Text('Individual Courses',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: courses.length,
             itemBuilder: (context, index) {
               final course = courses[index];
@@ -75,18 +203,20 @@ class CoursesEditor extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
-                      child: _renderDynamicIcon(course.icon,
+                      child: renderDynamicIcon(course.icon,
                           color: CoursesEditorUIConfig.darkGreen, size: 20),
                     ),
                   ),
-                  title: Text(course.title, style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                  title: Text(course.title,
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
                   subtitle: Text(course.fee),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                         icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () => _showCourseDialog(context, course: course, index: index),
+                        onPressed: () => _showCourseDialog(context,
+                            course: course, index: index),
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
@@ -98,8 +228,24 @@ class CoursesEditor extends StatelessWidget {
               );
             },
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Row(
+        children: [
+          Container(
+              width: 4, height: 16, color: CoursesEditorUIConfig.darkGreen),
+          const SizedBox(width: 8),
+          Text(title,
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+        ],
+      ),
     );
   }
 
@@ -132,14 +278,15 @@ class CoursesEditor extends StatelessWidget {
                 children: [
                   TextField(
                       controller: iconController,
-                      decoration:
-                          const InputDecoration(labelText: 'Icon (Emoji or URL)')),
+                      decoration: const InputDecoration(
+                          labelText: 'Icon (Emoji or URL)')),
                   TextField(
                       controller: titleController,
                       decoration: const InputDecoration(labelText: 'Title')),
                   TextField(
                       controller: descController,
-                      decoration: const InputDecoration(labelText: 'Description'),
+                      decoration:
+                          const InputDecoration(labelText: 'Description'),
                       maxLines: 2),
                   TextField(
                       controller: feeController,
@@ -227,31 +374,6 @@ class CoursesEditor extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-// Reuse the common icon renderer
-Widget _renderDynamicIcon(String icon,
-    {Color? color, double size = 24, bool circle = false}) {
-  bool isUrl = icon.startsWith('http');
-
-  if (isUrl) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(circle ? 100 : 8),
-      child: Image.network(
-        icon,
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) =>
-            Icon(Icons.broken_image, color: color, size: size * 0.8),
-      ),
-    );
-  } else {
-    return Text(
-      icon,
-      style: TextStyle(fontSize: size),
     );
   }
 }

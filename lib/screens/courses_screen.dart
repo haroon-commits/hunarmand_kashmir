@@ -98,14 +98,14 @@ class CoursesScreen extends StatelessWidget {
                   'Hunarmand Kashmir offers practical digital courses designed to help you master modern skills and start earning from home.',
             ),
             // Section highlighting the choice between Campus and Online learning
-            SliverToBoxAdapter(child: _buildLearningChoiceSection(context)),
+            SliverToBoxAdapter(child: _buildLearningChoiceSection(context, provider)),
             // The primary listing of all vocational programs and their fees
             SliverToBoxAdapter(
                 child: _buildCoursesAndFeesSection(context, content.courses)),
             // Incentive section for early registrations
             SliverToBoxAdapter(child: _buildEarlyBirdSection(context)),
             // Targeted scholarship highlight for orphan students
-            SliverToBoxAdapter(child: _buildOrphanSupportCard(context)),
+            SliverToBoxAdapter(child: _buildOrphanSupportCard(context, provider)),
             // Final secondary conversion banner
             SliverToBoxAdapter(child: _buildReadyToStartCard(context)),
             // Global site footer
@@ -117,7 +117,7 @@ class CoursesScreen extends StatelessWidget {
   }
 
   /// Builds the 'Learning Choice' section that displays environment options.
-  Widget _buildLearningChoiceSection(BuildContext context) {
+  Widget _buildLearningChoiceSection(BuildContext context, DynamicContentProvider provider) {
     final hPad = Responsive.contentPaddingH(context);
     final isDesktop = Responsive.isDesktop(context);
     return Container(
@@ -134,7 +134,7 @@ class CoursesScreen extends StatelessWidget {
               children: [
                 FadeInDown(
                   child: Text(
-                    'Your Learning, Your Choice',
+                    provider.content.courseLearningChoiceTitle,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
                       color: CoursesUIConfig.darkGreen,
@@ -149,7 +149,7 @@ class CoursesScreen extends StatelessWidget {
                 FadeInDown(
                   delay: const Duration(milliseconds: 100),
                   child: Text(
-                    'Choose the location and schedule that fits your routine.',
+                    provider.content.courseLearningChoiceDescription,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
                         color: CoursesUIConfig.textMedium, 
@@ -165,31 +165,31 @@ class CoursesScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: _locationCard(
-                              Icons.school_outlined,
+                              provider.content.courseLocation1Icon,
                               const Color(0xFFE91E8C), // pink accent
-                              'Freelancing Hub (HFK)',
-                              'Hassan Colony, Mirpur',
-                              'Mon–Fri Batches',
+                              provider.content.courseLocation1Title,
+                              provider.content.courseLocation1Text,
+                              provider.content.courseLocation1Timing,
                             ),
                           ),
                           const SizedBox(width: CoursesUIConfig.spacerMedium),
                           Expanded(
                             child: _locationCard(
-                              Icons.business_outlined,
+                              provider.content.courseLocation2Icon,
                               CoursesUIConfig.accentGold,
-                              'SCO Software Technology Park',
-                              'SCO Software Technology Park, Mirpur',
-                              'Special Timing',
+                              provider.content.courseLocation2Title,
+                              provider.content.courseLocation2Text,
+                              provider.content.courseLocation2Timing,
                             ),
                           ),
                           const SizedBox(width: CoursesUIConfig.spacerMedium),
                           Expanded(
                             child: _locationCard(
-                              Icons.laptop_outlined,
+                              provider.content.courseLocation3Icon,
                               CoursesUIConfig.successGreen,
-                              'Online Classes Live',
-                              'Learn from anywhere in Kashmir',
-                              'Flexible Timings',
+                              provider.content.courseLocation3Title,
+                              provider.content.courseLocation3Text,
+                              provider.content.courseLocation3Timing,
                             ),
                           ),
                         ],
@@ -197,27 +197,27 @@ class CoursesScreen extends StatelessWidget {
                     : Column(
                         children: [
                           _locationCard(
-                            Icons.school_outlined,
+                            provider.content.courseLocation1Icon,
                             const Color(0xFFE91E8C),
-                            'Freelancing Hub (HFK)',
-                            'Hassan Colony, Mirpur',
-                            'Mon–Fri Batches',
+                            provider.content.courseLocation1Title,
+                            provider.content.courseLocation1Text,
+                            provider.content.courseLocation1Timing,
                           ),
                           const SizedBox(height: CoursesUIConfig.spacerMedium),
                           _locationCard(
-                            Icons.business_outlined,
+                            provider.content.courseLocation2Icon,
                             CoursesUIConfig.accentGold,
-                            'SCO Software Technology Park',
-                            'SCO Software Technology Park, Mirpur',
-                            'Special Timing',
+                            provider.content.courseLocation2Title,
+                            provider.content.courseLocation2Text,
+                            provider.content.courseLocation2Timing,
                           ),
                           const SizedBox(height: CoursesUIConfig.spacerMedium),
                           _locationCard(
-                            Icons.laptop_outlined,
+                            provider.content.courseLocation3Icon,
                             CoursesUIConfig.successGreen,
-                            'Online Classes Live',
-                            'Learn from anywhere in Kashmir',
-                            'Flexible Timings',
+                            provider.content.courseLocation3Title,
+                            provider.content.courseLocation3Text,
+                            provider.content.courseLocation3Timing,
                           ),
                         ],
                       ),
@@ -232,7 +232,7 @@ class CoursesScreen extends StatelessWidget {
 
   /// Helper to build a stylistic card representing a learning location.
   Widget _locationCard(
-    IconData icon,
+    String icon,
     Color accentColor,
     String title,
     String location,
@@ -258,7 +258,7 @@ class CoursesScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-          Icon(icon, color: accentColor, size: CoursesUIConfig.iconSizeMedium + 4),
+          renderDynamicIcon(icon, color: accentColor, size: CoursesUIConfig.iconSizeMedium + 4),
           const SizedBox(height: CoursesUIConfig.spacerMedium - 4),
           Text(
             title,
@@ -744,8 +744,8 @@ class CoursesScreen extends StatelessWidget {
     );
   }
 
-  /// Builds a focused informational card highlighting the orphan support policy.
-  Widget _buildOrphanSupportCard(BuildContext context) {
+  /// Builds a prominent highlight card for orphan student support.
+  Widget _buildOrphanSupportCard(BuildContext context, DynamicContentProvider provider) {
     final hPad = Responsive.contentPaddingH(context);
     return Center(
       child: ConstrainedBox(
@@ -765,8 +765,12 @@ class CoursesScreen extends StatelessWidget {
                   height: CoursesUIConfig.spacerExtraLarge + 6,
                   decoration: const BoxDecoration(
                       shape: BoxShape.circle, color: CoursesUIConfig.accentGold),
-                  child: const Center(
-                    child: Text('❤️', style: TextStyle(fontSize: CoursesUIConfig.spacerLarge)),
+                  child: Center(
+                    child: renderDynamicIcon(
+                      provider.content.courseOrphanSupportIcon,
+                      size: CoursesUIConfig.spacerLarge,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 const SizedBox(width: CoursesUIConfig.spacerMedium + 2),
@@ -775,7 +779,7 @@ class CoursesScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Support for Orphans',
+                        provider.content.courseOrphanSupportTitle,
                         style: GoogleFonts.inter(
                           color: CoursesUIConfig.white,
                           fontSize: CoursesUIConfig.fontBodyLarge,
@@ -783,24 +787,11 @@ class CoursesScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 5),
-                      RichText(
-                        text: TextSpan(
-                          style: GoogleFonts.inter(
-                              color: Colors.white70, 
-                              fontSize: CoursesUIConfig.fontLabelSmall + 1,
-                          ),
-                          children: const [
-                            TextSpan(text: 'We provide a '),
-                            TextSpan(
-                              text: '100% Fee Waiver',
-                              style: TextStyle(
-                                color: CoursesUIConfig.accentGold,
-                                fontWeight: FontWeight.w700,
-                                backgroundColor: Color(0x33F5A623),
-                              ),
-                            ),
-                            TextSpan(text: ' for orphan students.'),
-                          ],
+                      Text(
+                        provider.content.courseOrphanSupportDescription,
+                        style: GoogleFonts.inter(
+                          color: Colors.white70, 
+                          fontSize: CoursesUIConfig.fontLabelSmall + 1,
                         ),
                       ),
                     ],

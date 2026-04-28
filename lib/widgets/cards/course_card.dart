@@ -12,7 +12,6 @@
 
 import 'package:flutter/material.dart'; // Flutter core for StatefulWidget, AnimatedContainer, etc.
 import 'package:google_fonts/google_fonts.dart'; // Google Fonts for Poppins typography
-import '../utils/dynamic_icon.dart'; // renderDynamicIcon: renders emoji or URL-based icons
 
 
 // ─── COURSECARDUICONFIG ──────────────────────────────
@@ -92,6 +91,23 @@ class _CourseCardState extends State<CourseCard> {
   // Internal hover state: toggled by MouseRegion onEnter/onExit events
   bool _isHovered = false;
 
+  /// Returns a hardcoded Material icon based on the course title.
+  /// Completely independent of Firestore — always shows a distinct icon.
+  IconData _getHardcodedIcon() {
+    switch (widget.title.toLowerCase().trim()) {
+      case 'ai mastery':             return Icons.psychology_outlined;
+      case 'graphic design':         return Icons.palette_outlined;
+      case 'e-commerce':             return Icons.shopping_cart_outlined;
+      case 'freelancing':            return Icons.work_outline;
+      case 'social media marketing': return Icons.campaign_outlined;
+      case 'web development':        return Icons.code_outlined;
+      case 'digital marketing':      return Icons.ads_click_outlined;
+      case 'photography':            return Icons.camera_alt_outlined;
+      case 'video editing':          return Icons.movie_outlined;
+      default:                       return Icons.school_outlined;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // RepaintBoundary isolates this card's repaint from the rest of the widget tree
@@ -143,11 +159,11 @@ class _CourseCardState extends State<CourseCard> {
                         borderRadius: BorderRadius.circular(CourseCardUIConfig.radiusSmall + 2), // 14px corners
                       ),
                       child: Center(
-                        // renderDynamicIcon renders the emoji or network image icon
-                        child: renderDynamicIcon(
-                          widget.icon, // Icon string from Course model
-                          color: Colors.white, // White fallback icon color
-                          size: CourseCardUIConfig.iconSizeMedium, // 24px icon size
+                        // Hardcoded icon based on course title — no Firestore dependency
+                        child: Icon(
+                          _getHardcodedIcon(),
+                          color: Colors.white,
+                          size: CourseCardUIConfig.iconSizeMedium,
                         ),
                       ),
                     ),

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/dynamic_content_provider.dart';
+import '../../../models/content_model.dart';
 
 
 // ─── GLOBALEDITORUICONFIG ──────────────────────────────
@@ -30,27 +31,37 @@ class GlobalEditor extends StatefulWidget {
   @override
   State<GlobalEditor> createState() => _GlobalEditorState();
 }
-
 class _GlobalEditorState extends State<GlobalEditor> {
-  final _logoTextController = TextEditingController();
   final _footerDescController = TextEditingController();
   final _addressController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
+  final _logoUrlController = TextEditingController();
+  
+  // Theme Controllers
+  final _primaryColorController = TextEditingController();
+  final _accentColorController = TextEditingController();
+  final _backgroundColorController = TextEditingController();
+  final _cardRadiusController = TextEditingController();
+  final _buttonRadiusController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     final content = context.read<DynamicContentProvider>().content;
-    _logoTextController.text = content.logoText;
     _footerDescController.text = content.footerDescription;
     _addressController.text = content.contactAddress;
     _phoneController.text = content.contactPhone;
     _emailController.text = content.contactEmail;
     _logoUrlController.text = content.logoPath ?? '';
-  }
 
-  final _logoUrlController = TextEditingController();
+    final theme = content.themeConfig;
+    _primaryColorController.text = theme.primaryColorHex;
+    _accentColorController.text = theme.accentColorHex;
+    _backgroundColorController.text = theme.backgroundColorHex;
+    _cardRadiusController.text = theme.cardBorderRadius.toString();
+    _buttonRadiusController.text = theme.buttonBorderRadius.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,9 +78,8 @@ class _GlobalEditorState extends State<GlobalEditor> {
             ),
           ),
           const SizedBox(height: 24),
+          
           _buildSection('Branding', [
-            _buildTextField('Logo Text', _logoTextController),
-            const SizedBox(height: 16),
             _buildTextField('Logo Image URL', _logoUrlController,
                 hint: 'https://example.com/logo.png'),
             if (_logoUrlController.text.isNotEmpty) ...[
@@ -85,7 +95,29 @@ class _GlobalEditorState extends State<GlobalEditor> {
               ),
             ],
           ]),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
+
+          _buildSection('Theme & Style', [
+            Row(
+              children: [
+                Expanded(child: _buildTextField('Primary Color (Hex)', _primaryColorController, hint: '#0D3320')),
+                const SizedBox(width: 16),
+                Expanded(child: _buildTextField('Accent Color (Hex)', _accentColorController, hint: '#F5A623')),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildTextField('Background Color (Hex)', _backgroundColorController, hint: '#FAFAFA'),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(child: _buildTextField('Card Corner Radius', _cardRadiusController, hint: '20.0')),
+                const SizedBox(width: 16),
+                Expanded(child: _buildTextField('Button Corner Radius', _buttonRadiusController, hint: '16.0')),
+              ],
+            ),
+          ]),
+          const SizedBox(height: 24),
+
           _buildSection('Footer & Contact', [
             _buildTextField('Footer Description', _footerDescController, maxLines: 3),
             const SizedBox(height: 16),
@@ -99,15 +131,31 @@ class _GlobalEditorState extends State<GlobalEditor> {
           ElevatedButton(
             onPressed: () {
               final provider = context.read<DynamicContentProvider>();
-              provider.updateLogo(_logoUrlController.text, _logoTextController.text);
+              
+              // Update content pieces
+              provider.updateLogo(_logoUrlController.text);
               provider.updateFooter(_footerDescController.text);
               provider.updateContact(
                 _addressController.text,
                 _phoneController.text,
                 _emailController.text,
               );
+
+              // Update theme config
+              final currentTheme = provider.content.themeConfig;
+              provider.updateTheme(ThemeConfig(
+                primaryColorHex: _primaryColorController.text,
+                accentColorHex: _accentColorController.text,
+                backgroundColorHex: _backgroundColorController.text,
+                cardBackgroundColorHex: currentTheme.cardBackgroundColorHex,
+                textDarkHex: currentTheme.textDarkHex,
+                textLightHex: currentTheme.textLightHex,
+                cardBorderRadius: double.tryParse(_cardRadiusController.text) ?? 20.0,
+                buttonBorderRadius: double.tryParse(_buttonRadiusController.text) ?? 16.0,
+              ));
+
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Global settings updated!')),
+                const SnackBar(content: Text('Global settings & theme updated!')),
               );
             },
             style: ElevatedButton.styleFrom(
@@ -115,8 +163,9 @@ class _GlobalEditorState extends State<GlobalEditor> {
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
             ),
-            child: const Text('Save All Changes'),
+            child: const Text('Save All Global Changes'),
           ),
+          const SizedBox(height: 40),
         ],
       ),
     );

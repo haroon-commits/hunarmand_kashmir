@@ -85,7 +85,10 @@ class DynamicContentProvider extends ChangeNotifier {
   /// Called when ChangeNotifierProvider creates this instance in main.dart's MultiProvider.
   /// The _init() call starts the real-time stream immediately.
   DynamicContentProvider() {
-    _init(); // Begin Firestore synchronization as soon as the provider is created
+    // Initialize with production-ready defaults immediately to prevent
+    // LateInitializationError before the first Firestore snapshot arrives.
+    _content = _getDefaults();
+    _init(); // Begin Firestore synchronization
   }
 
   /// Lifecycle cleanup: Cancels the Firestore subscription when the provider is disposed.
@@ -102,7 +105,7 @@ class DynamicContentProvider extends ChangeNotifier {
   Future<void> _init() async {
     debugPrint('[INITIALIZATION] Starting DynamicContentProvider sync...');
 
-    // Start the Firestore listener
+    // Start the real-time Firestore listener
     _loadFromFirestore();
 
     // Safety timeout: If loading is still true after 5 seconds, force it to false.
@@ -112,12 +115,6 @@ class DynamicContentProvider extends ChangeNotifier {
         debugPrint(
             '[INITIALIZATION] Timeout reached. Forcing splash screen removal.');
         _isLoading = false;
-        // If content wasn't loaded yet, ensure we have defaults to render
-        try {
-          _content;
-        } catch (_) {
-          _content = _getDefaults();
-        }
         notifyListeners();
       }
     });
@@ -196,36 +193,64 @@ class DynamicContentProvider extends ChangeNotifier {
     return AppContent(
       // ── Global Branding ──
       appTitle: 'Hunarmand Kashmir', // Browser tab title and app header
-      logoText: 'ہنرمند', // Urdu branding text (rendered with AmiriQuran font)
+      themeConfig: ThemeConfig(
+        primaryColorHex: '#0D3320',
+        accentColorHex: '#F5A623',
+        backgroundColorHex: '#FAFAFA',
+        cardBackgroundColorHex: '#FFFFFF',
+        textDarkHex: '#1A1A1A',
+        textLightHex: '#FFFFFF',
+        cardBorderRadius: 20.0,
+        buttonBorderRadius: 16.0,
+      ),
+      layoutConfig: LayoutConfig(
+        showHomeCourses: true,
+        showHomeFeatures: true,
+        showHomeWhyUs: true,
+        showHomeCta: true,
+        showHomeStats: true,
+        showAboutTeam: true,
+        showIconsInCards: true,
+      ),
 
-      // ── Home Screen: Hero Section ──
-      heroHeadline:
-          'Empowering Kashmir through Digital Excellence', // Main landing headline
+      // ... existing Hero ...
+      heroHeadline: 'Empowering Kashmir through Digital Excellence',
       heroSubheadline:
-          'Join the valley\'s premier skill-building initiative. Master modern technologies, build a global career, and transform your future with expert-led mentorship.', // Supporting narrative
+          'Join the valley\'s premier skill-building initiative. Master modern technologies, build a global career, and transform your future with expert-led mentorship.',
+
+      // ── Stats ──
+      stats: [
+        Stat(
+            icon: 'material:group', value: '1,200+', label: 'Students Trained'),
+        Stat(icon: 'material:school', value: '15+', label: 'Digital Courses'),
+        Stat(
+            icon: 'material:public', value: '450+', label: 'Freelance Careers'),
+        Stat(
+            icon: 'material:verified', value: '100%', label: 'Practical Focus'),
+      ],
 
       // ── Courses: Master list of all offered courses ──
       // Each Course object maps to a CourseCard in home_screen.dart and courses_screen.dart
       courses: [
         Course(
-          title: 'AI Mastery', // Course title displayed on card heading
+          title: 'AI Mastery',
           description:
-              'Practical AI skills for real income. Learn to use AI tools to build products and earn online.', // Card body text
-          icon: '🤖', // Emoji rendered via dynamic_icon.dart
-          duration: '3 Months', // Duration label
-          fee: 'Rs. 8,000', // Fee label
+              'Practical AI skills for real income. Learn to use AI tools to build products and earn online.',
+          icon: '🤖', // AI / Robot
+          duration: '3 Months',
+          fee: 'Rs. 8,000',
           topics: [
             'ChatGPT & Prompt Engineering',
             'AI Image Generation',
             'AI for Business',
             'Freelancing with AI'
-          ], // Curriculum checklist
+          ],
         ),
         Course(
           title: 'Graphic Design',
           description:
               'Professional design skills. Master the tools used by top designers worldwide.',
-          icon: '🎨',
+          icon: '🎨', // Palette
           duration: '3 Months',
           fee: 'Rs. 7,000',
           topics: [
@@ -239,7 +264,7 @@ class DynamicContentProvider extends ChangeNotifier {
           title: 'E-Commerce',
           description:
               'Build and scale online stores. Learn to sell products globally from Kashmir.',
-          icon: '🛍️',
+          icon: '🛒', // Shopping Cart
           duration: '3 Months',
           fee: 'Rs. 6,000',
           topics: [
@@ -253,7 +278,7 @@ class DynamicContentProvider extends ChangeNotifier {
           title: 'Freelancing',
           description:
               'Work with global clients. Get your first international client within the first month.',
-          icon: '💻',
+          icon: '💼', // Briefcase
           duration: '2 Months',
           fee: 'Rs. 5,000',
           topics: [
@@ -267,7 +292,7 @@ class DynamicContentProvider extends ChangeNotifier {
           title: 'Social Media Marketing',
           description:
               'Digital growth strategies. Help businesses grow their online presence.',
-          icon: '📢',
+          icon: '📱', // Mobile Phone
           duration: '3 Months',
           fee: 'Rs. 7,000',
           topics: [
@@ -279,49 +304,50 @@ class DynamicContentProvider extends ChangeNotifier {
         ),
       ],
 
-      // ── Features: Selling points shown on home screen 'Why Us' section ──
       features: [
         Feature(
-          icon: '👨‍🏫', // Emoji for the feature card icon
-          title: 'Expert Mentorship', // Card heading
+          icon: '👨‍🏫', // Teacher / Expert Mentor
+          title: 'Expert Mentorship',
           description:
-              'Learn from industry professionals who have worked globally.', // Card body
+              'Learn from industry professionals who have worked globally.',
         ),
         Feature(
-          icon: '🛠️',
+          icon: '🛠️', // Tools / Hands-on Learning
           title: 'Practical Learning',
           description:
               'No boring theory. Work on real projects that build your portfolio.',
         ),
         Feature(
-          icon: '🚀',
+          icon: '🚀', // Rocket / Career Growth
           title: 'Career Support',
           description:
               'From resume building to freelance gigs, we guide your career path.',
         ),
       ],
 
-      // ── Donation Tiers: Financial support levels for public donors ──
       donationTiers: [
         DonationTier(
-            title: 'Small Support',
-            amount: '\$10',
-            description: 'Helps one student with basic tools.',
-            icon: '☕'),
+          title: 'Small Support',
+          amount: '\$10',
+          description: 'Helps one student with basic tools.',
+          icon: 'material:volunteer', // Changed from emoji
+        ),
         DonationTier(
-            title: 'Growth Pack',
-            amount: '\$50',
-            description: 'Covers training for one month.',
-            icon: '🌱',
-            popular: true), // Marked as 'MOST POPULAR' in UI
+          title: 'Growth Pack',
+          amount: '\$50',
+          description: 'Covers training for one month.',
+          icon: 'material:lightbulb', // Changed from emoji
+          popular: true,
+        ),
         DonationTier(
-            title: 'Future Builder',
-            amount: '\$200',
-            description: 'Full scholarship for one student.',
-            icon: '🏢'),
+          title: 'Future Builder',
+          amount: '\$200',
+          description: 'Full scholarship for one student.',
+          icon: 'material:handshake', // Changed from emoji
+        ),
       ],
 
-      // ── Team Members: Leadership profiles shown on About page ──
+      // ... rest remains same until Course Locations
       teamMembers: [
         TeamMember(
             name: 'Adnan Khan',
@@ -339,47 +365,54 @@ class DynamicContentProvider extends ChangeNotifier {
             imageUrl:
                 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80'),
       ],
-
-      // ── Footer & Contact ──
       footerDescription:
-          'Empowering Youth. Empowering the youth of Kashmir through digital skills, fostering self-reliance, and building a future where talent meets opportunity.', // Footer branding narrative
-      contactAddress:
-          'SCO Software Technology Park, Mirpur', // Physical address
-      contactPhone: '0313 884 0971', // Primary phone number
-      contactEmail: 'salam@hunarmandkashmir.com', // Official email
-
-      // ── About Page Content ──
-      aboutStoryHeadline:
-          'From Kashmir to Global Opportunities', // Story section heading
+          'Empowering Youth. Empowering the youth of Kashmir through digital skills, fostering self-reliance, and building a future where talent meets opportunity.',
+      contactAddress: 'SCO Software Technology Park, Mirpur',
+      contactPhone: '0313 884 0971',
+      contactEmail: 'salam@hunarmandkashmir.com',
+      aboutStoryHeadline: 'From Kashmir to Global Opportunities',
       aboutStoryText:
-          'Hunarmand Kashmir was born from a simple yet powerful truth: talent is everywhere, but opportunity is not. For far too long, the brilliant minds of Kashmir have faced challenges—geographical isolation, limited infrastructure, and limited exposure to global industries.\n\nWe believe digital skills are the great equalizer. With the right training, mentorship, and access, a student from even the most remote areas of Kashmir can work with companies and clients across the world.', // Full story narrative
+          'Hunarmand Kashmir was born from a simple yet powerful truth: talent is everywhere, but opportunity is not. For far too long, the brilliant minds of Kashmir have faced challenges—geographical isolation, limited infrastructure, and limited exposure to global industries.\n\nWe believe digital skills are the great equalizer. With the right training, mentorship, and access, a student from even the most remote areas of Kashmir can work with companies and clients across the world.',
       aboutMissionText:
-          'To bridge the skills gap in Kashmir by delivering world-class digital training that empowers 10,000 young people by 2030 to achieve financial independence with dignity and confidence.', // Mission statement
+          'To bridge the skills gap in Kashmir by delivering world-class digital training that empowers 10,000 young people by 2030 to achieve financial independence with dignity and confidence.',
+      aboutMissionIcon: 'material:history',
       aboutVisionText:
-          'A self-reliant Kashmir where every young person has the skills to compete globally without leaving their homeland.', // Vision statement
+          'A self-reliant Kashmir where every young person has the skills to compete globally without leaving their homeland.',
+      aboutVisionIcon: 'material:favorite',
       aboutValuesText:
-          'We are more than an institute; we are a family. We support each other, share opportunities, and grow together as a skilled collective.', // Values narrative
-
-      // ── Donate Page Hero ──
-      donateHeroTitle:
-          'Invest in Dignity, Not Dependency.', // Donate page headline
+          'We are more than an institute; we are a family. We support each other, share opportunities, and grow together as a skilled collective.',
+      aboutValuesIcon: 'material:diversity',
+      donateHeroTitle: 'Invest in Dignity, Not Dependency.',
       donateHeroDescription:
-          'Your contribution unlocks futures. Help empower youth in Kashmir to earn a livelihood and build self-reliant communities.', // Donate page description
-
-      // ── Contact Page Hero ──
-      contactHeroTitle: 'Get in Touch', // Contact page headline
+          'Your contribution unlocks futures. Help empower youth in Kashmir to earn a livelihood and build self-reliant communities.',
+      contactHeroTitle: 'Get in Touch',
       contactHeroDescription:
-          'Have questions? We are here to help you start your journey or discuss collaboration opportunities.', // Contact page description
-
-      // ── Home Page: Why Us Section ──
-      homeWhyTitle: 'Why Hunarmand Kashmir?', // Why Us section headline
+          'Have questions? We are here to help you start your journey or discuss collaboration opportunities.',
+      homeWhyTitle: 'Why Hunarmand Kashmir?',
       homeWhyDescription:
-          'We believe in "Skills over Degrees". In a rapidly changing world, we provide practical, hands-on training that the industry demands, right here in Mirpur.', // Why Us description
-
-      // ── Home Page: Call-to-Action Section ──
-      homeCtaTitle: 'Your Journey Begins Here', // CTA headline
+          'We believe in "Skills over Degrees". In a rapidly changing world, we provide practical, hands-on training that the industry demands, right here in Mirpur.',
+      homeCtaTitle: 'Your Journey Begins Here',
       homeCtaDescription:
-          "Don't let lack of opportunity hold you back. Join Hunarmand Kashmir today and unlock a future of dignity, independence, and success.", // CTA description
+          "Don't let lack of opportunity hold you back. Join Hunarmand Kashmir today and unlock a future of dignity, independence, and success.",
+      courseLearningChoiceTitle: 'Your Learning, Your Choice',
+      courseLearningChoiceDescription:
+          'Choose the location and schedule that fits your routine.',
+      courseLocation1Icon: 'material:location', // Changed from school
+      courseLocation1Title: 'Freelancing Hub (HFK)',
+      courseLocation1Text: 'Hassan Colony, Mirpur',
+      courseLocation1Timing: 'Mon–Fri Batches',
+      courseLocation2Icon: 'material:business',
+      courseLocation2Title: 'SCO Software Technology Park',
+      courseLocation2Text: 'SCO Software Technology Park, Mirpur',
+      courseLocation2Timing: 'Special Timing',
+      courseLocation3Icon: 'material:web', // Changed from laptop
+      courseLocation3Title: 'Online Classes Live',
+      courseLocation3Text: 'Learn from anywhere in Kashmir',
+      courseLocation3Timing: 'Flexible Timings',
+      courseOrphanSupportIcon: 'material:favorite', // Changed from ❤️
+      courseOrphanSupportTitle: 'Support for Orphans',
+      courseOrphanSupportDescription:
+          'We provide a 100% Fee Waiver for orphan students to ensure they have the same opportunities as everyone else.',
 
       // ── Gallery Page ──
       galleryHeroTitle: 'Moments of Hope', // Gallery page headline
@@ -451,25 +484,39 @@ class DynamicContentProvider extends ChangeNotifier {
     }
   }
 
-  /// Updates the main Hero section headlines on the home screen.
-  /// CALLED BY: screens/admin/editors/home_editor.dart → 'Save Hero' button
-  /// AFFECTS: screens/home_screen.dart → _HeroSection headline and subheadline
-  void updateHero(String headline, String subheadline) {
-    // Create a new AppContent with updated hero fields, preserving all other fields
+  /// Updates the Home section content.
+  /// CALLED BY: screens/admin/editors/home_editor.dart
+  void updateHome(
+    String headline,
+    String subheadline, {
+    String? whyTitle,
+    String? whyDescription,
+    String? ctaTitle,
+    String? ctaDescription,
+  }) {
     _content = _content.copyWith(
-      heroHeadline: headline, // New hero headline text
-      heroSubheadline: subheadline, // New hero subheadline text
+      heroHeadline: headline,
+      heroSubheadline: subheadline,
+      homeWhyTitle: whyTitle,
+      homeWhyDescription: whyDescription,
+      homeCtaTitle: ctaTitle,
+      homeCtaDescription: ctaDescription,
     );
-    saveContent(); // Persist to Firestore and notify listeners
+    saveContent();
   }
 
-  /// Updates the primary logo image path and Urdu branding text.
+  /// Updates the platform statistics.
+  void updateStats(List<Stat> stats) {
+    _content = _content.copyWith(stats: stats);
+    saveContent();
+  }
+
+  /// Updates the primary logo image path.
   /// CALLED BY: screens/admin/editors/global_editor.dart → 'Save' button
   /// AFFECTS: hunarmand_app_bar.dart, hunarmand_drawer.dart, app_footer.dart (logo display)
-  void updateLogo(String? path, String text) {
+  void updateLogo(String? path) {
     // Create a new AppContent with updated logo fields
     _content = _content.copyWith(
-      logoText: text, // New Urdu branding text
       logoPath: path, // New logo image URL (can be null for text-only branding)
     );
     saveContent(); // Persist and notify
@@ -502,13 +549,17 @@ class DynamicContentProvider extends ChangeNotifier {
   /// CALLED BY: screens/admin/editors/about_editor.dart → 'Save' button
   /// AFFECTS: screens/about_screen.dart → story section, mission/vision cards, values card
   void updateAbout(String headline, String story, String mission, String vision,
-      String values) {
+      String values,
+      {String? missionIcon, String? visionIcon, String? valuesIcon}) {
     _content = _content.copyWith(
       aboutStoryHeadline: headline, // New story section headline
       aboutStoryText: story, // New story narrative body
       aboutMissionText: mission, // New mission statement
+      aboutMissionIcon: missionIcon,
       aboutVisionText: vision, // New vision statement
+      aboutVisionIcon: visionIcon,
       aboutValuesText: values, // New values narrative
+      aboutValuesIcon: valuesIcon,
     );
     saveContent(); // Persist and notify
   }
@@ -613,7 +664,8 @@ class DynamicContentProvider extends ChangeNotifier {
   /// AFFECTS: screens/courses_screen.dart → new course card appears in the grid
   /// AFFECTS: screens/home_screen.dart → new course appears in top-3 preview
   void addCourse(Course course) {
-    _content.courses.add(course); // Append the new course to the existing list
+    final updatedCourses = List<Course>.from(_content.courses)..add(course);
+    _content = _content.copyWith(courses: updatedCourses);
     saveContent(); // Persist and notify
   }
 
@@ -621,8 +673,9 @@ class DynamicContentProvider extends ChangeNotifier {
   /// CALLED BY: screens/admin/editors/courses_editor.dart → 'Update' button on course tile
   /// AFFECTS: The corresponding course card in courses_screen.dart and home_screen.dart
   void updateCourse(int index, Course course) {
-    _content.courses[index] =
-        course; // Replace the course at the given position
+    final updatedCourses = List<Course>.from(_content.courses);
+    updatedCourses[index] = course;
+    _content = _content.copyWith(courses: updatedCourses);
     saveContent(); // Persist and notify
   }
 
@@ -630,7 +683,28 @@ class DynamicContentProvider extends ChangeNotifier {
   /// CALLED BY: screens/admin/editors/courses_editor.dart → 'Delete' button on course tile
   /// AFFECTS: The course card is removed from courses_screen.dart and home_screen.dart
   void removeCourse(int index) {
-    _content.courses.removeAt(index); // Remove the course at the given position
+    final updatedCourses = List<Course>.from(_content.courses)..removeAt(index);
+    _content = _content.copyWith(courses: updatedCourses);
     saveContent(); // Persist and notify
+  }
+
+  /// Updates the global theme configuration.
+  void updateTheme(ThemeConfig newTheme) {
+    _content = _content.copyWith(themeConfig: newTheme);
+    saveContent();
+  }
+
+  /// Updates structural layout toggles.
+  /// CALLED BY: screens/admin/editors/theme_editor.dart
+  /// AFFECTS: Visibility of major sections across the app.
+  void updateLayout(LayoutConfig newLayout) {
+    _content = _content.copyWith(layoutConfig: newLayout);
+    saveContent();
+  }
+
+  /// Generic update for entire content object
+  void updateContent(AppContent newContent) {
+    _content = newContent;
+    saveContent();
   }
 }

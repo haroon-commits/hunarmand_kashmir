@@ -16,9 +16,11 @@ import '../widgets/cards/course_card.dart';
 import '../widgets/common/responsive_grid.dart';
 import '../providers/dynamic_content_provider.dart';
 import '../utils/responsive.dart';
+import '../widgets/utils/dynamic_icon.dart';
 
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
+import '../models/content_model.dart';
 
 // ─── HOME SCREEN UI CONFIGURATION ─────────────────────────────────────────────
 /// Isolated UI configuration specific to only the Home Screen.
@@ -146,20 +148,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
             // The philosophical mission section ('Why us?')
-            _WhySectionSliver(
-              features: content.features,
-              title: content.homeWhyTitle,
-              description: content.homeWhyDescription,
-            ),
-            // The featured courses highlight section
-            _CoursesSectionSliver(courses: content.courses),
-            // The final conversion point (CTA)
-            SliverToBoxAdapter(
-              child: _CtaSection(
-                title: content.homeCtaTitle,
-                description: content.homeCtaDescription,
+            if (content.layoutConfig.showHomeFeatures)
+              _WhySectionSliver(
+                features: content.features,
+                title: content.homeWhyTitle,
+                description: content.homeWhyDescription,
               ),
-            ),
+            // The platform achievements and statistics
+            if (content.layoutConfig.showHomeStats)
+              _StatsSectionSliver(stats: content.stats),
+            // The featured courses highlight section
+            if (content.layoutConfig.showHomeCourses)
+              _CoursesSectionSliver(courses: content.courses),
+            // The final conversion point (CTA)
+            if (content.layoutConfig.showHomeCta)
+              SliverToBoxAdapter(
+                child: _CtaSection(
+                  title: content.homeCtaTitle,
+                  description: content.homeCtaDescription,
+                ),
+              ),
             // Global site footer
             const SliverToBoxAdapter(child: AppFooter()),
           ],
@@ -622,9 +630,105 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
+// ─── Stats Section (Sliver) ──────────────────────────────────────────────────
+
+class _StatsSectionSliver extends StatelessWidget {
+  final List<Stat> stats;
+  const _StatsSectionSliver({required this.stats});
+
+  @override
+  Widget build(BuildContext context) {
+    final hPad = Responsive.contentPaddingH(context);
+
+    return SliverToBoxAdapter(
+      child: Container(
+        color: HomeUIConfig.darkGreen,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: HomeUIConfig.maxContentWidth),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: hPad,
+                vertical: HomeUIConfig.paddingSectionVertical / 1.5,
+              ),
+              child: ResponsiveCardGrid(
+                mobileCols: 1,
+                tabletCols: 2,
+                desktopCols: 4,
+                children: stats.map((s) => _StatCard(stat: s)).toList(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatefulWidget {
+  final Stat stat;
+  const _StatCard({required this.stat});
+
+  @override
+  State<_StatCard> createState() => _StatCardState();
+}
+
+class _StatCardState extends State<_StatCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        decoration: BoxDecoration(
+          color: _isHovered ? Colors.white.withOpacity(0.05) : Colors.transparent,
+          borderRadius: BorderRadius.circular(HomeUIConfig.radiusLarge / 2),
+        ),
+        child: Column(
+          children: [
+            AnimatedScale(
+              scale: _isHovered ? 1.1 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              child: renderDynamicIcon(
+                widget.stat.icon,
+                color: HomeUIConfig.accentGold,
+                size: HomeUIConfig.spacerExtraLarge,
+              ),
+            ),
+            const SizedBox(height: HomeUIConfig.spacerMedium),
+            Text(
+              widget.stat.value,
+              style: GoogleFonts.inter(
+                color: HomeUIConfig.white,
+                fontSize: HomeUIConfig.fontHeadlineLarge,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              widget.stat.label.toUpperCase(),
+              style: GoogleFonts.inter(
+                color: HomeUIConfig.white38,
+                fontSize: HomeUIConfig.fontLabelSmall - 2,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 // ─── Buttons ──────────────────────────────────────────────────────────────────
 
-/// _PrimaryButton - A solid, high-priority button component.
+/// _PrimaryButton - A solid gold call-to-action button.
+/// Uses Container (not ElevatedButton) to match _SecondaryButton sizing exactly.
 class _PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
@@ -635,28 +739,33 @@ class _PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onTap,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: HomeUIConfig.accentGold,
-        foregroundColor: HomeUIConfig.darkGreen,
-        padding: EdgeInsets.symmetric(
-          horizontal: large
-              ? HomeUIConfig.paddingButtonLargeH
-              : HomeUIConfig.paddingButtonSmallH,
-          vertical: large
-              ? HomeUIConfig.paddingButtonLargeV
-              : HomeUIConfig.paddingButtonSmallV,
-        ),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(HomeUIConfig.radiusLarge)),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.inter(
-          fontWeight: FontWeight.w700,
-          fontSize:
-              large ? HomeUIConfig.fontBodyLarge : HomeUIConfig.fontBodyMedium,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: large
+                ? HomeUIConfig.paddingButtonLargeH
+                : HomeUIConfig.paddingButtonSmallH,
+            vertical: large
+                ? HomeUIConfig.paddingButtonLargeV
+                : HomeUIConfig.paddingButtonSmallV, // ← same as secondary
+          ),
+          decoration: BoxDecoration(
+            color: HomeUIConfig.accentGold,
+            borderRadius: BorderRadius.circular(HomeUIConfig.radiusLarge),
+          ),
+          child: Text(
+            label,
+            style: GoogleFonts.inter(
+              color: HomeUIConfig.darkGreen,
+              fontWeight: FontWeight.w700,
+              fontSize: large
+                  ? HomeUIConfig.fontBodyLarge
+                  : HomeUIConfig.fontBodyMedium,
+            ),
+          ),
         ),
       ),
     );
@@ -685,7 +794,7 @@ class _SecondaryButton extends StatelessWidget {
                 : HomeUIConfig.paddingButtonSmallH,
             vertical: large
                 ? HomeUIConfig.paddingButtonLargeV
-                : HomeUIConfig.paddingButtonSmallV + 2,
+                : HomeUIConfig.paddingButtonSmallV, // ← removed the extra + 2
           ),
           decoration: BoxDecoration(
             border: Border.all(color: HomeUIConfig.white38),
@@ -695,7 +804,7 @@ class _SecondaryButton extends StatelessWidget {
             label,
             style: GoogleFonts.inter(
               color: HomeUIConfig.white,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700, // ← matched to primary
               fontSize: large
                   ? HomeUIConfig.fontBodyLarge
                   : HomeUIConfig.fontBodyMedium,

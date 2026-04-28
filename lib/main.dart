@@ -12,9 +12,7 @@
 
 import 'package:flutter/material.dart'; // Importing standard Flutter material components
 import 'widgets/nav/hunarmand_drawer.dart';
-import 'widgets/feedback/splash_screen.dart';
 import 'widgets/nav/hunarmand_app_bar.dart';
-import 'widgets/layout/app_footer.dart';
 import 'package:provider/provider.dart'; // Importing provider for global state management
 import 'package:google_fonts/google_fonts.dart'; // Importing Google Fonts for high-quality typography
 
@@ -84,16 +82,20 @@ class HunarmandKashmirApp extends StatelessWidget {
   @override
   // The build method defines the UI structure of this component
   Widget build(BuildContext context) {
-    // Returning a MaterialApp which is the core shell of any Flutter app
-    return MaterialApp(
-      // Setting the title of the application shown in browser tabs or task switchers
-      title: 'Hunarmand Kashmir',
-      // Disabling the debug banner usually seen in development mode
-      debugShowCheckedModeBanner: false,
-      // Applying our globally defined high-fidelity theme
-      theme: AppTheme.theme,
-      // Setting the initial home widget to our MainNavigator
-      home: const MainNavigator(),
+    return Consumer<DynamicContentProvider>(
+      builder: (context, dynamicContent, _) {
+        // Returning a MaterialApp which is the core shell of any Flutter app
+        return MaterialApp(
+          // Setting the title of the application shown in browser tabs or task switchers
+          title: 'Hunarmand Kashmir',
+          // Disabling the debug banner usually seen in development mode
+          debugShowCheckedModeBanner: false,
+          // Applying our globally defined high-fidelity theme
+          theme: AppTheme.buildTheme(dynamicContent.content.themeConfig),
+          // Setting the initial home widget to our MainNavigator
+          home: const MainNavigator(),
+        );
+      },
     );
   }
 }

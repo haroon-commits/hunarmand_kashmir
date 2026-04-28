@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/dynamic_content_provider.dart';
 import '../../../models/content_model.dart';
+import '../../../widgets/utils/dynamic_icon.dart';
 
 
 // ─── ABOUTEDITORUICONFIG ──────────────────────────────
@@ -37,8 +38,13 @@ class _AboutEditorState extends State<AboutEditor> {
   final _headlineController = TextEditingController();
   final _storyController = TextEditingController();
   final _missionController = TextEditingController();
+  final _missionIconController = TextEditingController();
   final _visionController = TextEditingController();
+  final _visionIconController = TextEditingController();
   final _valuesController = TextEditingController();
+  final _valuesIconController = TextEditingController();
+
+  late bool _showTeam;
 
   @override
   void initState() {
@@ -47,8 +53,13 @@ class _AboutEditorState extends State<AboutEditor> {
     _headlineController.text = content.aboutStoryHeadline;
     _storyController.text = content.aboutStoryText;
     _missionController.text = content.aboutMissionText;
+    _missionIconController.text = content.aboutMissionIcon;
     _visionController.text = content.aboutVisionText;
+    _visionIconController.text = content.aboutVisionIcon;
     _valuesController.text = content.aboutValuesText;
+    _valuesIconController.text = content.aboutValuesIcon;
+
+    _showTeam = content.layoutConfig.showAboutTeam;
   }
 
   @override
@@ -72,14 +83,30 @@ class _AboutEditorState extends State<AboutEditor> {
             _buildTextField('Story Text', _storyController, maxLines: 6),
           ]),
           const SizedBox(height: 24),
+          _buildSection('Screen Layout & Settings', [
+            SwitchListTile(
+              title: const Text('Show Team Section'),
+              subtitle: const Text('Display the leadership grid at the bottom of the page.'),
+              value: _showTeam,
+              onChanged: (v) => setState(() => _showTeam = v),
+              activeColor: const Color(0xFFF5A623),
+            ),
+          ]),
+          const SizedBox(height: 24),
           _buildSection('Mission & Vision', [
             _buildTextField('Mission Text', _missionController, maxLines: 4),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+            _buildTextField('Mission Icon (material:name)', _missionIconController),
+            const SizedBox(height: 24),
             _buildTextField('Vision Text', _visionController, maxLines: 4),
+            const SizedBox(height: 12),
+            _buildTextField('Vision Icon (material:name)', _visionIconController),
           ]),
           const SizedBox(height: 24),
           _buildSection('Values', [
             _buildTextField('Values Text', _valuesController, maxLines: 4),
+            const SizedBox(height: 12),
+            _buildTextField('Values Icon (material:name)', _valuesIconController),
           ]),
           const SizedBox(height: 24),
           _buildSection('Our Team', [
@@ -88,15 +115,30 @@ class _AboutEditorState extends State<AboutEditor> {
           const SizedBox(height: 40),
           ElevatedButton(
             onPressed: () {
-              context.read<DynamicContentProvider>().updateAbout(
-                    _headlineController.text,
-                    _storyController.text,
-                    _missionController.text,
-                    _visionController.text,
-                    _valuesController.text,
-                  );
+                context.read<DynamicContentProvider>().updateAbout(
+                      _headlineController.text,
+                      _storyController.text,
+                      _missionController.text,
+                      _visionController.text,
+                      _valuesController.text,
+                      missionIcon: _missionIconController.text,
+                      visionIcon: _visionIconController.text,
+                      valuesIcon: _valuesIconController.text,
+                    );
+
+              final newLayout = context.read<DynamicContentProvider>().content.layoutConfig;
+              context.read<DynamicContentProvider>().updateLayout(LayoutConfig(
+                showHomeCourses: newLayout.showHomeCourses,
+                showHomeFeatures: newLayout.showHomeFeatures,
+                showHomeWhyUs: newLayout.showHomeWhyUs,
+                showHomeCta: newLayout.showHomeCta,
+                showHomeStats: newLayout.showHomeStats,
+                showAboutTeam: _showTeam,
+                showIconsInCards: newLayout.showIconsInCards,
+              ));
+
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('About screen updated!')),
+                const SnackBar(content: Text('About settings & content updated!')),
               );
             },
             style: ElevatedButton.styleFrom(
@@ -146,12 +188,7 @@ class _AboutEditorState extends State<AboutEditor> {
             return Card(
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: AboutEditorUIConfig.lightTeal,
-                  child: member.imageUrl.startsWith('http')
-                      ? null
-                      : Text(member.imageUrl, style: const TextStyle(fontSize: 18)),
-                ),
+                leading: renderDynamicIcon(member.imageUrl, size: 24, circle: true),
                 title: Text(member.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text(member.role),
                 trailing: Row(

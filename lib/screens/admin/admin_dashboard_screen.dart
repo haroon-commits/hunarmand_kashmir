@@ -19,7 +19,7 @@ import 'editors/about_editor.dart';
 import 'editors/gallery_editor.dart';
 import 'editors/donate_editor.dart';
 import 'editors/contact_editor.dart';
-
+import 'editors/theme_editor.dart';
 
 // ─── ADMINDASHBOARDUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to admin_dashboard_screen.dart.
@@ -49,6 +49,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     GalleryEditor(),
     DonateEditor(),
     ContactEditor(),
+    ThemeEditor(),
   ];
 
   @override
@@ -79,6 +80,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 _buildNavItem(4, Icons.photo_library, 'Gallery'),
                 _buildNavItem(5, Icons.volunteer_activism, 'Donate Screen'),
                 _buildNavItem(6, Icons.contact_mail, 'Contact Screen'),
+                _buildNavItem(7, Icons.color_lens, 'Theme Editor'),
                 const Spacer(),
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.white70),

@@ -23,33 +23,75 @@ import 'package:flutter/material.dart'; // Flutter core for Widget, ClipRRect, I
 ///
 /// RETURNS: A Widget (either Image.network or Text) ready to be placed in the widget tree.
 Widget renderDynamicIcon(String icon, {Color? color, double size = 24, bool circle = false}) {
-  // Checking if the icon string is a web URL by looking for the 'http' prefix
-  bool isUrl = icon.startsWith('http');
-
   // Branch 1: The icon is a network image URL
-  if (isUrl) {
+  if (icon.startsWith('http')) {
     return ClipRRect(
-      // If circle mode is requested, use a very large radius (100) to make it circular.
-      // Otherwise, use a subtle 8px radius for rounded corners.
       borderRadius: BorderRadius.circular(circle ? 100 : 8),
-      // Loading the image from the network at the specified dimensions
       child: Image.network(
-        icon, // The URL string passed in as the icon parameter
-        width: size, // Setting the image width to match the requested size
-        height: size, // Setting the image height to match the requested size
-        fit: BoxFit.cover, // Scaling the image to fill the box, cropping if needed
-        // Error handler: if the network image fails to load (broken URL, no internet),
-        // display a broken image icon instead with the optional tint color
+        icon,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) =>
             Icon(Icons.broken_image, color: color, size: size * 0.8),
       ),
     );
   }
-  // Branch 2: The icon is an emoji or text character (e.g., '🤖', '🎨', '👨‍🏫')
-  else {
-    return Text(
-      icon, // Rendering the emoji string directly as text
-      style: TextStyle(fontSize: size), // Scaling the emoji to the requested size
+  
+  // Branch 2: The icon is a Material Icon (e.g., 'material:school')
+  if (icon.startsWith('material:')) {
+    final iconName = icon.replaceFirst('material:', '').trim();
+    return Icon(
+      _getMaterialIcon(iconName),
+      color: color,
+      size: size,
     );
+  }
+
+  // Branch 3: The icon is an emoji or text character (e.g., '🤖', '🎨', '👨‍🏫')
+  return Text(
+    icon,
+    style: TextStyle(fontSize: size),
+  );
+}
+
+/// Helper map to resolve string names to Material Icons.
+IconData _getMaterialIcon(String name) {
+  switch (name) {
+    case 'school': return Icons.school_outlined;
+    case 'business': return Icons.business_outlined;
+    case 'laptop': return Icons.laptop_outlined;
+    case 'work': return Icons.work_outline;
+    case 'star': return Icons.star_border;
+    case 'group': return Icons.group_outlined;
+    case 'email': return Icons.email_outlined;
+    case 'phone': return Icons.phone_outlined;
+    case 'location': return Icons.location_on_outlined;
+    case 'favorite': return Icons.favorite_border;
+    case 'verified': return Icons.verified_user_outlined;
+    case 'rocket': return Icons.rocket_launch_outlined;
+    case 'support': return Icons.support_agent_outlined;
+    case 'code': return Icons.code_outlined;
+    case 'palette': return Icons.palette_outlined;
+    case 'shopping': return Icons.shopping_bag_outlined;
+    case 'campaign': return Icons.campaign_outlined;
+    case 'security': return Icons.security_outlined;
+    case 'trending': return Icons.trending_up_outlined;
+    case 'book': return Icons.book_outlined;
+    case 'design': return Icons.design_services_outlined;
+    case 'web': return Icons.language_outlined;
+    case 'store': return Icons.store_outlined;
+    case 'marketing': return Icons.ads_click_outlined;
+    case 'payments': return Icons.payments_outlined;
+    case 'volunteer': return Icons.volunteer_activism_outlined;
+    case 'diversity': return Icons.diversity_3_outlined;
+    case 'psychology': return Icons.psychology_outlined;
+    case 'history': return Icons.history_edu_outlined;
+    case 'wallet': return Icons.account_balance_wallet_outlined;
+    case 'public': return Icons.public_outlined;
+    case 'handshake': return Icons.handshake_outlined;
+    case 'lightbulb': return Icons.lightbulb_outline;
+    case 'assignment': return Icons.assignment_outlined;
+    default: return Icons.help_outline; // Fallback icon
   }
 }

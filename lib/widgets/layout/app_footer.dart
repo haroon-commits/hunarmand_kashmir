@@ -7,7 +7,7 @@
 /// CONNECTIONS:
 ///   - USED BY: Every public screen file (home, about, courses, gallery, contact, donate)
 ///              as a SliverToBoxAdapter(child: AppFooter()) at the end of CustomScrollView
-///   - READS FROM: providers/dynamic_content_provider.dart → logoText, footerDescription,
+///   - READS FROM: providers/dynamic_content_provider.dart → footerDescription,
 ///                 contactAddress, contactPhone, contactEmail
 ///   - WRITES TO: providers/app_state.dart → navigate() for quick links + admin portal
 ///   - DEPENDS ON: utils/responsive.dart → isDesktop(), isTablet(), contentPaddingH()
@@ -18,7 +18,7 @@ import 'package:google_fonts/google_fonts.dart'; // Google Fonts for AmiriQuran 
 import 'package:provider/provider.dart'; // Provider for Consumer and context.read state access
 import '../../utils/responsive.dart'; // Responsive: isDesktop(), isTablet(), contentPaddingH()
 import '../../providers/app_state.dart'; // AppState: navigate() for quick link page switching
-import '../../providers/dynamic_content_provider.dart'; // DynamicContentProvider: logoText, footerDescription, contact*
+import '../../providers/dynamic_content_provider.dart'; // DynamicContentProvider: footerDescription, contact*
 
 
 // ─── APPFOOTERUICONFIG ──────────────────────────────
@@ -144,12 +144,15 @@ class AppFooter extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start, // Left-aligned content
           children: [
-            // Brand logo asset image
-            Image.asset(
-              'assets/images/main_logo.png', // Local brand logo
-              height: 64, // Comfortable logo size in footer
-              fit: BoxFit.contain,
-            ),
+            // Dynamic or Asset logo
+            content.logoPath != null && content.logoPath!.isNotEmpty
+                ? Image.network(
+                    content.logoPath!,
+                    height: 70,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => _buildAssetLogo(),
+                  )
+                : _buildAssetLogo(),
             const SizedBox(height: AppFooterUIConfig.spacerSmall + 2), // 10px gap
             // Footer description: short brand narrative
             Text(
@@ -163,6 +166,14 @@ class AppFooter extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildAssetLogo() {
+    return Image.asset(
+      'assets/images/main_logo.png', // Local brand logo
+      height: 64, // Comfortable logo size in footer
+      fit: BoxFit.contain,
     );
   }
 

@@ -11,6 +11,7 @@
 
 import 'package:flutter/material.dart'; // Flutter core for Color, ThemeData, etc.
 import 'package:google_fonts/google_fonts.dart'; // Google Fonts for premium typography (Inter)
+import '../models/content_model.dart';
 
 // ─── THEME UI CONFIGURATION ──────────────────────────────────────────────────
 /// Default UI metrics used by the global theme.
@@ -106,133 +107,129 @@ class AppColors {
 ///
 /// DEPENDS ON: AppColors (this file), ThemeUIConfig (this file), GoogleFonts
 class AppTheme {
-  /// Generates the [ThemeData] instance for the application.
-  /// Called once in main.dart's HunarmandKashmirApp.build() method.
-  static ThemeData get theme {
+  /// Generates a customized [ThemeData] instance based on the provided [ThemeConfig].
+  /// This allows the application's look and feel to be updated dynamically from the CMS.
+  static ThemeData buildTheme(ThemeConfig config) {
+    // Parse hex strings into Flutter Color objects
+    final primaryColor = Color(int.parse(config.primaryColorHex.replaceFirst('#', '0xFF')));
+    final accentColor = Color(int.parse(config.accentColorHex.replaceFirst('#', '0xFF')));
+    final backgroundColor = Color(int.parse(config.backgroundColorHex.replaceFirst('#', '0xFF')));
+    final cardColor = Color(int.parse(config.cardBackgroundColorHex.replaceFirst('#', '0xFF')));
+    final textDark = Color(int.parse(config.textDarkHex.replaceFirst('#', '0xFF')));
+    final textLight = Color(int.parse(config.textLightHex.replaceFirst('#', '0xFF')));
+
     return ThemeData(
-      // Setting the primary color used by Flutter for default widget theming
-      primaryColor: AppColors.darkGreen,
-      // Default background color for all Scaffold widgets in the app
-      scaffoldBackgroundColor: AppColors.white,
-      // Global fallback fonts for CanvasKit to resolve missing characters (Urdu/Arabic & emojis)
+      useMaterial3: true,
+      primaryColor: primaryColor,
+      scaffoldBackgroundColor: backgroundColor,
+      cardColor: cardColor,
       fontFamilyFallback: const <String>['Noto Naskh Arabic', 'Noto Color Emoji'],
 
-      
-      // Color Scheme Mapping - Tells Flutter's Material 3 system which colors to use
-      // for primary, secondary, and surface elements across all built-in widgets
-      colorScheme: const ColorScheme.light(
-        primary: AppColors.darkGreen, // Primary swatch: buttons, links, active states
-        secondary: AppColors.accentGold, // Secondary swatch: FABs, accent elements
-        surface: AppColors.white, // Surface color: cards, dialogs, bottom sheets
+      colorScheme: ColorScheme.light(
+        primary: primaryColor,
+        secondary: accentColor,
+        surface: cardColor,
+        // Removed deprecated background property
+        onPrimary: textLight,
+        onSurface: textDark,
       ),
 
-      // Typography Configuration - Sets the global text theme using Google Fonts.
-      // GoogleFonts.interTextTheme() creates a base theme with Inter (sans-serif),
-      // then .copyWith() overrides specific text styles with custom sizing and colors.
       textTheme: GoogleFonts.interTextTheme().copyWith(
-        // displayLarge: Used for major hero headings (rare, reserved for impact)
         displayLarge: GoogleFonts.inter(
           fontSize: ThemeUIConfig.fontDisplay,
-          fontWeight: FontWeight.bold, // Maximum emphasis
-          color: AppColors.white, // White on dark hero backgrounds
+          fontWeight: FontWeight.bold,
+          color: textLight,
         ),
-        // headlineLarge: Used for section titles (e.g., 'Why Hunarmand Kashmir?')
         headlineLarge: GoogleFonts.inter(
           fontSize: ThemeUIConfig.fontHeadlineLarge,
-          fontWeight: FontWeight.bold, // Bold weight for section headers
-          color: AppColors.darkGreen, // Brand green for section titles
+          fontWeight: FontWeight.bold,
+          color: primaryColor,
         ),
-        // headlineMedium: Used for card titles and sub-section headers
         headlineMedium: GoogleFonts.inter(
           fontSize: ThemeUIConfig.fontHeadlineMedium,
-          fontWeight: FontWeight.bold, // Bold weight
-          color: AppColors.darkGreen, // Consistent brand color
+          fontWeight: FontWeight.bold,
+          color: primaryColor,
         ),
-        // bodyLarge: Primary body text style with comfortable line height
         bodyLarge: GoogleFonts.inter(
           fontSize: ThemeUIConfig.fontBodyLarge,
-          color: AppColors.textMedium, // Medium grey for readability
-          height: 1.6, // Generous line spacing for long-form text
+          color: textDark.withOpacity(0.8),
+          height: 1.6,
         ),
-        // bodyMedium: Secondary body text style for smaller content
         bodyMedium: GoogleFonts.inter(
           fontSize: ThemeUIConfig.fontBodyMedium,
-          color: AppColors.textMedium, // Medium grey for readability
+          color: textDark.withOpacity(0.7),
         ),
-        // labelLarge: Used for button labels, navigation items, and badges
         labelLarge: GoogleFonts.inter(
           fontSize: ThemeUIConfig.fontLabelLarge,
-          fontWeight: FontWeight.w600, // Semi-bold for button emphasis
-          color: AppColors.white, // White for dark button backgrounds
+          fontWeight: FontWeight.w600,
+          color: textLight,
         ),
-      ).apply(fontFamilyFallback: const ['Noto Naskh Arabic', 'Noto Color Emoji']),
+      ).apply(
+        fontFamilyFallback: const ['Noto Naskh Arabic', 'Noto Color Emoji'],
+        bodyColor: textDark,
+        displayColor: textDark,
+      ),
 
-      // AppBar Customization - Global default styling for ALL AppBar widgets.
-      // Individual app bars can override these defaults via their own parameters.
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.darkGreen, // Dark green background for all app bars
-        foregroundColor: AppColors.white, // White icons and text by default
-        elevation: 0, // Flat design: no shadow under the app bar
-        // Default title text style for app bar titles
+        backgroundColor: primaryColor,
+        foregroundColor: textLight,
+        elevation: 0,
+        centerTitle: false,
         titleTextStyle: GoogleFonts.inter(
-          fontSize: 18, // Title font size
-          fontWeight: FontWeight.w600, // Semi-bold
-          color: AppColors.white, // White text on dark background
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: textLight,
         ),
       ),
 
-      // Global ElevatedButton Style - Default appearance for ALL ElevatedButton widgets.
-      // Individual buttons can override via ElevatedButton.styleFrom().
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.darkGreen, // Dark green fill
-          foregroundColor: AppColors.white, // White text and icon color
-          // Generous padding for comfortable touch targets
+          backgroundColor: primaryColor,
+          foregroundColor: textLight,
           padding: const EdgeInsets.symmetric(
-            horizontal: ThemeUIConfig.spacerLarge + 4, // 28px horizontal padding
-            vertical: ThemeUIConfig.spacerMedium - 2, // 14px vertical padding
+            horizontal: ThemeUIConfig.spacerLarge + 4,
+            vertical: ThemeUIConfig.spacerMedium - 2,
           ),
-          // Rounded pill-like shape using radiusLarge from design tokens
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(ThemeUIConfig.radiusLarge), // 30px radius
+            borderRadius: BorderRadius.circular(config.buttonBorderRadius),
           ),
-          // Default button text style
           textStyle: GoogleFonts.inter(
             fontSize: ThemeUIConfig.fontLabelLarge,
-            fontWeight: FontWeight.w600, // Semi-bold for legibility
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
 
-      // Input Decoration (Forms & TextFields) - Global default styling for ALL TextField widgets.
-      // Applied automatically to TextField, TextFormField, etc. across the app.
+      cardTheme: CardThemeData(
+        color: cardColor,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(config.cardBorderRadius),
+        ),
+      ),
+
       inputDecorationTheme: InputDecorationTheme(
-        filled: true, // Enables background fill color
-        fillColor: AppColors.lightGrey, // Light grey background for form fields
-        // Default border (when not focused or enabled): no visible border line
+        filled: true,
+        fillColor: textDark.withOpacity(0.05),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(ThemeUIConfig.radiusSmall - 2), // 10px rounded corners
-          borderSide: BorderSide.none, // No visible border line
+          borderRadius: BorderRadius.circular(config.cardBorderRadius / 2),
+          borderSide: BorderSide.none,
         ),
-        // Enabled state border: subtle grey outline
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(ThemeUIConfig.radiusSmall - 2), // 10px rounded corners
-          borderSide: BorderSide(color: Colors.grey.shade200), // Very subtle grey border
+          borderRadius: BorderRadius.circular(config.cardBorderRadius / 2),
+          borderSide: BorderSide(color: textDark.withOpacity(0.1)),
         ),
-        // Focused state border: prominent dark green outline indicating active field
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(ThemeUIConfig.radiusSmall - 2), // 10px rounded corners
-          borderSide: const BorderSide(color: AppColors.darkGreen, width: 1.5), // Green focus ring
+          borderRadius: BorderRadius.circular(config.cardBorderRadius / 2),
+          borderSide: BorderSide(color: primaryColor, width: 1.5),
         ),
-        // Hint text styling for placeholder text inside empty fields
         hintStyle: GoogleFonts.inter(
-          color: AppColors.textLight, // Light grey hint color
-          fontSize: ThemeUIConfig.fontBodyMedium, // 14px to match body text
+          color: textDark.withOpacity(0.4),
+          fontSize: ThemeUIConfig.fontBodyMedium,
         ),
-        // Internal padding within the text field
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: ThemeUIConfig.spacerMedium, // 16px horizontal padding
-          vertical: ThemeUIConfig.spacerMedium - 2, // 14px vertical padding
+          horizontal: ThemeUIConfig.spacerMedium,
+          vertical: ThemeUIConfig.spacerMedium - 2,
         ),
       ),
     );

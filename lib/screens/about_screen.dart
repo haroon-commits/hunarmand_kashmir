@@ -1,7 +1,7 @@
 /// ═══════════════════════════════════════════════════════════════════════
 /// FILE: about_screen.dart
 /// PURPOSE: A descriptive page providing the narrative background, mission,
-///          vision, and values of the Hunarmand Kashmir platform. Uses a 
+///          vision, and values of the Hunarmand Kashmir platform. Uses a
 ///          layered scrollable design with sections for story, team, and CTA.
 /// CONNECTIONS:
 ///   - USED BY: main.dart (MainNavigator)
@@ -22,7 +22,6 @@ import '../providers/app_state.dart';
 import '../providers/dynamic_content_provider.dart';
 import '../models/content_model.dart';
 
-
 // ─── ABOUTUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to about_screen.dart.
 class AboutUIConfig {
@@ -35,32 +34,44 @@ class AboutUIConfig {
   static const Color textMedium = Color(0xFF555555);
   static const Color white = Color(0xFFFFFFFF);
 
-  // Dimensions, Spacing & Typography
-  static const double cardIconSize = 60.0;
-  static const double cardPadding = 24.0;
-  static const double fontBodyLarge = 26.0;
-  static const double fontBodyMedium = 14.0;
-  static const double fontDisplayDesktop = 92.0;
-  static const double fontDisplayTablet = 86.0;
-  static const double fontHeadlineLarge = 38.0;
-  static const double fontHeadlineMedium = 32.0;
-  static const double fontLabelSmall = 12.0;
-  static const double iconSizeMedium = 28.0;
+  // Layout & spacing
   static const double maxContentWidth = 1200.0;
-  static const double paddingButtonLargeH = 50.0;
-  static const double paddingButtonSmallV = 22.0;
-  static const double paddingHeroMobile = 44.0;
   static const double paddingSectionVertical = 64.0;
-  static const double radiusLarge = 30.0;
-  static const double radiusMedium = 20.0;
-  static const double radiusSmall = 12.0;
-  static const double spacerDisplay = 32.0;
+  static const double paddingHeroMobile = 44.0;
+  static const double cardPadding = 24.0;
+  static const double cardIconSize = 48.0;
+  static const double iconSizeMedium = 24.0;
   static const double spacerExtraLarge = 48.0;
+  static const double spacerDisplay = 32.0;
   static const double spacerLarge = 24.0;
   static const double spacerMedium = 16.0;
   static const double spacerSmall = 8.0;
-}
+  static const double radiusLarge = 30.0;
+  static const double radiusMedium = 20.0;
+  static const double radiusSmall = 12.0;
 
+  // Responsive section heading sizes
+  static const double fontSectionDesktop = 42.0;
+  static const double fontSectionTablet = 32.0;
+  static const double fontSectionMobile = 26.0;
+
+  // Story headline sizes
+  static const double fontStoryDesktop = 36.0;
+  static const double fontStoryTablet = 28.0;
+  static const double fontStoryMobile = 22.0;
+
+  // Body & card text
+  static const double fontBodyMedium = 14.0;
+  static const double fontCardTitle = 17.0;
+  static const double fontTeamName = 16.0;
+  static const double fontTeamRole = 13.0;
+  static const double fontLabelSmall = 12.0;
+  static const double fontCTATitle = 34.0;
+
+  // Button
+  static const double paddingButtonLargeH = 48.0;
+  static const double paddingButtonV = 18.0;
+}
 
 /// A descriptive page providing the narrative background, mission, and vision of the platform.
 /// Uses a layered scrollable design with distinct sections for story, values, and action.
@@ -88,14 +99,11 @@ class AboutScreen extends StatelessWidget {
                     content.aboutStoryText)),
             // Philosophical core (Mission, Vision, and Values)
             SliverToBoxAdapter(
-                child: _buildMissionVisionSection(
-                    context,
-                    content.aboutMissionText,
-                    content.aboutVisionText,
-                    content.aboutValuesText)),
+                child: _buildMissionVisionSection(context, content)),
             // Dynamic Team section (Mentors and founders)
-            SliverToBoxAdapter(
-                child: _buildTeamSection(context, content.teamMembers)),
+            if (content.layoutConfig.showAboutTeam)
+              SliverToBoxAdapter(
+                  child: _buildTeamSection(context, content.teamMembers)),
             // Final engagement block
             SliverToBoxAdapter(child: _buildCtaSection(context)),
             // Global site footer
@@ -107,25 +115,27 @@ class AboutScreen extends StatelessWidget {
   }
 
   /// Builds the 'Story' section which combines narrative text with visual identifiers.
-  Widget _buildStorySection(BuildContext context, String headline, String text) {
+  Widget _buildStorySection(
+      BuildContext context, String headline, String text) {
     final isDesktop = Responsive.isDesktop(context);
     final hPad = Responsive.contentPaddingH(context);
- 
+
     return Container(
       color: AboutUIConfig.white,
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AboutUIConfig.maxContentWidth),
+          constraints:
+              const BoxConstraints(maxWidth: AboutUIConfig.maxContentWidth),
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: hPad, 
+              horizontal: hPad,
               vertical: AboutUIConfig.paddingSectionVertical,
             ),
             child: isDesktop
                 ? Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(flex: 3, child: _buildStoryText(headline, text)),
+                      Expanded(flex: 3, child: _buildStoryText(context, headline, text)),
                       const SizedBox(width: AboutUIConfig.spacerExtraLarge),
                       Expanded(flex: 2, child: _buildRightColumn()),
                     ],
@@ -133,7 +143,7 @@ class AboutScreen extends StatelessWidget {
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildStoryText(headline, text),
+                      _buildStoryText(context, headline, text),
                       const SizedBox(height: AboutUIConfig.spacerDisplay),
                       _buildRightColumn(),
                     ],
@@ -143,28 +153,47 @@ class AboutScreen extends StatelessWidget {
       ),
     );
   }
- 
+
   /// Organizes the primary narrative text blocks.
-  Widget _buildStoryText(String headline, String text) {
+  Widget _buildStoryText(BuildContext context, String headline, String text) {
+    final isDesktop = Responsive.isDesktop(context);
+    final isTablet = Responsive.isTablet(context);
+    final headlineSize = isDesktop
+        ? AboutUIConfig.fontStoryDesktop
+        : isTablet
+            ? AboutUIConfig.fontStoryTablet
+            : AboutUIConfig.fontStoryMobile;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Gold uppercase label — matches home screen 'OUR PROGRAMS' pattern
+        Text(
+          'OUR STORY',
+          style: GoogleFonts.inter(
+            color: AboutUIConfig.accentGold,
+            fontSize: AboutUIConfig.fontLabelSmall - 1,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: AboutUIConfig.spacerSmall),
         Text(
           headline,
           style: GoogleFonts.inter(
             color: AboutUIConfig.darkGreen,
-            fontSize: AboutUIConfig.fontDisplayTablet,
+            fontSize: headlineSize,
             fontWeight: FontWeight.bold,
             height: 1.3,
           ),
         ),
-        const SizedBox(height: AboutUIConfig.spacerMedium + 2),
+        const SizedBox(height: AboutUIConfig.spacerMedium),
         Text(
           text,
           style: GoogleFonts.inter(
             color: AboutUIConfig.textMedium,
             fontSize: AboutUIConfig.fontBodyMedium,
-            height: 1.7,
+            height: 1.8,
           ),
         ),
         const SizedBox(height: AboutUIConfig.spacerLarge),
@@ -188,7 +217,8 @@ class AboutScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AboutUIConfig.cardPadding - 2),
       decoration: const BoxDecoration(
-        border: Border(left: BorderSide(color: AboutUIConfig.accentGold, width: 4)),
+        border:
+            Border(left: BorderSide(color: AboutUIConfig.accentGold, width: 4)),
         color: AboutUIConfig.offWhite,
       ),
       child: Text(
@@ -209,59 +239,75 @@ class AboutScreen extends StatelessWidget {
   }
 
   /// Builds the 'Mission, Vision & Values' section with a 3-column grid.
-  Widget _buildMissionVisionSection(
-      BuildContext context, String mission, String vision, String values) {
+  Widget _buildMissionVisionSection(BuildContext context, AppContent content) {
     final hPad = Responsive.contentPaddingH(context);
     final items = [
       {
-        'icon': Icons.track_changes_outlined,
+        'icon': content.aboutMissionIcon,
         'iconColor': AboutUIConfig.accentGold,
         'title': 'Our Mission',
-        'desc': mission,
+        'desc': content.aboutMissionText,
       },
       {
-        'icon': Icons.favorite_border_rounded,
+        'icon': content.aboutVisionIcon,
         'iconColor': AboutUIConfig.darkGreen,
         'title': 'Our Vision',
-        'desc': vision,
+        'desc': content.aboutVisionText,
       },
       {
-        'icon': Icons.people_outline_rounded,
+        'icon': content.aboutValuesIcon,
         'iconColor': AboutUIConfig.accentGold,
         'title': 'Community',
-        'desc': values,
+        'desc': content.aboutValuesText,
       },
     ];
- 
+
     return Container(
       color: AboutUIConfig.offWhite,
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AboutUIConfig.maxContentWidth),
+          constraints:
+              const BoxConstraints(maxWidth: AboutUIConfig.maxContentWidth),
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: hPad, 
+              horizontal: hPad,
               vertical: AboutUIConfig.paddingSectionVertical,
             ),
             child: Column(
               children: [
+                // Gold uppercase label — matches home screen pattern
+                Text(
+                  'WHO WE ARE',
+                  style: GoogleFonts.inter(
+                    color: AboutUIConfig.accentGold,
+                    fontSize: AboutUIConfig.fontLabelSmall - 1,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: AboutUIConfig.spacerSmall),
                 Text(
                   'Mission, Vision & Values',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     color: AboutUIConfig.darkGreen,
-                    fontSize: Responsive.isDesktop(context) 
-                        ? AboutUIConfig.fontDisplayDesktop 
-                        : AboutUIConfig.fontDisplayTablet,
+                    fontSize: Responsive.isDesktop(context)
+                        ? AboutUIConfig.fontSectionDesktop
+                        : Responsive.isTablet(context)
+                            ? AboutUIConfig.fontSectionTablet
+                            : AboutUIConfig.fontSectionMobile,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                const SizedBox(height: 8),
+                Container(width: 48, height: 3, decoration: BoxDecoration(color: AboutUIConfig.accentGold, borderRadius: BorderRadius.circular(2))),
                 const SizedBox(height: AboutUIConfig.spacerExtraLarge - 12),
                 ResponsiveCardGrid(
                   mobileCols: 1,
                   tabletCols: 2,
                   desktopCols: 3,
-                  children: items.map((item) => MissionCard(item: item)).toList(),
+                  children:
+                      items.map((item) => MissionCard(item: item)).toList(),
                 ),
               ],
             ),
@@ -280,24 +326,42 @@ class AboutScreen extends StatelessWidget {
       color: AboutUIConfig.white,
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AboutUIConfig.maxContentWidth),
+          constraints:
+              const BoxConstraints(maxWidth: AboutUIConfig.maxContentWidth),
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: hPad, 
+              horizontal: hPad,
               vertical: AboutUIConfig.paddingSectionVertical,
             ),
             child: Column(
               children: [
+                // Gold uppercase label — matches home screen pattern
+                Text(
+                  'OUR TEAM',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    color: AboutUIConfig.accentGold,
+                    fontSize: AboutUIConfig.fontLabelSmall - 1,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: AboutUIConfig.spacerSmall),
                 Text(
                   'Voices of Guidance',
+                  textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     color: AboutUIConfig.darkGreen,
-                    fontSize: isDesktop 
-                        ? AboutUIConfig.fontDisplayDesktop 
-                        : AboutUIConfig.fontDisplayTablet,
+                    fontSize: isDesktop
+                        ? AboutUIConfig.fontSectionDesktop
+                        : Responsive.isTablet(context)
+                            ? AboutUIConfig.fontSectionTablet
+                            : AboutUIConfig.fontSectionMobile,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                const SizedBox(height: 8),
+                Container(width: 48, height: 3, decoration: BoxDecoration(color: AboutUIConfig.accentGold, borderRadius: BorderRadius.circular(2))),
                 const SizedBox(height: AboutUIConfig.spacerSmall + 4),
                 Text(
                   'Our dedicated mentors and instructors bringing world-class expertise to Kashmir.',
@@ -305,6 +369,7 @@ class AboutScreen extends StatelessWidget {
                   style: GoogleFonts.inter(
                     color: AboutUIConfig.textMedium,
                     fontSize: AboutUIConfig.fontBodyMedium,
+                    height: 1.6,
                   ),
                 ),
                 const SizedBox(height: AboutUIConfig.spacerExtraLarge),
@@ -329,12 +394,16 @@ class AboutScreen extends StatelessWidget {
       color: AboutUIConfig.white,
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AboutUIConfig.maxContentWidth),
+          constraints:
+              const BoxConstraints(maxWidth: AboutUIConfig.maxContentWidth),
           child: Padding(
-            padding: EdgeInsets.fromLTRB(hPad, AboutUIConfig.spacerSmall + 4, hPad, AboutUIConfig.paddingButtonLargeH),
+            padding: EdgeInsets.fromLTRB(hPad, AboutUIConfig.spacerSmall + 4,
+                hPad, AboutUIConfig.paddingButtonLargeH),
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: AboutUIConfig.spacerDisplay, vertical: AboutUIConfig.paddingHeroMobile),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AboutUIConfig.spacerDisplay,
+                  vertical: AboutUIConfig.paddingHeroMobile),
               decoration: BoxDecoration(
                 color: AboutUIConfig.darkGreen,
                 borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium),
@@ -346,7 +415,7 @@ class AboutScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
                       color: AboutUIConfig.white,
-                      fontSize: AboutUIConfig.fontHeadlineLarge - 2,
+                      fontSize: AboutUIConfig.fontCTATitle, // was fontHeadlineLarge
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -364,25 +433,27 @@ class AboutScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: AboutUIConfig.spacerLarge + 4),
+                  // Gold button matching home screen primary button style
                   MouseRegion(
                     cursor: SystemMouseCursors.click,
-                    child: OutlinedButton(
-                      onPressed: () => context.read<AppState>().navigate('contact'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AboutUIConfig.white,
-                        side: const BorderSide(color: AboutUIConfig.white),
+                    child: GestureDetector(
+                      onTap: () => context.read<AppState>().navigate('contact'),
+                      child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: AboutUIConfig.paddingButtonLargeH, 
-                          vertical: AboutUIConfig.paddingButtonSmallV + 2,
+                          horizontal: AboutUIConfig.paddingButtonLargeH,
+                          vertical: AboutUIConfig.paddingButtonV,
                         ),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AboutUIConfig.radiusLarge)),
-                      ),
-                      child: Text(
-                        'Contact Us Today',
-                        style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w600, 
-                            fontSize: AboutUIConfig.fontBodyLarge - 1,
+                        decoration: BoxDecoration(
+                          color: AboutUIConfig.accentGold,
+                          borderRadius: BorderRadius.circular(AboutUIConfig.radiusLarge),
+                        ),
+                        child: Text(
+                          'Contact Us Today →',
+                          style: GoogleFonts.inter(
+                            color: AboutUIConfig.darkGreen,
+                            fontWeight: FontWeight.w700,
+                            fontSize: AboutUIConfig.fontBodyMedium + 2,
+                          ),
                         ),
                       ),
                     ),
@@ -412,10 +483,21 @@ class MissionCard extends StatefulWidget {
 class _MissionCardState extends State<MissionCard> {
   bool _isHovered = false;
 
+  /// Hardcoded icon by title — completely independent of Firestore.
+  IconData _getHardcodedIcon(String title) {
+    switch (title.toLowerCase().trim()) {
+      case 'our mission': return Icons.flag_outlined;
+      case 'our vision':  return Icons.visibility_outlined;
+      case 'community':   return Icons.groups_outlined;
+      default:            return Icons.lightbulb_outline;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final IconData icon = (widget.item['icon'] as IconData?) ?? Icons.star_outline;
-    final Color iconColor = (widget.item['iconColor'] as Color?) ?? AboutUIConfig.accentGold;
+    final String title = (widget.item['title'] as String?) ?? '';
+    final Color iconColor =
+        (widget.item['iconColor'] as Color?) ?? AboutUIConfig.accentGold;
 
     return RepaintBoundary(
       child: MouseRegion(
@@ -425,7 +507,8 @@ class _MissionCardState extends State<MissionCard> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeOutCubic,
-          transform: Matrix4.identity()..translate(0.0, _isHovered ? -6.0 : 0.0),
+          transform: Matrix4.identity()
+            ..translate(0.0, _isHovered ? -6.0 : 0.0),
           decoration: BoxDecoration(
             color: AboutUIConfig.white,
             borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium - 4),
@@ -458,11 +541,10 @@ class _MissionCardState extends State<MissionCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Icon container with subtle tinted background
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    width: AboutUIConfig.cardIconSize - 12,
-                    height: AboutUIConfig.cardIconSize - 12,
+                    width: AboutUIConfig.cardIconSize,
+                    height: AboutUIConfig.cardIconSize,
                     decoration: BoxDecoration(
                       color: iconColor.withOpacity(_isHovered ? 0.15 : 0.08),
                       borderRadius: BorderRadius.circular(AboutUIConfig.radiusSmall + 2),
@@ -472,18 +554,18 @@ class _MissionCardState extends State<MissionCard> {
                         scale: _isHovered ? 1.15 : 1.0,
                         duration: const Duration(milliseconds: 200),
                         child: Icon(
-                          icon,
+                          _getHardcodedIcon(title),
                           color: _isHovered ? AboutUIConfig.darkGreen : iconColor,
                           size: AboutUIConfig.iconSizeMedium + 4,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: AboutUIConfig.spacerMedium - 2),
+                  const SizedBox(height: AboutUIConfig.spacerMedium),
                   Text(
-                    '${widget.item['title']}',
+                    title,
                     style: GoogleFonts.inter(
-                      fontSize: AboutUIConfig.fontHeadlineMedium - 5,
+                      fontSize: AboutUIConfig.fontCardTitle,
                       fontWeight: FontWeight.w700,
                       color: AboutUIConfig.textDark,
                     ),
@@ -566,7 +648,8 @@ class _TeamCardState extends State<TeamCard> {
                     : Center(
                         child: Text(
                           widget.member.imageUrl,
-                          style: const TextStyle(fontSize: AboutUIConfig.spacerDisplay),
+                          style: const TextStyle(
+                              fontSize: AboutUIConfig.spacerDisplay),
                         ),
                       ),
               ),
@@ -576,8 +659,8 @@ class _TeamCardState extends State<TeamCard> {
               widget.member.name,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                fontWeight: FontWeight.bold,
-                fontSize: AboutUIConfig.fontBodyLarge,
+                fontWeight: FontWeight.w700,
+                fontSize: AboutUIConfig.fontTeamName, // Fixed: was 26px, now 16px
                 color: AboutUIConfig.darkGreen,
               ),
             ),
@@ -586,9 +669,9 @@ class _TeamCardState extends State<TeamCard> {
               widget.member.role,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                fontSize: AboutUIConfig.fontBodyMedium - 1,
+                fontSize: AboutUIConfig.fontTeamRole,
                 color: AboutUIConfig.accentGold,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -658,7 +741,8 @@ class _WorkshopCardState extends State<WorkshopCard> {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.workspace_premium,
-                    color: AboutUIConfig.accentGold, size: AboutUIConfig.spacerExtraLarge),
+                    color: AboutUIConfig.accentGold,
+                    size: AboutUIConfig.spacerExtraLarge),
               ),
               const SizedBox(height: AboutUIConfig.spacerMedium),
               Text(
@@ -677,7 +761,7 @@ class _WorkshopCardState extends State<WorkshopCard> {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   color: AboutUIConfig.white,
-                  fontSize: AboutUIConfig.fontHeadlineMedium,
+                  fontSize: AboutUIConfig.fontSectionMobile, // was fontHeadlineMedium (32px), now 26px
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.5,
                 ),

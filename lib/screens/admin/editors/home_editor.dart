@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/dynamic_content_provider.dart';
 import '../../../models/content_model.dart';
+import '../../../widgets/utils/dynamic_icon.dart';
 
 
 // ─── HOMEEDITORUICONFIG ──────────────────────────────
@@ -40,6 +41,13 @@ class _HomeEditorState extends State<HomeEditor> {
   final _ctaTitleController = TextEditingController();
   final _ctaDescController = TextEditingController();
 
+  late bool _showCourses;
+  late bool _showFeatures;
+  late bool _showWhyUs;
+  late bool _showStats;
+  late bool _showCta;
+  late bool _showIcons;
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +58,14 @@ class _HomeEditorState extends State<HomeEditor> {
     _whyDescController.text = content.homeWhyDescription;
     _ctaTitleController.text = content.homeCtaTitle;
     _ctaDescController.text = content.homeCtaDescription;
+
+    final layout = content.layoutConfig;
+    _showCourses = layout.showHomeCourses;
+    _showFeatures = layout.showHomeFeatures;
+    _showWhyUs = layout.showHomeWhyUs;
+    _showStats = layout.showHomeStats;
+    _showCta = layout.showHomeCta;
+    _showIcons = layout.showIconsInCards;
   }
 
   @override
@@ -73,6 +89,45 @@ class _HomeEditorState extends State<HomeEditor> {
             _buildTextField('Subheadline', _subheadlineController, maxLines: 4),
           ]),
           const SizedBox(height: 24),
+          _buildSection('Screen Layout & Settings', [
+            SwitchListTile(
+              title: const Text('Show Courses Grid'),
+              value: _showCourses,
+              onChanged: (v) => setState(() => _showCourses = v),
+              activeColor: const Color(0xFFF5A623),
+            ),
+            SwitchListTile(
+              title: const Text('Show Features Highlights'),
+              value: _showFeatures,
+              onChanged: (v) => setState(() => _showFeatures = v),
+              activeColor: const Color(0xFFF5A623),
+            ),
+            SwitchListTile(
+              title: const Text('Show "Why Us" Text Section'),
+              value: _showWhyUs,
+              onChanged: (v) => setState(() => _showWhyUs = v),
+              activeColor: const Color(0xFFF5A623),
+            ),
+            SwitchListTile(
+              title: const Text('Show Call To Action Banner'),
+              value: _showCta,
+              onChanged: (v) => setState(() => _showCta = v),
+              activeColor: const Color(0xFFF5A623),
+            ),
+            SwitchListTile(
+              title: const Text('Show Platform Statistics'),
+              value: _showStats,
+              onChanged: (v) => setState(() => _showStats = v),
+              activeColor: const Color(0xFFF5A623),
+            ),
+            SwitchListTile(
+              title: const Text('Display Icons in Cards'),
+              value: _showIcons,
+              onChanged: (v) => setState(() => _showIcons = v),
+              activeColor: const Color(0xFFF5A623),
+            ),
+          ]),
+          const SizedBox(height: 24),
           _buildSection('Why Section', [
             _buildTextField('Why Title', _whyTitleController),
             const SizedBox(height: 16),
@@ -86,24 +141,36 @@ class _HomeEditorState extends State<HomeEditor> {
             const SizedBox(height: 16),
             _buildTextField('CTA Description', _ctaDescController, maxLines: 4),
           ]),
+          const SizedBox(height: 24),
+          _buildSection('Statistics', [
+            _buildStatsOrganizer(context),
+          ]),
           const SizedBox(height: 40),
           ElevatedButton(
             onPressed: () {
               final provider = context.read<DynamicContentProvider>();
-              provider.updateHero(
+              provider.updateHome(
                 _headlineController.text,
                 _subheadlineController.text,
+                whyTitle: _whyTitleController.text,
+                whyDescription: _whyDescController.text,
+                ctaTitle: _ctaTitleController.text,
+                ctaDescription: _ctaDescController.text,
               );
-              provider.updateHomeWhy(
-                _whyTitleController.text,
-                _whyDescController.text,
-              );
-              provider.updateHomeCta(
-                _ctaTitleController.text,
-                _ctaDescController.text,
-              );
+
+              final newLayout = provider.content.layoutConfig;
+              provider.updateLayout(LayoutConfig(
+                showHomeCourses: _showCourses,
+                showHomeFeatures: _showFeatures,
+                showHomeWhyUs: _showWhyUs,
+                showHomeCta: _showCta,
+                showHomeStats: _showStats,
+                showAboutTeam: newLayout.showAboutTeam,
+                showIconsInCards: _showIcons,
+              ));
+
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Home sections updated!')),
+                const SnackBar(content: Text('Home settings & content updated!')),
               );
             },
             style: ElevatedButton.styleFrom(
@@ -153,7 +220,7 @@ class _HomeEditorState extends State<HomeEditor> {
             return Card(
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
-                leading: Text(feature.icon, style: const TextStyle(fontSize: 24)),
+                leading: renderDynamicIcon(feature.icon, size: 24, color: HomeEditorUIConfig.darkGreen),
                 title: Text(feature.title, style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text(feature.description, maxLines: 1, overflow: TextOverflow.ellipsis),
                 trailing: Row(
@@ -179,10 +246,125 @@ class _HomeEditorState extends State<HomeEditor> {
     );
   }
 
+  Widget _buildStatsOrganizer(BuildContext context) {
+    final provider = context.watch<DynamicContentProvider>();
+    final stats = provider.content.stats;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Key Statistics',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: HomeEditorUIConfig.textDark,
+              ),
+            ),
+            TextButton.icon(
+              onPressed: () => _showStatDialog(context),
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('Add Stat'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (stats.isEmpty)
+          const Text('No stats added yet.')
+        else
+          ...stats.asMap().entries.map((entry) {
+            final index = entry.key;
+            final stat = entry.value;
+            return Card(
+              margin: const EdgeInsets.only(bottom: 8),
+              child: ListTile(
+                leading: renderDynamicIcon(stat.icon, size: 24, color: HomeEditorUIConfig.darkGreen),
+                title: Text(stat.value, style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(stat.label),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit, size: 20),
+                      onPressed: () => _showStatDialog(context, stat: stat, index: index),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, size: 20, color: Colors.red),
+                      onPressed: () {
+                        final updated = List<Stat>.from(stats)..removeAt(index);
+                        provider.updateStats(updated);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+      ],
+    );
+  }
+
+  void _showStatDialog(BuildContext context, {Stat? stat, int? index}) {
+    final valueController = TextEditingController(text: stat?.value ?? '');
+    final labelController = TextEditingController(text: stat?.label ?? '');
+    final iconController = TextEditingController(text: stat?.icon ?? 'material:trending_up');
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(stat == null ? 'Add Statistic' : 'Edit Statistic'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: iconController,
+              decoration: const InputDecoration(labelText: 'Icon (material:name)'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: valueController,
+              decoration: const InputDecoration(labelText: 'Value (e.g. 1,000+)'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: labelController,
+              decoration: const InputDecoration(labelText: 'Label (e.g. Students)'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              final provider = context.read<DynamicContentProvider>();
+              final newStat = Stat(
+                icon: iconController.text,
+                value: valueController.text,
+                label: labelController.text,
+              );
+              final updated = List<Stat>.from(provider.content.stats);
+              if (index == null) {
+                updated.add(newStat);
+              } else {
+                updated[index] = newStat;
+              }
+              provider.updateStats(updated);
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showFeatureDialog(BuildContext context, {Feature? feature, int? index}) {
     final titleController = TextEditingController(text: feature?.title ?? '');
     final descController = TextEditingController(text: feature?.description ?? '');
-    final iconController = TextEditingController(text: feature?.icon ?? '🚀');
+    final iconController = TextEditingController(text: feature?.icon ?? 'material:rocket');
 
     showDialog(
       context: context,
@@ -194,7 +376,7 @@ class _HomeEditorState extends State<HomeEditor> {
             children: [
               TextField(
                 controller: iconController,
-                decoration: const InputDecoration(labelText: 'Icon (Emoji or URL)'),
+                decoration: const InputDecoration(labelText: 'Icon (material:name or emoji)'),
               ),
               const SizedBox(height: 12),
               TextField(

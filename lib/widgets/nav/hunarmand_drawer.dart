@@ -6,7 +6,7 @@
 ///          shows a subset of links on smaller screens.
 /// CONNECTIONS:
 ///   - USED BY: main.dart → MainNavigator Scaffold drawer (mobile/tablet only)
-///   - READS FROM: providers/dynamic_content_provider.dart → logoPath, logoText, appTitle
+///   - READS FROM: providers/dynamic_content_provider.dart → logoPath, appTitle
 ///   - WRITES TO: providers/app_state.dart → navigate() for page switching
 ///   - DEPENDS ON: google_fonts → GoogleFonts.inter
 /// ═══════════════════════════════════════════════════════════════════════
@@ -15,7 +15,7 @@ import 'package:flutter/material.dart'; // Flutter core for Drawer, ListTile, El
 import 'package:google_fonts/google_fonts.dart'; // Google Fonts for Inter (Latin) typography
 import 'package:provider/provider.dart'; // Provider for Consumer and context.read state access
 import '../../providers/app_state.dart'; // AppState: navigate() for global page switching
-import '../../providers/dynamic_content_provider.dart'; // DynamicContentProvider: logoPath, logoText, appTitle
+import '../../providers/dynamic_content_provider.dart'; // DynamicContentProvider: logoPath, appTitle
 
 
 // ─── APPDRAWERUICONFIG ──────────────────────────────
@@ -59,7 +59,7 @@ class HunarmandDrawer extends StatelessWidget {
       child: Column(
         children: [
           // ── TOP: Drawer Header with Branding ──
-          // Shows the logo image or Urdu text + app title from DynamicContentProvider
+          // Shows the logo image + app title from DynamicContentProvider
           _buildDrawerHeader(context),
 
           // ── MIDDLE: Vertical Navigation Links ──
@@ -92,12 +92,15 @@ class HunarmandDrawer extends StatelessWidget {
           builder: (context, provider, _) => Column(
             mainAxisAlignment: MainAxisAlignment.center, // Vertically center the content
             children: [
-              // Static asset logo
-              Image.asset(
-                'assets/images/main_logo.png', // Local brand logo
-                height: AppDrawerUIConfig.iconSizeHero + 2, // 50px logo height
-                fit: BoxFit.contain,
-              ),
+              // Dynamic or Asset logo
+              provider.content.logoPath != null && provider.content.logoPath!.isNotEmpty
+                  ? Image.network(
+                      provider.content.logoPath!,
+                      height: AppDrawerUIConfig.iconSizeHero + 12,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => _buildAssetLogo(),
+                    )
+                  : _buildAssetLogo(),
               const SizedBox(height: AppDrawerUIConfig.spacerSmall), // 8px gap
               // App title text below the logo
               Text(
@@ -111,6 +114,14 @@ class HunarmandDrawer extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAssetLogo() {
+    return Image.asset(
+      'assets/images/main_logo.png', // Local brand logo
+      height: AppDrawerUIConfig.iconSizeHero + 2, // 50px logo height
+      fit: BoxFit.contain,
     );
   }
 

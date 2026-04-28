@@ -11,7 +11,6 @@
 
 import 'package:flutter/material.dart'; // Flutter core for StatefulWidget, AnimatedContainer, etc.
 import 'package:google_fonts/google_fonts.dart'; // Google Fonts for Poppins typography
-import '../utils/dynamic_icon.dart'; // renderDynamicIcon: renders emoji or URL-based icons
 
 
 // ─── FEATURECARDUICONFIG ──────────────────────────────
@@ -79,6 +78,20 @@ class _FeatureCardState extends State<FeatureCard> {
   // Internal hover state: false by default, toggled by MouseRegion onEnter/onExit
   bool _isHovered = false;
 
+  /// Returns a hardcoded Material icon based on the feature title.
+  /// Completely independent of Firestore — always shows a distinct icon.
+  IconData _getHardcodedIcon() {
+    switch (widget.title.toLowerCase().trim()) {
+      case 'expert mentorship':  return Icons.people_alt_outlined;
+      case 'practical learning': return Icons.build_outlined;
+      case 'career support':     return Icons.rocket_launch_outlined;
+      case 'community':          return Icons.groups_outlined;
+      case 'certification':      return Icons.verified_outlined;
+      case 'flexible learning':  return Icons.schedule_outlined;
+      default:                   return Icons.lightbulb_outline;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // RepaintBoundary creates an isolated repaint layer for this widget.
@@ -142,12 +155,11 @@ class _FeatureCardState extends State<FeatureCard> {
                       : [], // No shadow at rest
                 ),
                 child: Center(
-                  // renderDynamicIcon from widgets/utils/dynamic_icon.dart
-                  // Renders the icon string as either a network image or emoji text
-                  child: renderDynamicIcon(
-                    widget.icon, // Icon string from Feature model
-                    color: Colors.white, // White tint for error fallback icon
-                    size: FeatureCardUIConfig.iconSizeMedium + 4, // 28px icon size
+                  // Hardcoded icon based on feature title — no Firestore dependency
+                  child: Icon(
+                    _getHardcodedIcon(),
+                    color: Colors.white,
+                    size: FeatureCardUIConfig.iconSizeMedium + 4,
                   ),
                 ),
               ),
