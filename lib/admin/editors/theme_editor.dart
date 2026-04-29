@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../models/content_model.dart';
-import '../../../providers/dynamic_content_provider.dart';
+import '../../models/content_model.dart';
+import '../../providers/dynamic_content_provider.dart';
 
 class ThemeEditor extends StatefulWidget {
   const ThemeEditor({super.key});
@@ -68,7 +68,7 @@ class _ThemeEditorState extends State<ThemeEditor> {
 
   void _saveTheme() async {
     setState(() => _isSaving = true);
-    
+
     final newTheme = ThemeConfig(
       primaryColorHex: _primaryColorHex,
       accentColorHex: _accentColorHex,
@@ -101,13 +101,15 @@ class _ThemeEditorState extends State<ThemeEditor> {
     setState(() => _isSaving = false);
   }
 
-  void _showColorPicker(String title, Color initialColor, ValueChanged<Color> onColorChanged) {
+  void _showColorPicker(
+      String title, Color initialColor, ValueChanged<Color> onColorChanged) {
     Color tempColor = initialColor;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(title, style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+          title: Text(title,
+              style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
           content: SingleChildScrollView(
             child: ColorPicker(
               pickerColor: initialColor,
@@ -136,10 +138,12 @@ class _ThemeEditorState extends State<ThemeEditor> {
     );
   }
 
-  Widget _buildColorTile(String title, String subtitle, String currentHex, ValueChanged<String> onChanged) {
+  Widget _buildColorTile(String title, String subtitle, String currentHex,
+      ValueChanged<String> onChanged) {
     return ListTile(
       title: Text(title, style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-      subtitle: Text(subtitle, style: GoogleFonts.inter(color: Colors.grey.shade600)),
+      subtitle:
+          Text(subtitle, style: GoogleFonts.inter(color: Colors.grey.shade600)),
       trailing: Container(
         width: 40,
         height: 40,
@@ -148,7 +152,10 @@ class _ThemeEditorState extends State<ThemeEditor> {
           shape: BoxShape.circle,
           border: Border.all(color: Colors.grey.shade300),
           boxShadow: [
-            BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, 2)),
+            BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: const Offset(0, 2)),
           ],
         ),
       ),
@@ -160,14 +167,19 @@ class _ThemeEditorState extends State<ThemeEditor> {
     );
   }
 
-  Widget _buildSliderTile(String title, String subtitle, double value, double min, double max, ValueChanged<double> onChanged) {
+  Widget _buildSliderTile(String title, String subtitle, double value,
+      double min, double max, ValueChanged<double> onChanged) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 16)),
-          Text(subtitle, style: GoogleFonts.inter(color: Colors.grey.shade600, fontSize: 13)),
+          Text(title,
+              style:
+                  GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 16)),
+          Text(subtitle,
+              style:
+                  GoogleFonts.inter(color: Colors.grey.shade600, fontSize: 13)),
           Row(
             children: [
               Expanded(
@@ -180,7 +192,8 @@ class _ThemeEditorState extends State<ThemeEditor> {
                   onChanged: onChanged,
                 ),
               ),
-              Text('${value.round()}px', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+              Text('${value.round()}px',
+                  style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
             ],
           ),
         ],
@@ -188,10 +201,12 @@ class _ThemeEditorState extends State<ThemeEditor> {
     );
   }
 
-  Widget _buildSwitchTile(String title, String subtitle, bool value, ValueChanged<bool> onChanged) {
+  Widget _buildSwitchTile(
+      String title, String subtitle, bool value, ValueChanged<bool> onChanged) {
     return SwitchListTile(
       title: Text(title, style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-      subtitle: Text(subtitle, style: GoogleFonts.inter(color: Colors.grey.shade600)),
+      subtitle:
+          Text(subtitle, style: GoogleFonts.inter(color: Colors.grey.shade600)),
       value: value,
       onChanged: onChanged,
       activeColor: const Color(0xFFF5A623),
@@ -207,18 +222,24 @@ class _ThemeEditorState extends State<ThemeEditor> {
           children: [
             Text(
               'Theme & Layout CMS',
-              style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold),
+              style:
+                  GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             ElevatedButton.icon(
               onPressed: _isSaving ? null : _saveTheme,
               icon: _isSaving
-                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white))
                   : const Icon(Icons.save),
               label: Text(_isSaving ? 'Saving...' : 'Save Theme'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0D3320),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               ),
             ),
           ],
@@ -235,14 +256,34 @@ class _ThemeEditorState extends State<ThemeEditor> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Global Colors', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('Global Colors',
+                    style: GoogleFonts.inter(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
                 const Divider(height: 32),
-                _buildColorTile('Primary Brand Color', 'Used for headers, footers, and main accents.', _primaryColorHex, (v) => setState(() => _primaryColorHex = v)),
-                _buildColorTile('Accent Color (Gold)', 'Used for prominent buttons and highlights.', _accentColorHex, (v) => setState(() => _accentColorHex = v)),
-                _buildColorTile('App Background Color', 'The main background behind sections.', _backgroundColorHex, (v) => setState(() => _backgroundColorHex = v)),
-                _buildColorTile('Card Background Color', 'Background for all UI cards (Courses, Gallery, etc).', _cardBackgroundColorHex, (v) => setState(() => _cardBackgroundColorHex = v)),
-                _buildColorTile('Dark Text Color', 'Main reading text color.', _textDarkHex, (v) => setState(() => _textDarkHex = v)),
-                _buildColorTile('Light Text Color', 'Text on dark backgrounds.', _textLightHex, (v) => setState(() => _textLightHex = v)),
+                _buildColorTile(
+                    'Primary Brand Color',
+                    'Used for headers, footers, and main accents.',
+                    _primaryColorHex,
+                    (v) => setState(() => _primaryColorHex = v)),
+                _buildColorTile(
+                    'Accent Color (Gold)',
+                    'Used for prominent buttons and highlights.',
+                    _accentColorHex,
+                    (v) => setState(() => _accentColorHex = v)),
+                _buildColorTile(
+                    'App Background Color',
+                    'The main background behind sections.',
+                    _backgroundColorHex,
+                    (v) => setState(() => _backgroundColorHex = v)),
+                _buildColorTile(
+                    'Card Background Color',
+                    'Background for all UI cards (Courses, Gallery, etc).',
+                    _cardBackgroundColorHex,
+                    (v) => setState(() => _cardBackgroundColorHex = v)),
+                _buildColorTile('Dark Text Color', 'Main reading text color.',
+                    _textDarkHex, (v) => setState(() => _textDarkHex = v)),
+                _buildColorTile('Light Text Color', 'Text on dark backgrounds.',
+                    _textLightHex, (v) => setState(() => _textLightHex = v)),
               ],
             ),
           ),
@@ -259,10 +300,24 @@ class _ThemeEditorState extends State<ThemeEditor> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Component Styling', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('Component Styling',
+                    style: GoogleFonts.inter(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
                 const Divider(height: 32),
-                _buildSliderTile('Card Corner Radius', 'How rounded the corners of content cards should be.', _cardBorderRadius, 0, 40, (v) => setState(() => _cardBorderRadius = v)),
-                _buildSliderTile('Button Corner Radius', 'How rounded the corners of buttons should be.', _buttonBorderRadius, 0, 40, (v) => setState(() => _buttonBorderRadius = v)),
+                _buildSliderTile(
+                    'Card Corner Radius',
+                    'How rounded the corners of content cards should be.',
+                    _cardBorderRadius,
+                    0,
+                    40,
+                    (v) => setState(() => _cardBorderRadius = v)),
+                _buildSliderTile(
+                    'Button Corner Radius',
+                    'How rounded the corners of buttons should be.',
+                    _buttonBorderRadius,
+                    0,
+                    40,
+                    (v) => setState(() => _buttonBorderRadius = v)),
               ],
             ),
           ),
@@ -279,15 +334,45 @@ class _ThemeEditorState extends State<ThemeEditor> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Layout Visibility & Toggles', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('Layout Visibility & Toggles',
+                    style: GoogleFonts.inter(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
                 const Divider(height: 32),
-                _buildSwitchTile('Show Courses Section', 'Toggle the main courses grid on the home page.', _showHomeCourses, (v) => setState(() => _showHomeCourses = v)),
-                _buildSwitchTile('Show Features Section', 'Toggle the features/highlights section on the home page.', _showHomeFeatures, (v) => setState(() => _showHomeFeatures = v)),
-                _buildSwitchTile('Show "Why Us" Section', 'Toggle the text explanation block on the home page.', _showHomeWhyUs, (v) => setState(() => _showHomeWhyUs = v)),
-                _buildSwitchTile('Show Call to Action', 'Toggle the large green action banner on the home page.', _showHomeCta, (v) => setState(() => _showHomeCta = v)),
-                _buildSwitchTile('Show Platform Stats', 'Toggle the numerical impact statistics on the home page.', _showHomeStats, (v) => setState(() => _showHomeStats = v)),
-                _buildSwitchTile('Show Team Section', 'Toggle the leadership/mentors grid on the About page.', _showAboutTeam, (v) => setState(() => _showAboutTeam = v)),
-                _buildSwitchTile('Show Icons in Cards', 'Display the emoji icons inside course and feature cards.', _showIconsInCards, (v) => setState(() => _showIconsInCards = v)),
+                _buildSwitchTile(
+                    'Show Courses Section',
+                    'Toggle the main courses grid on the home page.',
+                    _showHomeCourses,
+                    (v) => setState(() => _showHomeCourses = v)),
+                _buildSwitchTile(
+                    'Show Features Section',
+                    'Toggle the features/highlights section on the home page.',
+                    _showHomeFeatures,
+                    (v) => setState(() => _showHomeFeatures = v)),
+                _buildSwitchTile(
+                    'Show "Why Us" Section',
+                    'Toggle the text explanation block on the home page.',
+                    _showHomeWhyUs,
+                    (v) => setState(() => _showHomeWhyUs = v)),
+                _buildSwitchTile(
+                    'Show Call to Action',
+                    'Toggle the large green action banner on the home page.',
+                    _showHomeCta,
+                    (v) => setState(() => _showHomeCta = v)),
+                _buildSwitchTile(
+                    'Show Platform Stats',
+                    'Toggle the numerical impact statistics on the home page.',
+                    _showHomeStats,
+                    (v) => setState(() => _showHomeStats = v)),
+                _buildSwitchTile(
+                    'Show Team Section',
+                    'Toggle the leadership/mentors grid on the About page.',
+                    _showAboutTeam,
+                    (v) => setState(() => _showAboutTeam = v)),
+                _buildSwitchTile(
+                    'Show Icons in Cards',
+                    'Display the emoji icons inside course and feature cards.',
+                    _showIconsInCards,
+                    (v) => setState(() => _showIconsInCards = v)),
               ],
             ),
           ),

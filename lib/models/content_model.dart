@@ -43,6 +43,11 @@ class Course {
   /// Rendered as a checklist in courses_screen.dart _expandedCourseCard().
   final List<String> topics;
 
+  /// Optional external URL for the course registration form.
+  /// When set, the 'Register Now' button in courses_screen.dart opens this link.
+  /// When null or empty, the button falls back to the contact page.
+  final String? registrationLink;
+
   /// Constructor requiring all fields to create a complete Course instance.
   Course({
     required this.title,
@@ -51,6 +56,7 @@ class Course {
     required this.duration,
     required this.fee,
     required this.topics,
+    this.registrationLink, // Optional; null means fallback to contact page
   });
 
   /// Converts the Course instance into a JSON-compatible map.
@@ -63,6 +69,7 @@ class Course {
         'duration': duration, // Maps to Firestore field 'duration'
         'fee': fee, // Maps to Firestore field 'fee'
         'topics': topics, // Maps to Firestore field 'topics' (stored as array)
+        'registrationLink': registrationLink, // Optional external registration URL
       };
 
   /// Factory constructor to create a Course instance from a Firestore JSON map.
@@ -75,6 +82,7 @@ class Course {
         duration: json['duration'], // Reads the 'duration' field
         fee: json['fee'], // Reads the 'fee' field
         topics: List<String>.from(json['topics']), // Converts Firestore array to Dart List<String>
+        registrationLink: json['registrationLink'], // Optional; null if not set in Firestore
       );
 }
 

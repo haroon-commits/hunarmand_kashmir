@@ -106,19 +106,30 @@ class ResponsiveCardGrid extends StatelessWidget {
           );
         }
 
-        final availableWidth = constraints.maxWidth;
-        final itemWidth = (availableWidth - (spacing * (cols - 1))) / cols;
-
-        return Wrap(
-          spacing: spacing,
-          runSpacing: spacing,
-          children: children.map((child) {
-            return SizedBox(
-              width: itemWidth,
-              child: child,
-            );
-          }).toList(),
-        );
+        final rows = <Widget>[];
+        for (int i = 0; i < children.length; i += cols) {
+          final rowChildren = <Widget>[];
+          for (int j = 0; j < cols; j++) {
+            if (i + j < children.length) {
+              rowChildren.add(Expanded(child: children[i + j]));
+            } else {
+              rowChildren.add(Expanded(child: const SizedBox()));
+            }
+            if (j < cols - 1) {
+              rowChildren.add(SizedBox(width: spacing));
+            }
+          }
+          rows.add(IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: rowChildren,
+            ),
+          ));
+          if (i + cols < children.length) {
+            rows.add(SizedBox(height: spacing));
+          }
+        }
+        return Column(children: rows);
       },
     );
   }

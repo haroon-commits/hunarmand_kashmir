@@ -476,24 +476,25 @@ class DynamicContentProvider extends ChangeNotifier {
       // .set() overwrites the entire document with the new state.
       await _firestore.doc(_documentPath).set(_content.toJson());
       // Immediately notify listeners for optimistic UI update
-      // (the Firestore listener will also fire, but this ensures instant feedback)
       notifyListeners();
     } catch (e) {
-      // Log the error without crashing the app; the UI stays on the last known good state
-      debugPrint('Error saving content to Firestore: $e');
+      // ❌ If you see "PERMISSION_DENIED" below, your Firestore Security Rules
+      // are blocking writes. Fix them in Firebase Console → Firestore → Rules.
+      debugPrint('❌ Firestore write failed: $e');
+      rethrow; // Surface the error to admin editor callers
     }
   }
 
   /// Updates the Home section content.
   /// CALLED BY: screens/admin/editors/home_editor.dart
-  void updateHome(
+  Future<void> updateHome(
     String headline,
     String subheadline, {
     String? whyTitle,
     String? whyDescription,
     String? ctaTitle,
     String? ctaDescription,
-  }) {
+  }) async {
     _content = _content.copyWith(
       heroHeadline: headline,
       heroSubheadline: subheadline,
@@ -502,55 +503,55 @@ class DynamicContentProvider extends ChangeNotifier {
       homeCtaTitle: ctaTitle,
       homeCtaDescription: ctaDescription,
     );
-    saveContent();
+    await saveContent();
   }
 
   /// Updates the platform statistics.
-  void updateStats(List<Stat> stats) {
+  Future<void> updateStats(List<Stat> stats) async {
     _content = _content.copyWith(stats: stats);
-    saveContent();
+    await saveContent();
   }
 
   /// Updates the primary logo image path.
   /// CALLED BY: screens/admin/editors/global_editor.dart → 'Save' button
   /// AFFECTS: hunarmand_app_bar.dart, hunarmand_drawer.dart, app_footer.dart (logo display)
-  void updateLogo(String? path) {
+  Future<void> updateLogo(String? path) async {
     // Create a new AppContent with updated logo fields
     _content = _content.copyWith(
       logoPath: path, // New logo image URL (can be null for text-only branding)
     );
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Updates the global footer narrative description.
   /// CALLED BY: screens/admin/editors/global_editor.dart → 'Save' button
   /// AFFECTS: widgets/layout/app_footer.dart → _buildLogoColumn footer description text
-  void updateFooter(String description) {
+  Future<void> updateFooter(String description) async {
     _content = _content.copyWith(
       footerDescription: description, // New footer description text
     );
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Updates centralized contact information (Address, Phone, Email).
   /// CALLED BY: screens/admin/editors/contact_editor.dart → 'Save' button
   /// AFFECTS: screens/contact_screen.dart → ContactInfoTile widgets
   /// AFFECTS: widgets/layout/app_footer.dart → _buildContactColumn
-  void updateContact(String address, String phone, String email) {
+  Future<void> updateContact(String address, String phone, String email) async {
     _content = _content.copyWith(
       contactAddress: address, // New physical address
       contactPhone: phone, // New phone number
       contactEmail: email, // New email address
     );
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Updates the entire About Us narrative structure.
   /// CALLED BY: screens/admin/editors/about_editor.dart → 'Save' button
   /// AFFECTS: screens/about_screen.dart → story section, mission/vision cards, values card
-  void updateAbout(String headline, String story, String mission, String vision,
+  Future<void> updateAbout(String headline, String story, String mission, String vision,
       String values,
-      {String? missionIcon, String? visionIcon, String? valuesIcon}) {
+      {String? missionIcon, String? visionIcon, String? valuesIcon}) async {
     _content = _content.copyWith(
       aboutStoryHeadline: headline, // New story section headline
       aboutStoryText: story, // New story narrative body
@@ -561,150 +562,150 @@ class DynamicContentProvider extends ChangeNotifier {
       aboutValuesText: values, // New values narrative
       aboutValuesIcon: valuesIcon,
     );
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Updates the Donation screen hero banners.
   /// CALLED BY: screens/admin/editors/donate_editor.dart → 'Save Hero' button
   /// AFFECTS: screens/donate_screen.dart → _buildHero section title and description
-  void updateDonateHero(String title, String description) {
+  Future<void> updateDonateHero(String title, String description) async {
     _content = _content.copyWith(
       donateHeroTitle: title, // New donate page headline
       donateHeroDescription: description, // New donate page description
     );
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Updates the Contact screen hero banners.
   /// CALLED BY: screens/admin/editors/contact_editor.dart → 'Save Hero' button
   /// AFFECTS: screens/contact_screen.dart → SliverGreenPageHeader title and subtitle
-  void updateContactHero(String title, String description) {
+  Future<void> updateContactHero(String title, String description) async {
     _content = _content.copyWith(
       contactHeroTitle: title, // New contact page headline
       contactHeroDescription: description, // New contact page description
     );
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Updates the 'Why Us' sales arguments on the home screen.
   /// CALLED BY: screens/admin/editors/home_editor.dart → 'Save Why Section' button
   /// AFFECTS: screens/home_screen.dart → _WhySectionSliver headline and description
-  void updateHomeWhy(String title, String description) {
+  Future<void> updateHomeWhy(String title, String description) async {
     _content = _content.copyWith(
       homeWhyTitle: title, // New 'Why Us' heading
       homeWhyDescription: description, // New 'Why Us' body text
     );
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Updates the Home screen Call-To-Action section content.
   /// CALLED BY: screens/admin/editors/home_editor.dart → 'Save CTA Section' button
   /// AFFECTS: screens/home_screen.dart → _CtaSection title and description
-  void updateHomeCta(String title, String description) {
+  Future<void> updateHomeCta(String title, String description) async {
     _content = _content.copyWith(
       homeCtaTitle: title, // New CTA heading
       homeCtaDescription: description, // New CTA body text
     );
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Updates the Gallery screen header text.
   /// CALLED BY: screens/admin/editors/gallery_editor.dart → 'Save Hero' button
   /// AFFECTS: screens/gallery_screen.dart → SliverGreenPageHeader title and subtitle
-  void updateGalleryHero(String title, String description) {
+  Future<void> updateGalleryHero(String title, String description) async {
     _content = _content.copyWith(
       galleryHeroTitle: title, // New gallery page headline
       galleryHeroDescription: description, // New gallery page description
     );
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Replaces the entire gallery image collection.
   /// CALLED BY: screens/admin/editors/gallery_editor.dart → 'Save Gallery' button
   /// AFFECTS: screens/gallery_screen.dart → gallery grid with GalleryCardWidget items
-  void updateGalleryImages(List<GalleryImage> images) {
+  Future<void> updateGalleryImages(List<GalleryImage> images) async {
     _content = _content.copyWith(
       galleryImages: images, // Complete replacement of gallery image list
     );
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Replaces the platform's key feature list.
   /// CALLED BY: screens/admin/editors/home_editor.dart → features management section
   /// AFFECTS: screens/home_screen.dart → _WhySectionSliver → FeatureCard widgets
-  void updateFeatures(List<Feature> features) {
+  Future<void> updateFeatures(List<Feature> features) async {
     _content = _content.copyWith(
       features: features, // Complete replacement of features list
     );
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Replaces the team member registry.
   /// CALLED BY: screens/admin/editors/about_editor.dart → team members management
   /// AFFECTS: screens/about_screen.dart → _buildTeamSection → TeamCard widgets
-  void updateTeamMembers(List<TeamMember> team) {
+  Future<void> updateTeamMembers(List<TeamMember> team) async {
     _content = _content.copyWith(
       teamMembers: team, // Complete replacement of team members list
     );
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Replaces the donation impact tiers.
   /// CALLED BY: screens/admin/editors/donate_editor.dart → tiers management section
   /// AFFECTS: screens/donate_screen.dart → _buildDonationTiers → DonationTierCard widgets
-  void updateDonationTiers(List<DonationTier> tiers) {
+  Future<void> updateDonationTiers(List<DonationTier> tiers) async {
     _content = _content.copyWith(
       donationTiers: tiers, // Complete replacement of donation tiers list
     );
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Adds a new course to the curriculum.
   /// CALLED BY: screens/admin/editors/courses_editor.dart → 'Add Course' button
   /// AFFECTS: screens/courses_screen.dart → new course card appears in the grid
   /// AFFECTS: screens/home_screen.dart → new course appears in top-3 preview
-  void addCourse(Course course) {
+  Future<void> addCourse(Course course) async {
     final updatedCourses = List<Course>.from(_content.courses)..add(course);
     _content = _content.copyWith(courses: updatedCourses);
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Updates an existing course at a specific index in the courses list.
   /// CALLED BY: screens/admin/editors/courses_editor.dart → 'Update' button on course tile
   /// AFFECTS: The corresponding course card in courses_screen.dart and home_screen.dart
-  void updateCourse(int index, Course course) {
+  Future<void> updateCourse(int index, Course course) async {
     final updatedCourses = List<Course>.from(_content.courses);
     updatedCourses[index] = course;
     _content = _content.copyWith(courses: updatedCourses);
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Permanently removes a course from the curriculum by its index.
   /// CALLED BY: screens/admin/editors/courses_editor.dart → 'Delete' button on course tile
   /// AFFECTS: The course card is removed from courses_screen.dart and home_screen.dart
-  void removeCourse(int index) {
+  Future<void> removeCourse(int index) async {
     final updatedCourses = List<Course>.from(_content.courses)..removeAt(index);
     _content = _content.copyWith(courses: updatedCourses);
-    saveContent(); // Persist and notify
+    await saveContent(); // Persist and notify
   }
 
   /// Updates the global theme configuration.
-  void updateTheme(ThemeConfig newTheme) {
+  Future<void> updateTheme(ThemeConfig newTheme) async {
     _content = _content.copyWith(themeConfig: newTheme);
-    saveContent();
+    await saveContent();
   }
 
   /// Updates structural layout toggles.
   /// CALLED BY: screens/admin/editors/theme_editor.dart
   /// AFFECTS: Visibility of major sections across the app.
-  void updateLayout(LayoutConfig newLayout) {
+  Future<void> updateLayout(LayoutConfig newLayout) async {
     _content = _content.copyWith(layoutConfig: newLayout);
-    saveContent();
+    await saveContent();
   }
 
   /// Generic update for entire content object
-  void updateContent(AppContent newContent) {
+  Future<void> updateContent(AppContent newContent) async {
     _content = newContent;
-    saveContent();
+    await saveContent();
   }
 }

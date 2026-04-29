@@ -10,9 +10,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../../providers/dynamic_content_provider.dart';
-import '../../../models/content_model.dart';
-import '../../../widgets/utils/dynamic_icon.dart';
+import '../../providers/dynamic_content_provider.dart';
+import '../../models/content_model.dart';
+import '../../widgets/utils/dynamic_icon.dart';
 
 // ─── COURSESEDITORUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to courses_editor.dart.
@@ -220,7 +220,20 @@ class CoursesEditor extends StatelessWidget {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => provider.removeCourse(index),
+                        onPressed: () async {
+                          try {
+                            await provider.removeCourse(index);
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('❌ Delete failed: $e'),
+                                  backgroundColor: Colors.red.shade700,
+                                ),
+                              );
+                            }
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -255,6 +268,8 @@ class CoursesEditor extends StatelessWidget {
     final feeController = TextEditingController(text: course?.fee);
     final durationController = TextEditingController(text: course?.duration);
     final iconController = TextEditingController(text: course?.icon ?? '🎓');
+    final linkController =
+        TextEditingController(text: course?.registrationLink ?? '');
 
     // List of controllers for individual topics
     final List<TextEditingController> topicControllers = (course?.topics ?? [])
@@ -294,6 +309,14 @@ class CoursesEditor extends StatelessWidget {
                   TextField(
                       controller: durationController,
                       decoration: const InputDecoration(labelText: 'Duration')),
+                  const SizedBox(height: 8),
+                  TextField(
+                      controller: linkController,
+                      decoration: const InputDecoration(
+                        labelText: 'Registration Link (URL)',
+                        hintText: 'https://forms.google.com/...',
+                        prefixIcon: Icon(Icons.link),
+                      )),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -349,25 +372,40 @@ class CoursesEditor extends StatelessWidget {
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Cancel')),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final newCourse = Course(
                   title: titleController.text,
                   description: descController.text,
                   fee: feeController.text,
                   duration: durationController.text,
                   icon: iconController.text,
+                  registrationLink: linkController.text.trim().isEmpty
+                      ? null
+                      : linkController.text.trim(),
                   topics: topicControllers
                       .map((c) => c.text)
                       .where((t) => t.isNotEmpty)
                       .toList(),
                 );
                 final provider = context.read<DynamicContentProvider>();
-                if (index == null) {
-                  provider.addCourse(newCourse);
-                } else {
-                  provider.updateCourse(index, newCourse);
+                try {
+                  if (index == null) {
+                    await provider.addCourse(newCourse);
+                  } else {
+                    await provider.updateCourse(index, newCourse);
+                  }
+                  if (context.mounted) Navigator.pop(context);
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('❌ Save failed: $e'),
+                        backgroundColor: Colors.red.shade700,
+                        duration: const Duration(seconds: 6),
+                      ),
+                    );
+                  }
                 }
-                Navigator.pop(context);
               },
               child: const Text('Save'),
             ),

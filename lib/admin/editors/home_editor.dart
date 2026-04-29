@@ -1,6 +1,6 @@
 /// ═══════════════════════════════════════════════════════════════════════
 /// FILE: home_editor.dart
-/// PURPOSE: Admin interface for configuring the homepage hero messaging 
+/// PURPOSE: Admin interface for configuring the homepage hero messaging
 ///          and the primary value propositions ('Features') of the platform.
 /// CONNECTIONS:
 ///   - USED BY: admin_dashboard_screen.dart
@@ -10,10 +10,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../../providers/dynamic_content_provider.dart';
-import '../../../models/content_model.dart';
-import '../../../widgets/utils/dynamic_icon.dart';
-
+import '../../providers/dynamic_content_provider.dart';
+import '../../models/content_model.dart';
+import '../../widgets/utils/dynamic_icon.dart';
 
 // ─── HOMEEDITORUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to home_editor.dart.
@@ -22,9 +21,7 @@ class HomeEditorUIConfig {
   static const Color darkGreen = Color(0xFF0D3320);
   static const Color textDark = Color(0xFF1A1A1A);
   static const Color textMedium = Color(0xFF555555);
-
 }
-
 
 class HomeEditor extends StatefulWidget {
   const HomeEditor({super.key});
@@ -170,7 +167,8 @@ class _HomeEditorState extends State<HomeEditor> {
               ));
 
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Home settings & content updated!')),
+                const SnackBar(
+                    content: Text('Home settings & content updated!')),
               );
             },
             style: ElevatedButton.styleFrom(
@@ -220,20 +218,26 @@ class _HomeEditorState extends State<HomeEditor> {
             return Card(
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
-                leading: renderDynamicIcon(feature.icon, size: 24, color: HomeEditorUIConfig.darkGreen),
-                title: Text(feature.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text(feature.description, maxLines: 1, overflow: TextOverflow.ellipsis),
+                leading: renderDynamicIcon(feature.icon,
+                    size: 24, color: HomeEditorUIConfig.darkGreen),
+                title: Text(feature.title,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(feature.description,
+                    maxLines: 1, overflow: TextOverflow.ellipsis),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit, size: 20),
-                      onPressed: () => _showFeatureDialog(context, feature: feature, index: index),
+                      onPressed: () => _showFeatureDialog(context,
+                          feature: feature, index: index),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete, size: 20, color: Colors.red),
+                      icon:
+                          const Icon(Icons.delete, size: 20, color: Colors.red),
                       onPressed: () {
-                        final updated = List<Feature>.from(features)..removeAt(index);
+                        final updated = List<Feature>.from(features)
+                          ..removeAt(index);
                         provider.updateFeatures(updated);
                       },
                     ),
@@ -281,18 +285,22 @@ class _HomeEditorState extends State<HomeEditor> {
             return Card(
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
-                leading: renderDynamicIcon(stat.icon, size: 24, color: HomeEditorUIConfig.darkGreen),
-                title: Text(stat.value, style: const TextStyle(fontWeight: FontWeight.bold)),
+                leading: renderDynamicIcon(stat.icon,
+                    size: 24, color: HomeEditorUIConfig.darkGreen),
+                title: Text(stat.value,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text(stat.label),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit, size: 20),
-                      onPressed: () => _showStatDialog(context, stat: stat, index: index),
+                      onPressed: () =>
+                          _showStatDialog(context, stat: stat, index: index),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete, size: 20, color: Colors.red),
+                      icon:
+                          const Icon(Icons.delete, size: 20, color: Colors.red),
                       onPressed: () {
                         final updated = List<Stat>.from(stats)..removeAt(index);
                         provider.updateStats(updated);
@@ -310,7 +318,8 @@ class _HomeEditorState extends State<HomeEditor> {
   void _showStatDialog(BuildContext context, {Stat? stat, int? index}) {
     final valueController = TextEditingController(text: stat?.value ?? '');
     final labelController = TextEditingController(text: stat?.label ?? '');
-    final iconController = TextEditingController(text: stat?.icon ?? 'material:trending_up');
+    final iconController =
+        TextEditingController(text: stat?.icon ?? 'material:trending_up');
 
     showDialog(
       context: context,
@@ -321,22 +330,27 @@ class _HomeEditorState extends State<HomeEditor> {
           children: [
             TextField(
               controller: iconController,
-              decoration: const InputDecoration(labelText: 'Icon (material:name)'),
+              decoration:
+                  const InputDecoration(labelText: 'Icon (material:name)'),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: valueController,
-              decoration: const InputDecoration(labelText: 'Value (e.g. 1,000+)'),
+              decoration:
+                  const InputDecoration(labelText: 'Value (e.g. 1,000+)'),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: labelController,
-              decoration: const InputDecoration(labelText: 'Label (e.g. Students)'),
+              decoration:
+                  const InputDecoration(labelText: 'Label (e.g. Students)'),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               final provider = context.read<DynamicContentProvider>();
@@ -361,10 +375,13 @@ class _HomeEditorState extends State<HomeEditor> {
     );
   }
 
-  void _showFeatureDialog(BuildContext context, {Feature? feature, int? index}) {
+  void _showFeatureDialog(BuildContext context,
+      {Feature? feature, int? index}) {
     final titleController = TextEditingController(text: feature?.title ?? '');
-    final descController = TextEditingController(text: feature?.description ?? '');
-    final iconController = TextEditingController(text: feature?.icon ?? 'material:rocket');
+    final descController =
+        TextEditingController(text: feature?.description ?? '');
+    final iconController =
+        TextEditingController(text: feature?.icon ?? 'material:rocket');
 
     showDialog(
       context: context,
@@ -376,7 +393,8 @@ class _HomeEditorState extends State<HomeEditor> {
             children: [
               TextField(
                 controller: iconController,
-                decoration: const InputDecoration(labelText: 'Icon (material:name or emoji)'),
+                decoration: const InputDecoration(
+                    labelText: 'Icon (material:name or emoji)'),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -393,7 +411,9 @@ class _HomeEditorState extends State<HomeEditor> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               final provider = context.read<DynamicContentProvider>();
@@ -444,7 +464,8 @@ class _HomeEditorState extends State<HomeEditor> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, {int maxLines = 1}) {
+  Widget _buildTextField(String label, TextEditingController controller,
+      {int maxLines = 1}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

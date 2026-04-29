@@ -1,6 +1,6 @@
 /// ═══════════════════════════════════════════════════════════════════════
 /// FILE: donate_editor.dart
-/// PURPOSE: Admin interface for managing donation tier configurations, 
+/// PURPOSE: Admin interface for managing donation tier configurations,
 ///          allowing modification of target amounts and engagement phrasing.
 /// CONNECTIONS:
 ///   - USED BY: admin_dashboard_screen.dart
@@ -10,9 +10,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../../providers/dynamic_content_provider.dart';
-import '../../../models/content_model.dart';
-
+import '../../providers/dynamic_content_provider.dart';
+import '../../models/content_model.dart';
 
 // ─── DONATEEDITORUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to donate_editor.dart.
@@ -22,9 +21,7 @@ class DonateEditorUIConfig {
   static const Color darkGreen = Color(0xFF0D3320);
   static const Color textDark = Color(0xFF1A1A1A);
   static const Color textMedium = Color(0xFF555555);
-
 }
-
 
 class DonateEditor extends StatefulWidget {
   const DonateEditor({super.key});
@@ -131,16 +128,20 @@ class _DonateEditorState extends State<DonateEditor> {
                     if (tier.popular)
                       const Padding(
                         padding: EdgeInsets.only(right: 8.0),
-                        child: Icon(Icons.star, color: DonateEditorUIConfig.accentGold, size: 20),
+                        child: Icon(Icons.star,
+                            color: DonateEditorUIConfig.accentGold, size: 20),
                       ),
                     IconButton(
                       icon: const Icon(Icons.edit, size: 20),
-                      onPressed: () => _showTierDialog(context, tier: tier, index: index),
+                      onPressed: () =>
+                          _showTierDialog(context, tier: tier, index: index),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete, size: 20, color: Colors.red),
+                      icon:
+                          const Icon(Icons.delete, size: 20, color: Colors.red),
                       onPressed: () {
-                        final updated = List<DonationTier>.from(tiers)..removeAt(index);
+                        final updated = List<DonationTier>.from(tiers)
+                          ..removeAt(index);
                         provider.updateDonationTiers(updated);
                       },
                     ),
@@ -171,7 +172,8 @@ class _DonateEditorState extends State<DonateEditor> {
               children: [
                 TextField(
                   controller: iconController,
-                  decoration: const InputDecoration(labelText: 'Icon (Emoji or URL)'),
+                  decoration:
+                      const InputDecoration(labelText: 'Icon (Emoji or URL)'),
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -181,7 +183,8 @@ class _DonateEditorState extends State<DonateEditor> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: amountController,
-                  decoration: const InputDecoration(labelText: 'Amount (e.g., \$50)'),
+                  decoration:
+                      const InputDecoration(labelText: 'Amount (e.g., \$50)'),
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -199,7 +202,9 @@ class _DonateEditorState extends State<DonateEditor> {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel')),
             ElevatedButton(
               onPressed: () {
                 final provider = context.read<DynamicContentProvider>();
@@ -210,7 +215,8 @@ class _DonateEditorState extends State<DonateEditor> {
                   description: descController.text,
                   popular: isPopular,
                 );
-                final updated = List<DonationTier>.from(provider.content.donationTiers);
+                final updated =
+                    List<DonationTier>.from(provider.content.donationTiers);
                 if (index == null) {
                   updated.add(newTier);
                 } else {

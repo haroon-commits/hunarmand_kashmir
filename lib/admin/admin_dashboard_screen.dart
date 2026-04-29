@@ -1,6 +1,6 @@
 /// ═══════════════════════════════════════════════════════════════════════
 /// FILE: admin_dashboard_screen.dart
-/// PURPOSE: Central control panel for authenticated staff to manage website 
+/// PURPOSE: Central control panel for authenticated staff to manage website
 ///          content. Maps to individual data editors for each platform section.
 /// CONNECTIONS:
 ///   - USED BY: main.dart (when admin authenticated)
@@ -11,7 +11,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../providers/admin_provider.dart';
+import '../providers/admin_provider.dart';
+import '../providers/app_state.dart';
 import 'editors/home_editor.dart';
 import 'editors/courses_editor.dart';
 import 'editors/global_editor.dart';
@@ -27,9 +28,7 @@ class AdminDashboardUIConfig {
   // Brand Colors used locally
   static const Color accentGold = Color(0xFFF5A623);
   static const Color darkGreen = Color(0xFF0D3320);
-
 }
-
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -82,6 +81,31 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 _buildNavItem(6, Icons.contact_mail, 'Contact Screen'),
                 _buildNavItem(7, Icons.color_lens, 'Theme Editor'),
                 const Spacer(),
+                // ── View Website button ────────────────────────────────
+                Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AdminDashboardUIConfig.accentGold.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AdminDashboardUIConfig.accentGold.withOpacity(0.4),
+                    ),
+                  ),
+                  child: ListTile(
+                    leading: const Icon(Icons.open_in_new,
+                        color: AdminDashboardUIConfig.accentGold),
+                    title: Text(
+                      'View Website',
+                      style: GoogleFonts.inter(
+                        color: AdminDashboardUIConfig.accentGold,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    onTap: () => context.read<AppState>().navigate('home'),
+                  ),
+                ),
+                // ── Logout button ──────────────────────────────────────
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.white70),
                   title: Text(
@@ -110,11 +134,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget _buildNavItem(int index, IconData icon, String label) {
     final isSelected = _selectedIndex == index;
     return ListTile(
-      leading: Icon(icon, color: isSelected ? AdminDashboardUIConfig.accentGold : Colors.white70),
+      leading: Icon(icon,
+          color:
+              isSelected ? AdminDashboardUIConfig.accentGold : Colors.white70),
       title: Text(
         label,
         style: GoogleFonts.inter(
-          color: isSelected ? AdminDashboardUIConfig.accentGold : Colors.white70,
+          color:
+              isSelected ? AdminDashboardUIConfig.accentGold : Colors.white70,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         ),
       ),

@@ -1,6 +1,6 @@
 /// ═══════════════════════════════════════════════════════════════════════
 /// FILE: contact_editor.dart
-/// PURPOSE: Admin interface for modifying official contact credentials and 
+/// PURPOSE: Admin interface for modifying official contact credentials and
 ///          physical address mappings displayed to the public.
 /// CONNECTIONS:
 ///   - USED BY: admin_dashboard_screen.dart
@@ -10,8 +10,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../../providers/dynamic_content_provider.dart';
-
+import '../../providers/dynamic_content_provider.dart';
 
 // ─── CONTACTEDITORUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to contact_editor.dart.
@@ -20,9 +19,7 @@ class ContactEditorUIConfig {
   static const Color darkGreen = Color(0xFF0D3320);
   static const Color textDark = Color(0xFF1A1A1A);
   static const Color textMedium = Color(0xFF555555);
-
 }
-
 
 class ContactEditor extends StatefulWidget {
   const ContactEditor({super.key});
@@ -67,7 +64,8 @@ class _ContactEditorState extends State<ContactEditor> {
           _buildSection('Hero Section', [
             _buildTextField('Hero Title', _heroTitleController),
             const SizedBox(height: 16),
-            _buildTextField('Hero Description', _heroDescController, maxLines: 4),
+            _buildTextField('Hero Description', _heroDescController,
+                maxLines: 4),
           ]),
           const SizedBox(height: 24),
           _buildSection('Campus Details', [

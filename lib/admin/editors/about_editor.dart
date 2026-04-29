@@ -1,6 +1,6 @@
 /// ═══════════════════════════════════════════════════════════════════════
 /// FILE: about_editor.dart
-/// PURPOSE: Admin interface for editing the platform's narrative, mission, 
+/// PURPOSE: Admin interface for editing the platform's narrative, mission,
 ///          and managing the roster of team members and mentors.
 /// CONNECTIONS:
 ///   - USED BY: admin_dashboard_screen.dart
@@ -10,10 +10,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../../providers/dynamic_content_provider.dart';
-import '../../../models/content_model.dart';
-import '../../../widgets/utils/dynamic_icon.dart';
-
+import '../../providers/dynamic_content_provider.dart';
+import '../../models/content_model.dart';
+import '../../widgets/utils/dynamic_icon.dart';
 
 // ─── ABOUTEDITORUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to about_editor.dart.
@@ -23,9 +22,7 @@ class AboutEditorUIConfig {
   static const Color lightTeal = Color(0xFFE8F5F3);
   static const Color textDark = Color(0xFF1A1A1A);
   static const Color textMedium = Color(0xFF555555);
-
 }
-
 
 class AboutEditor extends StatefulWidget {
   const AboutEditor({super.key});
@@ -86,7 +83,8 @@ class _AboutEditorState extends State<AboutEditor> {
           _buildSection('Screen Layout & Settings', [
             SwitchListTile(
               title: const Text('Show Team Section'),
-              subtitle: const Text('Display the leadership grid at the bottom of the page.'),
+              subtitle: const Text(
+                  'Display the leadership grid at the bottom of the page.'),
               value: _showTeam,
               onChanged: (v) => setState(() => _showTeam = v),
               activeColor: const Color(0xFFF5A623),
@@ -96,17 +94,20 @@ class _AboutEditorState extends State<AboutEditor> {
           _buildSection('Mission & Vision', [
             _buildTextField('Mission Text', _missionController, maxLines: 4),
             const SizedBox(height: 12),
-            _buildTextField('Mission Icon (material:name)', _missionIconController),
+            _buildTextField(
+                'Mission Icon (material:name)', _missionIconController),
             const SizedBox(height: 24),
             _buildTextField('Vision Text', _visionController, maxLines: 4),
             const SizedBox(height: 12),
-            _buildTextField('Vision Icon (material:name)', _visionIconController),
+            _buildTextField(
+                'Vision Icon (material:name)', _visionIconController),
           ]),
           const SizedBox(height: 24),
           _buildSection('Values', [
             _buildTextField('Values Text', _valuesController, maxLines: 4),
             const SizedBox(height: 12),
-            _buildTextField('Values Icon (material:name)', _valuesIconController),
+            _buildTextField(
+                'Values Icon (material:name)', _valuesIconController),
           ]),
           const SizedBox(height: 24),
           _buildSection('Our Team', [
@@ -115,30 +116,32 @@ class _AboutEditorState extends State<AboutEditor> {
           const SizedBox(height: 40),
           ElevatedButton(
             onPressed: () {
-                context.read<DynamicContentProvider>().updateAbout(
-                      _headlineController.text,
-                      _storyController.text,
-                      _missionController.text,
-                      _visionController.text,
-                      _valuesController.text,
-                      missionIcon: _missionIconController.text,
-                      visionIcon: _visionIconController.text,
-                      valuesIcon: _valuesIconController.text,
-                    );
+              context.read<DynamicContentProvider>().updateAbout(
+                    _headlineController.text,
+                    _storyController.text,
+                    _missionController.text,
+                    _visionController.text,
+                    _valuesController.text,
+                    missionIcon: _missionIconController.text,
+                    visionIcon: _visionIconController.text,
+                    valuesIcon: _valuesIconController.text,
+                  );
 
-              final newLayout = context.read<DynamicContentProvider>().content.layoutConfig;
+              final newLayout =
+                  context.read<DynamicContentProvider>().content.layoutConfig;
               context.read<DynamicContentProvider>().updateLayout(LayoutConfig(
-                showHomeCourses: newLayout.showHomeCourses,
-                showHomeFeatures: newLayout.showHomeFeatures,
-                showHomeWhyUs: newLayout.showHomeWhyUs,
-                showHomeCta: newLayout.showHomeCta,
-                showHomeStats: newLayout.showHomeStats,
-                showAboutTeam: _showTeam,
-                showIconsInCards: newLayout.showIconsInCards,
-              ));
+                    showHomeCourses: newLayout.showHomeCourses,
+                    showHomeFeatures: newLayout.showHomeFeatures,
+                    showHomeWhyUs: newLayout.showHomeWhyUs,
+                    showHomeCta: newLayout.showHomeCta,
+                    showHomeStats: newLayout.showHomeStats,
+                    showAboutTeam: _showTeam,
+                    showIconsInCards: newLayout.showIconsInCards,
+                  ));
 
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('About settings & content updated!')),
+                const SnackBar(
+                    content: Text('About settings & content updated!')),
               );
             },
             style: ElevatedButton.styleFrom(
@@ -188,20 +191,25 @@ class _AboutEditorState extends State<AboutEditor> {
             return Card(
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
-                leading: renderDynamicIcon(member.imageUrl, size: 24, circle: true),
-                title: Text(member.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                leading:
+                    renderDynamicIcon(member.imageUrl, size: 24, circle: true),
+                title: Text(member.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text(member.role),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit, size: 20),
-                      onPressed: () => _showTeamDialog(context, member: member, index: index),
+                      onPressed: () => _showTeamDialog(context,
+                          member: member, index: index),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete, size: 20, color: Colors.red),
+                      icon:
+                          const Icon(Icons.delete, size: 20, color: Colors.red),
                       onPressed: () {
-                        final updated = List<TeamMember>.from(team)..removeAt(index);
+                        final updated = List<TeamMember>.from(team)
+                          ..removeAt(index);
                         provider.updateTeamMembers(updated);
                       },
                     ),
@@ -217,7 +225,8 @@ class _AboutEditorState extends State<AboutEditor> {
   void _showTeamDialog(BuildContext context, {TeamMember? member, int? index}) {
     final nameController = TextEditingController(text: member?.name ?? '');
     final roleController = TextEditingController(text: member?.role ?? '');
-    final imageController = TextEditingController(text: member?.imageUrl ?? '👤');
+    final imageController =
+        TextEditingController(text: member?.imageUrl ?? '👤');
 
     showDialog(
       context: context,
@@ -229,7 +238,8 @@ class _AboutEditorState extends State<AboutEditor> {
             children: [
               TextField(
                 controller: imageController,
-                decoration: const InputDecoration(labelText: 'Image URL or Emoji'),
+                decoration:
+                    const InputDecoration(labelText: 'Image URL or Emoji'),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -245,7 +255,9 @@ class _AboutEditorState extends State<AboutEditor> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               final provider = context.read<DynamicContentProvider>();
@@ -254,7 +266,8 @@ class _AboutEditorState extends State<AboutEditor> {
                 name: nameController.text,
                 role: roleController.text,
               );
-              final updated = List<TeamMember>.from(provider.content.teamMembers);
+              final updated =
+                  List<TeamMember>.from(provider.content.teamMembers);
               if (index == null) {
                 updated.add(newMember);
               } else {

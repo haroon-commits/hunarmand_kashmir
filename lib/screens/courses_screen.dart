@@ -21,6 +21,7 @@ import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../providers/dynamic_content_provider.dart';
 import '../widgets/utils/dynamic_icon.dart';
+import '../widgets/common/responsive_grid.dart';
 
 
 // ─── COURSESUICONFIG ──────────────────────────────
@@ -79,6 +80,25 @@ class CoursesScreen extends StatelessWidget {
       // User feedback in case the URL cannot be resolved
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Unable to open WhatsApp')),
+      );
+    }
+  }
+
+  /// Launches the course-specific registration link in an external browser.
+  /// If the link is null/empty, falls back to the internal contact page.
+  Future<void> _launchRegistrationLink(
+      BuildContext context, String? link) async {
+    if (link == null || link.trim().isEmpty) {
+      // No link set — navigate to the contact / registration page instead
+      context.read<AppState>().navigate('contact');
+      return;
+    }
+    final url = Uri.tryParse(link.trim());
+    if (url != null && await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to open registration link')),
       );
     }
   }
@@ -161,7 +181,9 @@ class CoursesScreen extends StatelessWidget {
                 FadeInUp(
                   delay: const Duration(milliseconds: 200),
                   child: isDesktop
-                    ? Row(
+                    ? IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Expanded(
                             child: _locationCard(
@@ -193,8 +215,9 @@ class CoursesScreen extends StatelessWidget {
                             ),
                           ),
                         ],
-                      )
-                    : Column(
+                      ),
+                    )
+                  : Column(
                         children: [
                           _locationCard(
                             provider.content.courseLocation1Icon,
@@ -359,17 +382,19 @@ class CoursesScreen extends StatelessWidget {
       pairs.add(
         Padding(
           padding: const EdgeInsets.only(bottom: CoursesUIConfig.spacerMedium),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(child: _expandedCourseCard(context, left, i)),
-              const SizedBox(width: CoursesUIConfig.spacerMedium),
-              Expanded(
-                child: right != null
-                    ? _expandedCourseCard(context, right, i + 1)
-                    : const SizedBox(),
-              ),
-            ],
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: _expandedCourseCard(context, left, i)),
+                const SizedBox(width: CoursesUIConfig.spacerMedium),
+                Expanded(
+                  child: right != null
+                      ? _expandedCourseCard(context, right, i + 1)
+                      : const SizedBox(),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -561,7 +586,8 @@ class CoursesScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _primaryButton(context, 'Register Now',
-                            () => context.read<AppState>().navigate('contact')),
+                            () => _launchRegistrationLink(
+                                context, course.registrationLink as String?)),
                       ),
                       const SizedBox(width: CoursesUIConfig.spacerMedium - 4),
                       Expanded(
@@ -642,53 +668,47 @@ class CoursesScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: CoursesUIConfig.spacerLarge),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final cols = constraints.maxWidth < 480 ? 2 : 4;
-                    final spacing = CoursesUIConfig.gridSpacing - 4;
-                    final itemWidth = (constraints.maxWidth - (spacing * (cols - 1))) / cols;
-                    return Wrap(
-                      spacing: spacing,
-                      runSpacing: spacing,
-                      alignment: WrapAlignment.center,
-                      children: discounts.map((d) {
-                        return Container(
-                          width: itemWidth,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: CoursesUIConfig.radiusMedium, 
-                              horizontal: CoursesUIConfig.spacerSmall + 2,
+                ResponsiveCardGrid(
+                  mobileCols: 2,
+                  tabletCols: 4,
+                  desktopCols: 4,
+                  spacing: CoursesUIConfig.gridSpacing - 4,
+                  children: discounts.map((d) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: CoursesUIConfig.radiusMedium, 
+                          horizontal: CoursesUIConfig.spacerSmall + 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: d['color'] as Color,
+                        borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall + 2),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            d['students'] as String,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              color: CoursesUIConfig.textMedium,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                          decoration: BoxDecoration(
-                            color: d['color'] as Color,
-                            borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall + 2),
+                          const SizedBox(height: CoursesUIConfig.spacerSmall),
+                          Text(
+                            d['off'] as String,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: CoursesUIConfig.fontBodyLarge,
+                              color: CoursesUIConfig.darkGreen,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
-                          child: Column(
-                            children: [
-                              Text(
-                                d['students'] as String,
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.inter(
-                                  fontSize: 10,
-                                  color: CoursesUIConfig.textMedium,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: CoursesUIConfig.spacerSmall),
-                              Text(
-                                d['off'] as String,
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.inter(
-                                  fontSize: CoursesUIConfig.fontBodyLarge,
-                                  color: CoursesUIConfig.darkGreen,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
+                        ],
+                      ),
                     );
-                  },
+                  }).toList(),
                 ),
                 const SizedBox(height: CoursesUIConfig.spacerLarge - 4),
                 Container(

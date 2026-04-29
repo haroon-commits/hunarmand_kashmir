@@ -26,8 +26,8 @@ import 'screens/courses_screen.dart'; // Importing the courses screen class
 import 'screens/gallery_screen.dart'; // Importing the gallery screen class
 import 'screens/contact_screen.dart'; // Importing the contact screen class
 import 'screens/donate_screen.dart'; // Importing the donate screen class
-import 'screens/admin/admin_login_screen.dart'; // Importing admin login screen
-import 'screens/admin/admin_dashboard_screen.dart'; // Importing admin dashboard
+import 'admin/admin_login_screen.dart'; // Importing admin login screen
+import 'admin/admin_dashboard_screen.dart'; // Importing admin dashboard
 import 'providers/dynamic_content_provider.dart'; // Importing dynamic content provider
 import 'providers/admin_provider.dart'; // Importing admin provider
 import 'package:firebase_core/firebase_core.dart'; // Importing Firebase Core

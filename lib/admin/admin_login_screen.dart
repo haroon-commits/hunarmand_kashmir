@@ -10,8 +10,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../providers/admin_provider.dart';
-
+import '../providers/admin_provider.dart';
 
 // ─── ADMINLOGINUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to admin_login_screen.dart.
@@ -21,9 +20,7 @@ class AdminLoginUIConfig {
   static const Color textDark = Color(0xFF1A1A1A);
   static const Color textLight = Color(0xFF888888);
   static const Color white = Color(0xFFFFFFFF);
-
 }
-
 
 class AdminLoginScreen extends StatelessWidget {
   const AdminLoginScreen({super.key});
