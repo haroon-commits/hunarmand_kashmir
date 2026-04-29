@@ -9,31 +9,46 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../utils/dynamic_icon.dart';
+import '../../providers/dynamic_content_provider.dart';
+import '../../models/content_model.dart';
 
 
 // ─── DONATIONTIERCARDUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to donation_tier_card.dart.
 class DonationTierCardUIConfig {
-  // Brand Colors used locally
-  static const Color accentGold = Color(0xFFF5A623);
-  static const Color darkGreen = Color(0xFF0D3320);
+  // Brand Colors mapped to dynamic settings
+  static Color accentGold(BuildContext context) => _hexToColor(_t(context).accentColorHex);
+  static Color darkGreen(BuildContext context) => _hexToColor(_t(context).primaryColorHex);
   static const Color lightTeal = Color(0xFFE8F5F3);
-  static const Color textDark = Color(0xFF1A1A1A);
-  static const Color textMedium = Color(0xFF555555);
-  static const Color white = Color(0xFFFFFFFF);
+  static Color textDark(BuildContext context) => _hexToColor(_t(context).textDarkHex);
+  static Color textMedium = const Color(0xFF555555);
+  static Color white(BuildContext context) => _hexToColor(_t(context).cardBackgroundColorHex);
+
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  static Color _hexToColor(String hex) {
+    final buffer = StringBuffer();
+    if (hex.length == 6 || hex.length == 7) buffer.write('ff');
+    buffer.write(hex.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
 
   // Dimensions, Spacing & Typography
-  static const double fontBodyLarge = 26.0;
-  static const double fontBodyMedium = 14.0;
-  static const double fontHeadlineMedium = 32.0;
-  static const double fontLabelSmall = 12.0;
+  static double fontBodyLarge(BuildContext context) => _t(context).fontBodyLarge;
+  static double fontBodyMedium(BuildContext context) => _t(context).fontBodyMedium;
+  static double fontHeadlineMedium(BuildContext context) => _t(context).fontHeadlineMedium;
+  static double fontLabelSmall(BuildContext context) => _t(context).fontLabelSmall;
   static const double iconSizeLarge = 38.0;
-  static const double radiusLarge = 30.0;
-  static const double radiusMedium = 20.0;
-  static const double radiusSmall = 12.0;
+  static double radiusLarge(BuildContext context) => _t(context).buttonBorderRadius;
+  static double radiusMedium(BuildContext context) => _t(context).cardBorderRadius;
+  static double radiusSmall(BuildContext context) => _t(context).cardBorderRadius - 8;
   static const double spacerMedium = 16.0;
   static const double spacerSmall = 8.0;
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _t(context).fontFamilyBody;
 }
 
 
@@ -79,22 +94,22 @@ class _DonationTierCardState extends State<DonationTierCard> {
               curve: Curves.easeOutCubic,
               transform: Matrix4.identity()
                 ..translate(0.0, _isHovered ? -6.0 : 0.0),
-              padding: const EdgeInsets.all(DonationTierCardUIConfig.radiusMedium),
+              padding: EdgeInsets.all(DonationTierCardUIConfig.radiusMedium(context)),
               decoration: BoxDecoration(
-                color: DonationTierCardUIConfig.white,
-                borderRadius: BorderRadius.circular(DonationTierCardUIConfig.radiusSmall + 4),
+                color: DonationTierCardUIConfig.white(context),
+                borderRadius: BorderRadius.circular(DonationTierCardUIConfig.radiusSmall(context) + 4),
                 border: Border.all(
                   color: widget.isPopular
-                      ? DonationTierCardUIConfig.accentGold
+                      ? DonationTierCardUIConfig.accentGold(context)
                       : (_isHovered
-                          ? DonationTierCardUIConfig.darkGreen.withOpacity(0.5)
+                          ? DonationTierCardUIConfig.darkGreen(context).withOpacity(0.5)
                           : Colors.grey.shade200),
                   width: widget.isPopular ? 2 : 1,
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: _isHovered
-                        ? DonationTierCardUIConfig.darkGreen.withOpacity(0.12)
+                        ? DonationTierCardUIConfig.darkGreen(context).withOpacity(0.12)
                         : Colors.black.withOpacity(0.05),
                     blurRadius: _isHovered ? 20 : 10,
                     offset: Offset(0, _isHovered ? 8 : 4),
@@ -109,13 +124,13 @@ class _DonationTierCardState extends State<DonationTierCard> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: _isHovered ? DonationTierCardUIConfig.darkGreen : DonationTierCardUIConfig.lightTeal,
+                        color: _isHovered ? DonationTierCardUIConfig.darkGreen(context) : DonationTierCardUIConfig.lightTeal,
                         shape: BoxShape.circle,
                       ),
                       child: renderDynamicIcon(
                         widget.icon,
                         size: DonationTierCardUIConfig.iconSizeLarge,
-                        color: _isHovered ? DonationTierCardUIConfig.white : DonationTierCardUIConfig.darkGreen,
+                        color: _isHovered ? DonationTierCardUIConfig.white(context) : DonationTierCardUIConfig.darkGreen(context),
                         circle: true,
                       ),
                     ),
@@ -123,27 +138,30 @@ class _DonationTierCardState extends State<DonationTierCard> {
                   const SizedBox(height: DonationTierCardUIConfig.spacerSmall + 4),
                   Text(
                     widget.title,
-                    style: GoogleFonts.inter(
-                      fontSize: DonationTierCardUIConfig.fontBodyLarge,
+                    style: GoogleFonts.getFont(
+                      DonationTierCardUIConfig.fontFamily(context),
+                      fontSize: DonationTierCardUIConfig.fontBodyLarge(context),
                       fontWeight: FontWeight.w700,
-                      color: DonationTierCardUIConfig.textDark,
+                      color: DonationTierCardUIConfig.textDark(context),
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     widget.amount,
-                    style: GoogleFonts.inter(
-                      fontSize: DonationTierCardUIConfig.fontHeadlineMedium,
+                    style: GoogleFonts.getFont(
+                      DonationTierCardUIConfig.fontFamily(context),
+                      fontSize: DonationTierCardUIConfig.fontHeadlineMedium(context),
                       fontWeight: FontWeight.w800,
-                      color: DonationTierCardUIConfig.accentGold,
+                      color: DonationTierCardUIConfig.accentGold(context),
                     ),
                   ),
                   const SizedBox(height: DonationTierCardUIConfig.spacerSmall + 2),
                   Text(
                     widget.description,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      fontSize: DonationTierCardUIConfig.fontLabelSmall - 1,
+                    style: GoogleFonts.getFont(
+                      DonationTierCardUIConfig.fontFamily(context),
+                      fontSize: DonationTierCardUIConfig.fontLabelSmall(context) - 1,
                       color: DonationTierCardUIConfig.textMedium,
                       height: 1.5,
                     ),
@@ -155,22 +173,23 @@ class _DonationTierCardState extends State<DonationTierCard> {
                       onPressed: widget.onTap,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: widget.isPopular 
-                            ? DonationTierCardUIConfig.accentGold 
-                            : DonationTierCardUIConfig.darkGreen,
+                            ? DonationTierCardUIConfig.accentGold(context) 
+                            : DonationTierCardUIConfig.darkGreen(context),
                         foregroundColor: widget.isPopular 
-                            ? DonationTierCardUIConfig.darkGreen 
-                            : DonationTierCardUIConfig.white,
+                            ? DonationTierCardUIConfig.darkGreen(context) 
+                            : DonationTierCardUIConfig.white(context),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
-                              DonationTierCardUIConfig.radiusLarge - 5),
+                              DonationTierCardUIConfig.radiusLarge(context) - 5),
                         ),
                       ),
                       child: Text(
                         'Donate Now',
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.getFont(
+                          DonationTierCardUIConfig.fontFamily(context),
                           fontWeight: FontWeight.w700, 
-                          fontSize: DonationTierCardUIConfig.fontBodyMedium,
+                          fontSize: DonationTierCardUIConfig.fontBodyMedium(context),
                         ),
                       ),
                     ),
@@ -187,13 +206,14 @@ class _DonationTierCardState extends State<DonationTierCard> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: DonationTierCardUIConfig.accentGold,
+                color: DonationTierCardUIConfig.accentGold(context),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
                 'MOST POPULAR',
-                style: GoogleFonts.inter(
-                  color: DonationTierCardUIConfig.darkGreen,
+                style: GoogleFonts.getFont(
+                  DonationTierCardUIConfig.fontFamily(context),
+                  color: DonationTierCardUIConfig.darkGreen(context),
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
                 ),

@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 import '../widgets/layout/page_header.dart';
 import '../widgets/layout/app_footer.dart';
 import '../utils/responsive.dart';
+import '../utils/color_utils.dart';
 import '../providers/dynamic_content_provider.dart';
 import '../models/content_model.dart';
 
@@ -21,21 +22,35 @@ import '../models/content_model.dart';
 // ─── GALLERYUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to gallery_screen.dart.
 class GalleryUIConfig {
-  // Brand Colors used locally
-  static const Color accentGold = Color(0xFFF5A623);
-  static const Color darkGreen = Color(0xFF0D3320);
-  static const Color mediumGreen = Color(0xFF1A4A2E);
-  static const Color textMedium = Color(0xFF555555);
-  static const Color white = Color(0xFFFFFFFF);
+  // Helper to access current screen settings
+  static ScreenSettings _s(BuildContext context) => context.read<DynamicContentProvider>().content.gallerySettings;
+  static ScreenSettings _sec(BuildContext context, String id) => 
+      context.read<DynamicContentProvider>().content.sectionStyles[id] ?? _s(context);
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  // Brand Colors mapped to dynamic settings
+  static Color accentGold(BuildContext context) => hexToColor(_t(context).accentColorHex);
+  static Color darkGreen(BuildContext context) => hexToColor(_t(context).primaryColorHex);
+  static Color mediumGreen(BuildContext context) => darkGreen(context).withOpacity(0.85);
+  static Color backgroundColor(BuildContext context) => hexToColor(_s(context).backgroundColorHex);
+  static Color titleColor(BuildContext context) => hexToColor(_s(context).titleColorHex);
+  static Color bodyColor(BuildContext context) => hexToColor(_s(context).bodyColorHex);
+  static Color buttonColor(BuildContext context) => hexToColor(_s(context).buttonColorHex);
+  static Color buttonTextColor(BuildContext context) => hexToColor(_s(context).buttonTextColorHex);
+  static Color white(BuildContext context) => hexToColor(_t(context).cardBackgroundColorHex);
 
   // Dimensions, Spacing & Typography
   static const double cardIconSize = 60.0;
-  static const double fontBodyLarge = 26.0;
-  static const double fontLabelSmall = 12.0;
+  static double fontBodyLarge(BuildContext context) => _s(context).bodyFontSize + 4;
+  static double fontLabelSmall(BuildContext context) => _s(context).bodyFontSize - 4;
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _s(context).fontFamily;
+
   static const double gridSpacing = 16.0;
   static const double iconSizeLarge = 38.0;
   static const double paddingSectionVertical = 64.0;
-  static const double radiusSmall = 12.0;
+  static double radiusSmall(BuildContext context) => _t(context).cardBorderRadius - 8;
   static const double spacerExtraLarge = 48.0;
   static const double spacerMedium = 16.0;
   static const double spacerSmall = 8.0;
@@ -60,16 +75,20 @@ class GalleryScreen extends StatelessWidget {
             SliverGreenPageHeader(
               title: content.galleryHeroTitle,
               subtitle: content.galleryHeroDescription,
+              sectionId: 'gallery_hero',
             ),
 
             // Masonry gallery grid
             SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: hPad,
-                  vertical: GalleryUIConfig.paddingSectionVertical,
+              child: Container(
+                color: hexToColor(GalleryUIConfig._sec(context, 'gallery_grid').backgroundColorHex),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: hPad,
+                    vertical: GalleryUIConfig.paddingSectionVertical,
+                  ),
+                  child: _MasonryGallery(images: content.galleryImages),
                 ),
-                child: _MasonryGallery(images: content.galleryImages),
               ),
             ),
 
@@ -99,7 +118,7 @@ class _GoldDividerBar extends StatelessWidget {
     return Container(
       height: 3,
       width: double.infinity,
-      color: GalleryUIConfig.accentGold,
+      color: GalleryUIConfig.accentGold(context),
     );
   }
 }
@@ -120,7 +139,7 @@ class _MasonryGallery extends StatelessWidget {
     final isTablet = Responsive.isTablet(context);
 
     if (images.isEmpty) {
-      return _buildEmptyState();
+      return _buildEmptyState(context);
     }
 
     if (!isDesktop && !isTablet) {
@@ -212,21 +231,22 @@ class _MasonryGallery extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: GalleryUIConfig.spacerExtraLarge),
         child: Column(
           children: [
-            const Icon(Icons.photo_library_outlined,
-                color: GalleryUIConfig.darkGreen,
+            Icon(Icons.photo_library_outlined,
+                color: GalleryUIConfig.darkGreen(context),
                 size: GalleryUIConfig.cardIconSize),
             const SizedBox(height: GalleryUIConfig.spacerMedium),
             Text(
               'Gallery coming soon',
-              style: GoogleFonts.inter(
-                color: GalleryUIConfig.textMedium,
-                fontSize: GalleryUIConfig.fontBodyLarge,
+              style: GoogleFonts.getFont(
+                GalleryUIConfig.fontFamily(context),
+                color: GalleryUIConfig.bodyColor(context),
+                fontSize: GalleryUIConfig.fontBodyLarge(context),
               ),
             ),
           ],
@@ -261,12 +281,12 @@ class _GalleryCardWidgetState extends State<GalleryCardWidget> {
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOutCubic,
           decoration: BoxDecoration(
-            color: GalleryUIConfig.mediumGreen,
-            borderRadius: BorderRadius.circular(GalleryUIConfig.radiusSmall + 2),
+            color: GalleryUIConfig.mediumGreen(context),
+            borderRadius: BorderRadius.circular(GalleryUIConfig.radiusSmall(context) + 2),
             boxShadow: [
               if (_isHovered)
                 BoxShadow(
-                  color: GalleryUIConfig.darkGreen.withOpacity(0.25),
+                  color: GalleryUIConfig.darkGreen(context).withOpacity(0.25),
                   blurRadius: 18,
                   offset: const Offset(0, 8),
                 )
@@ -279,7 +299,7 @@ class _GalleryCardWidgetState extends State<GalleryCardWidget> {
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(GalleryUIConfig.radiusSmall + 2),
+            borderRadius: BorderRadius.circular(GalleryUIConfig.radiusSmall(context) + 2),
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -291,10 +311,10 @@ class _GalleryCardWidgetState extends State<GalleryCardWidget> {
                     if (loadingProgress == null) return child;
                     return Container(
                       color: Colors.grey.shade100,
-                      child: const Center(
+                      child: Center(
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: GalleryUIConfig.darkGreen,
+                          color: GalleryUIConfig.darkGreen(context),
                         ),
                       ),
                     );
@@ -310,9 +330,10 @@ class _GalleryCardWidgetState extends State<GalleryCardWidget> {
                         const SizedBox(height: GalleryUIConfig.spacerSmall),
                         Text(
                           'Image unavailable',
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.getFont(
+                            GalleryUIConfig.fontFamily(context),
                             color: Colors.grey.shade400,
-                            fontSize: GalleryUIConfig.fontLabelSmall,
+                            fontSize: GalleryUIConfig.fontLabelSmall(context),
                           ),
                         ),
                       ],
@@ -340,9 +361,10 @@ class _GalleryCardWidgetState extends State<GalleryCardWidget> {
                     child: Text(
                       widget.item.label,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        color: GalleryUIConfig.white,
-                        fontSize: GalleryUIConfig.fontLabelSmall - 1,
+                      style: GoogleFonts.getFont(
+                        GalleryUIConfig.fontFamily(context),
+                        color: GalleryUIConfig.white(context),
+                        fontSize: GalleryUIConfig.fontLabelSmall(context) - 1,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -355,24 +377,25 @@ class _GalleryCardWidgetState extends State<GalleryCardWidget> {
                   opacity: _isHovered ? 1.0 : 0.0,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: GalleryUIConfig.darkGreen.withOpacity(0.82),
+                      color: GalleryUIConfig.darkGreen(context).withOpacity(0.82),
                     ),
                     child: Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.zoom_in_rounded,
-                            color: GalleryUIConfig.accentGold,
+                            color: GalleryUIConfig.accentGold(context),
                             size: GalleryUIConfig.iconSizeLarge,
                           ),
                           const SizedBox(height: GalleryUIConfig.spacerSmall),
                           Text(
                             'View',
-                            style: GoogleFonts.inter(
-                              color: GalleryUIConfig.accentGold,
+                            style: GoogleFonts.getFont(
+                              GalleryUIConfig.fontFamily(context),
+                              color: GalleryUIConfig.accentGold(context),
                               fontWeight: FontWeight.w700,
-                              fontSize: GalleryUIConfig.fontLabelSmall + 2,
+                              fontSize: GalleryUIConfig.fontLabelSmall(context) + 2,
                             ),
                           ),
                         ],

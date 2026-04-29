@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../providers/dynamic_content_provider.dart';
 import '../../models/content_model.dart';
+import '../../utils/responsive.dart';
 
 // ─── GLOBALEDITORUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to global_editor.dart.
@@ -94,37 +95,62 @@ class _GlobalEditorState extends State<GlobalEditor> {
           ]),
           const SizedBox(height: 24),
           _buildSection('Theme & Style', [
-            Row(
-              children: [
-                Expanded(
-                    child: _buildTextField(
-                        'Primary Color (Hex)', _primaryColorController,
-                        hint: '#0D3320')),
-                const SizedBox(width: 16),
-                Expanded(
-                    child: _buildTextField(
-                        'Accent Color (Hex)', _accentColorController,
-                        hint: '#F5A623')),
-              ],
-            ),
+            if (Responsive.isMobile(context))
+              Column(
+                children: [
+                  _buildTextField(
+                      'Primary Color (Hex)', _primaryColorController,
+                      hint: '#0D3320'),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                      'Accent Color (Hex)', _accentColorController,
+                      hint: '#F5A623'),
+                ],
+              )
+            else
+              Row(
+                children: [
+                  Expanded(
+                      child: _buildTextField(
+                          'Primary Color (Hex)', _primaryColorController,
+                          hint: '#0D3320')),
+                  const SizedBox(width: 16),
+                  Expanded(
+                      child: _buildTextField(
+                          'Accent Color (Hex)', _accentColorController,
+                          hint: '#F5A623')),
+                ],
+              ),
             const SizedBox(height: 16),
             _buildTextField(
                 'Background Color (Hex)', _backgroundColorController,
                 hint: '#FAFAFA'),
             const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                    child: _buildTextField(
-                        'Card Corner Radius', _cardRadiusController,
-                        hint: '20.0')),
-                const SizedBox(width: 16),
-                Expanded(
-                    child: _buildTextField(
-                        'Button Corner Radius', _buttonRadiusController,
-                        hint: '16.0')),
-              ],
-            ),
+            if (Responsive.isMobile(context))
+              Column(
+                children: [
+                  _buildTextField('Card Corner Radius', _cardRadiusController,
+                      hint: '20.0'),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                      'Button Corner Radius', _buttonRadiusController,
+                      hint: '16.0'),
+                ],
+              )
+            else
+              Row(
+                children: [
+                  Expanded(
+                      child: _buildTextField(
+                          'Card Corner Radius', _cardRadiusController,
+                          hint: '20.0')),
+                  const SizedBox(width: 16),
+                  Expanded(
+                      child: _buildTextField(
+                          'Button Corner Radius', _buttonRadiusController,
+                          hint: '16.0')),
+                ],
+              ),
           ]),
           const SizedBox(height: 24),
           _buildSection('Footer & Contact', [
@@ -164,6 +190,17 @@ class _GlobalEditorState extends State<GlobalEditor> {
                     double.tryParse(_cardRadiusController.text) ?? 20.0,
                 buttonBorderRadius:
                     double.tryParse(_buttonRadiusController.text) ?? 16.0,
+                fontDisplayDesktop: currentTheme.fontDisplayDesktop,
+                fontDisplayTablet: currentTheme.fontDisplayTablet,
+                fontDisplayMobile: currentTheme.fontDisplayMobile,
+                fontHeadlineLarge: currentTheme.fontHeadlineLarge,
+                fontHeadlineMedium: currentTheme.fontHeadlineMedium,
+                fontBodyLarge: currentTheme.fontBodyLarge,
+                fontBodyMedium: currentTheme.fontBodyMedium,
+                fontLabelLarge: currentTheme.fontLabelLarge,
+                fontLabelSmall: currentTheme.fontLabelSmall,
+                fontFamilyHeadings: currentTheme.fontFamilyHeadings,
+                fontFamilyBody: currentTheme.fontFamilyBody,
               ));
 
               ScaffoldMessenger.of(context).showSnackBar(

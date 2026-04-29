@@ -10,33 +10,48 @@
 ///   - DEPENDS ON: widgets/utils/dynamic_icon.dart → renderDynamicIcon() for emoji/URL icons
 /// ═══════════════════════════════════════════════════════════════════════
 
-import 'package:flutter/material.dart'; // Flutter core for StatefulWidget, AnimatedContainer, etc.
-import 'package:google_fonts/google_fonts.dart'; // Google Fonts for Poppins typography
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../providers/dynamic_content_provider.dart';
+import '../../models/content_model.dart';
 
 
 // ─── COURSECARDUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to course_card.dart.
 class CourseCardUIConfig {
-  // Brand Colors used locally
-  static const Color accentGold = Color(0xFFF5A623);
-  static const Color darkGreen = Color(0xFF0D3320);
-  static const Color textDark = Color(0xFF1A1A1A);
-  static const Color textMedium = Color(0xFF555555);
-  static const Color white = Color(0xFFFFFFFF);
+  // Brand Colors mapped to dynamic settings
+  static Color accentGold(BuildContext context) => _hexToColor(_t(context).accentColorHex);
+  static Color darkGreen(BuildContext context) => _hexToColor(_t(context).primaryColorHex);
+  static Color textDark(BuildContext context) => _hexToColor(_t(context).textDarkHex);
+  static Color textMedium(BuildContext context) => const Color(0xFF555555);
+  static Color white(BuildContext context) => _hexToColor(_t(context).cardBackgroundColorHex);
+
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  static Color _hexToColor(String hex) {
+    final buffer = StringBuffer();
+    if (hex.length == 6 || hex.length == 7) buffer.write('ff');
+    buffer.write(hex.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
 
   // Dimensions, Spacing & Typography
   static const double cardPadding = 24.0;
-  static const double fontBodyMedium = 14.0;
-  static const double fontHeadlineMedium = 32.0;
-  static const double fontLabelLarge = 14.0;
-  static const double fontLabelSmall = 12.0;
+  static double fontBodyMedium(BuildContext context) => _t(context).fontBodyMedium;
+  static double fontHeadlineMedium(BuildContext context) => _t(context).fontHeadlineMedium;
+  static double fontLabelLarge(BuildContext context) => _t(context).fontLabelLarge;
+  static double fontLabelSmall(BuildContext context) => _t(context).fontLabelSmall;
   static const double iconSizeHero = 48.0;
   static const double iconSizeMedium = 28.0;
   static const double iconSizeSmall = 18.0;
-  static const double radiusMedium = 20.0;
-  static const double radiusSmall = 12.0;
+  static double radiusMedium(BuildContext context) => _t(context).buttonBorderRadius;
+  static double radiusSmall(BuildContext context) => _t(context).cardBorderRadius - 8;
   static const double spacerMedium = 16.0;
   static const double spacerSmall = 8.0;
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _t(context).fontFamilyBody;
 }
 
 
@@ -119,30 +134,32 @@ class _CourseCardState extends State<CourseCard> {
         onExit: (_) => setState(() => _isHovered = false),
         child: GestureDetector(
           onTap: widget.onTap, // Fire the callback when anywhere on the card is tapped
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 250), // Smooth 250ms animation
-            curve: Curves.easeOutCubic, // Decelerating curve
-            padding: const EdgeInsets.all(CourseCardUIConfig.cardPadding - 4), // 20px internal padding
-            decoration: BoxDecoration(
-              color: CourseCardUIConfig.white, // White card background
-              borderRadius: BorderRadius.circular(CourseCardUIConfig.radiusSmall + 4), // 16px corners
-              // Hover effect #1: Border transitions from grey to green
-              border: Border.all(
-                color: _isHovered
-                    ? CourseCardUIConfig.darkGreen.withOpacity(0.3) // Green border on hover
-                    : Colors.grey.shade100, // Subtle grey at rest
-              ),
-              // Hover effect #2: Shadow deepens on hover
-              boxShadow: [
-                BoxShadow(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250), // Smooth 250ms animation
+              curve: Curves.easeOutCubic, // Decelerating curve
+              transform: Matrix4.identity()
+                ..translate(0.0, _isHovered ? -6.0 : 0.0),
+              padding: const EdgeInsets.all(CourseCardUIConfig.cardPadding - 4), // 20px internal padding
+              decoration: BoxDecoration(
+                color: CourseCardUIConfig.white(context), // White card background
+                borderRadius: BorderRadius.circular(CourseCardUIConfig.radiusSmall(context) + 4), // 16px corners
+                // Hover effect #1: Border transitions from grey to green
+                border: Border.all(
                   color: _isHovered
-                      ? CourseCardUIConfig.darkGreen.withOpacity(0.08) // Green-tinted shadow
-                      : Colors.black.withOpacity(0.04), // Subtle grey shadow at rest
-                  blurRadius: _isHovered ? 15 : 8, // Larger blur on hover
-                  offset: Offset(0, _isHovered ? 8 : 4), // Shadow extends down on hover
+                      ? CourseCardUIConfig.darkGreen(context).withOpacity(0.3) // Green border on hover
+                      : Colors.grey.shade100, // Subtle grey at rest
                 ),
-              ],
-            ),
+                // Hover effect #2: Shadow deepens on hover
+                boxShadow: [
+                  BoxShadow(
+                    color: _isHovered
+                        ? CourseCardUIConfig.darkGreen(context).withOpacity(0.12) // Standard deep green shadow
+                        : Colors.black.withOpacity(0.04), // Subtle grey shadow at rest
+                    blurRadius: _isHovered ? 20 : 8, // Larger blur on hover
+                    offset: Offset(0, _isHovered ? 12 : 4), // Shadow extends down on hover
+                  ),
+                ],
+              ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start, // Left-aligned content
               children: [
@@ -155,8 +172,8 @@ class _CourseCardState extends State<CourseCard> {
                       width: CourseCardUIConfig.iconSizeHero + 4, // 52px width
                       height: CourseCardUIConfig.iconSizeHero + 4, // 52px height
                       decoration: BoxDecoration(
-                        color: CourseCardUIConfig.darkGreen, // Dark green background
-                        borderRadius: BorderRadius.circular(CourseCardUIConfig.radiusSmall + 2), // 14px corners
+                        color: CourseCardUIConfig.darkGreen(context), // Dark green background
+                        borderRadius: BorderRadius.circular(CourseCardUIConfig.radiusSmall(context) + 2), // 14px corners
                       ),
                       child: Center(
                         // Hardcoded icon based on course title — no Firestore dependency
@@ -177,18 +194,20 @@ class _CourseCardState extends State<CourseCard> {
                           // Course title
                           Text(
                             widget.title, // Course name (e.g., 'AI Mastery')
-                            style: GoogleFonts.inter(
-                              fontSize: CourseCardUIConfig.fontLabelLarge + 2, // 16px
+                            style: GoogleFonts.getFont(
+                              CourseCardUIConfig.fontFamily(context),
+                              fontSize: CourseCardUIConfig.fontLabelLarge(context) + 2, // 16px
                               fontWeight: FontWeight.w700, // Bold heading
-                              color: CourseCardUIConfig.textDark, // Dark text
+                              color: CourseCardUIConfig.textDark(context), // Dark text
                             ),
                           ),
                           // Course duration in gold accent
                           Text(
                             widget.duration, // Duration (e.g., '3 Months')
-                            style: GoogleFonts.inter(
-                              fontSize: CourseCardUIConfig.fontLabelSmall, // 12px
-                              color: CourseCardUIConfig.accentGold, // Gold accent
+                            style: GoogleFonts.getFont(
+                              CourseCardUIConfig.fontFamily(context),
+                              fontSize: CourseCardUIConfig.fontLabelSmall(context), // 12px
+                              color: CourseCardUIConfig.accentGold(context), // Gold accent
                               fontWeight: FontWeight.w600, // Semi-bold
                             ),
                           ),
@@ -202,9 +221,10 @@ class _CourseCardState extends State<CourseCard> {
                 // ── DESCRIPTION ──
                 Text(
                   widget.description, // Course description text
-                  style: GoogleFonts.inter(
-                    fontSize: CourseCardUIConfig.fontBodyMedium, // 14px body text
-                    color: CourseCardUIConfig.textMedium, // Medium grey
+                  style: GoogleFonts.getFont(
+                    CourseCardUIConfig.fontFamily(context),
+                    fontSize: CourseCardUIConfig.fontBodyMedium(context), // 14px body text
+                    color: CourseCardUIConfig.textMedium(context), // Medium grey
                     height: 1.5, // Comfortable line height
                   ),
                 ),
@@ -218,10 +238,11 @@ class _CourseCardState extends State<CourseCard> {
                     Flexible(
                       child: Text(
                         widget.fee, // Fee (e.g., 'Rs. 8,000')
-                        style: GoogleFonts.inter(
-                          fontSize: CourseCardUIConfig.fontHeadlineMedium - 4, // 18px
+                        style: GoogleFonts.getFont(
+                          CourseCardUIConfig.fontFamily(context),
+                          fontSize: CourseCardUIConfig.fontHeadlineMedium(context) - 4, // 18px
                           fontWeight: FontWeight.w800, // Extra-bold for price emphasis
-                          color: CourseCardUIConfig.darkGreen, // Brand green for financial info
+                          color: CourseCardUIConfig.darkGreen(context), // Brand green for financial info
                         ),
                         overflow: TextOverflow.ellipsis, // Add ellipsis if too long
                       ),
@@ -237,13 +258,13 @@ class _CourseCardState extends State<CourseCard> {
                       ),
                       decoration: BoxDecoration(
                         // Hover effect #3: Button bg transitions green → gold
-                        color: _isHovered ? CourseCardUIConfig.accentGold : CourseCardUIConfig.darkGreen,
-                        borderRadius: BorderRadius.circular(CourseCardUIConfig.radiusMedium), // 20px pill
+                        color: _isHovered ? CourseCardUIConfig.accentGold(context) : CourseCardUIConfig.darkGreen(context),
+                        borderRadius: BorderRadius.circular(CourseCardUIConfig.radiusMedium(context)), // 20px pill
                         // Hover effect: Gold glow shadow appears on hover
                         boxShadow: _isHovered
                             ? [
                                 BoxShadow(
-                                  color: CourseCardUIConfig.accentGold.withOpacity(0.4), // Gold glow
+                                  color: CourseCardUIConfig.accentGold(context).withOpacity(0.4), // Gold glow
                                   blurRadius: 8, // Soft blur
                                   offset: const Offset(0, 4), // Downward glow
                                 )
@@ -255,19 +276,20 @@ class _CourseCardState extends State<CourseCard> {
                         children: [
                           Text(
                             'Apply', // Button label
-                            style: GoogleFonts.inter(
-                              fontSize: CourseCardUIConfig.fontLabelSmall, // 12px
+                            style: GoogleFonts.getFont(
+                              CourseCardUIConfig.fontFamily(context),
+                              fontSize: CourseCardUIConfig.fontLabelSmall(context), // 12px
                               fontWeight: FontWeight.w700, // Bold
                               // Hover effect #4: Text color inverts on hover
-                              color: _isHovered ? CourseCardUIConfig.darkGreen : CourseCardUIConfig.white,
+                              color: _isHovered ? CourseCardUIConfig.darkGreen(context) : CourseCardUIConfig.white(context),
                             ),
                           ),
                           // Hover effect #5: Arrow icon appears on hover
                           if (_isHovered) ...[
                             const SizedBox(width: 4), // 4px gap
-                            const Icon(
+                            Icon(
                               Icons.arrow_forward, // Forward arrow
-                              color: CourseCardUIConfig.darkGreen, // Dark green on gold background
+                              color: CourseCardUIConfig.darkGreen(context), // Dark green on gold background
                               size: CourseCardUIConfig.iconSizeSmall, // 14px
                             ),
                           ]

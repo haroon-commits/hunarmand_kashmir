@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import '../../providers/dynamic_content_provider.dart';
 import '../../models/content_model.dart';
 import '../../widgets/utils/dynamic_icon.dart';
+import '../../utils/responsive.dart';
 
 // ─── ABOUTEDITORUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to about_editor.dart.
@@ -163,24 +164,52 @@ class _AboutEditorState extends State<AboutEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Team Members',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AboutEditorUIConfig.textDark,
+        if (Responsive.isMobile(context))
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Team Members',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AboutEditorUIConfig.textDark,
+                ),
               ),
-            ),
-            TextButton.icon(
-              onPressed: () => _showTeamDialog(context),
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('Add Member'),
-            ),
-          ],
-        ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton.icon(
+                  onPressed: () => _showTeamDialog(context),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add Member'),
+                  style: TextButton.styleFrom(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          )
+        else
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Team Members',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AboutEditorUIConfig.textDark,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () => _showTeamDialog(context),
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Add Member'),
+              ),
+            ],
+          ),
         const SizedBox(height: 8),
         if (team.isEmpty)
           const Text('No team members added yet.')

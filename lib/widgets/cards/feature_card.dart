@@ -11,29 +11,44 @@
 
 import 'package:flutter/material.dart'; // Flutter core for StatefulWidget, AnimatedContainer, etc.
 import 'package:google_fonts/google_fonts.dart'; // Google Fonts for Poppins typography
+import 'package:provider/provider.dart';
+import '../../providers/dynamic_content_provider.dart';
+import '../../models/content_model.dart';
 
 
 // ─── FEATURECARDUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to feature_card.dart.
 class FeatureCardUIConfig {
-  // Brand Colors used locally
-  static const Color accentGold = Color(0xFFF5A623);
-  static const Color darkGreen = Color(0xFF0D3320);
-  static const Color textDark = Color(0xFF1A1A1A);
-  static const Color textMedium = Color(0xFF555555);
-  static const Color white = Color(0xFFFFFFFF);
+  // Brand Colors mapped to dynamic settings
+  static Color accentGold(BuildContext context) => _hexToColor(_t(context).accentColorHex);
+  static Color darkGreen(BuildContext context) => _hexToColor(_t(context).primaryColorHex);
+  static Color textDark(BuildContext context) => _hexToColor(_t(context).textDarkHex);
+  static Color textMedium(BuildContext context) => const Color(0xFF555555);
+  static Color white(BuildContext context) => _hexToColor(_t(context).cardBackgroundColorHex);
+
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  static Color _hexToColor(String hex) {
+    final buffer = StringBuffer();
+    if (hex.length == 6 || hex.length == 7) buffer.write('ff');
+    buffer.write(hex.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
 
   // Dimensions, Spacing & Typography
   static const double cardIconRadius = 16.0;
   static const double cardIconSize = 60.0;
   static const double cardPadding = 24.0;
-  static const double cardRadius = 20.0;
-  static const double fontBodyMedium = 14.0;
-  static const double fontLabelLarge = 14.0;
+  static double cardRadius(BuildContext context) => _t(context).cardBorderRadius;
+  static double fontBodyMedium(BuildContext context) => _t(context).fontBodyMedium;
+  static double fontLabelLarge(BuildContext context) => _t(context).fontLabelLarge;
   static const double iconSizeMedium = 28.0;
   static const double iconSizeSmall = 18.0;
   static const double spacerMedium = 16.0;
   static const double spacerSmall = 8.0;
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _t(context).fontFamilyBody;
 }
 
 
@@ -111,12 +126,12 @@ class _FeatureCardState extends State<FeatureCard> {
             ..translate(0.0, _isHovered ? -FeatureCardUIConfig.spacerSmall + 2 : 0.0),
           padding: const EdgeInsets.all(FeatureCardUIConfig.cardPadding), // 24px internal padding
           decoration: BoxDecoration(
-            color: FeatureCardUIConfig.white, // White card background
-            borderRadius: BorderRadius.circular(FeatureCardUIConfig.cardRadius), // 20px rounded corners
+            color: FeatureCardUIConfig.white(context), // White card background
+            borderRadius: BorderRadius.circular(FeatureCardUIConfig.cardRadius(context)), // 20px rounded corners
             // Hover effect #2: Border transitions from grey to gold glow
             border: Border.all(
               color: _isHovered
-                  ? FeatureCardUIConfig.accentGold.withOpacity(0.5) // Gold border on hover
+                  ? FeatureCardUIConfig.accentGold(context).withOpacity(0.5) // Gold border on hover
                   : Colors.grey.shade100, // Subtle grey border at rest
               width: 1.2, // Thin border width
             ),
@@ -124,7 +139,7 @@ class _FeatureCardState extends State<FeatureCard> {
             boxShadow: [
               BoxShadow(
                 color: _isHovered
-                    ? FeatureCardUIConfig.darkGreen.withOpacity(0.08) // Green-tinted shadow on hover
+                    ? FeatureCardUIConfig.darkGreen(context).withOpacity(0.08) // Green-tinted shadow on hover
                     : Colors.black.withOpacity(0.04), // Subtle grey shadow at rest
                 blurRadius: _isHovered ? 20 : 12, // Larger blur on hover
                 offset: Offset(0, _isHovered ? 12 : 4), // Shadow moves further down on hover
@@ -141,13 +156,13 @@ class _FeatureCardState extends State<FeatureCard> {
                 width: FeatureCardUIConfig.cardIconSize, // 60px width
                 height: FeatureCardUIConfig.cardIconSize, // 60px height
                 decoration: BoxDecoration(
-                  color: FeatureCardUIConfig.darkGreen, // Dark green background for contrast
+                  color: FeatureCardUIConfig.darkGreen(context), // Dark green background for contrast
                   borderRadius: BorderRadius.circular(FeatureCardUIConfig.cardIconRadius), // 16px rounded
                   // Hover effect #4: Icon container gains drop shadow on hover
                   boxShadow: _isHovered
                       ? [
                           BoxShadow(
-                            color: FeatureCardUIConfig.darkGreen.withOpacity(0.25), // Green shadow
+                            color: FeatureCardUIConfig.darkGreen(context).withOpacity(0.25), // Green shadow
                             blurRadius: 8, // Soft blur
                             offset: const Offset(0, 4), // Downward shadow
                           )
@@ -168,10 +183,11 @@ class _FeatureCardState extends State<FeatureCard> {
               // ── Title Text ──
               Text(
                 widget.title, // Feature title from constructor
-                style: GoogleFonts.inter(
-                  fontSize: FeatureCardUIConfig.fontLabelLarge + 2, // 16px title size
+                style: GoogleFonts.getFont(
+                  FeatureCardUIConfig.fontFamily(context),
+                  fontSize: FeatureCardUIConfig.fontLabelLarge(context) + 2, // 16px title size
                   fontWeight: FontWeight.w700, // Bold for heading emphasis
-                  color: FeatureCardUIConfig.textDark, // Dark text for readability
+                  color: FeatureCardUIConfig.textDark(context), // Dark text for readability
                 ),
               ),
               const SizedBox(height: FeatureCardUIConfig.spacerSmall + 2), // 10px gap
@@ -179,9 +195,10 @@ class _FeatureCardState extends State<FeatureCard> {
               // ── Description Text ──
               Text(
                 widget.description, // Feature description from constructor
-                style: GoogleFonts.inter(
-                  fontSize: FeatureCardUIConfig.fontBodyMedium, // 14px body text
-                  color: FeatureCardUIConfig.textMedium, // Medium grey for secondary text
+                style: GoogleFonts.getFont(
+                  FeatureCardUIConfig.fontFamily(context),
+                  fontSize: FeatureCardUIConfig.fontBodyMedium(context), // 14px body text
+                  color: FeatureCardUIConfig.textMedium(context), // Medium grey for secondary text
                   height: 1.55, // Comfortable line height
                 ),
               ),

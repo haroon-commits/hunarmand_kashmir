@@ -15,6 +15,7 @@ import 'widgets/nav/hunarmand_drawer.dart';
 import 'widgets/nav/hunarmand_app_bar.dart';
 import 'package:provider/provider.dart'; // Importing provider for global state management
 import 'package:google_fonts/google_fonts.dart'; // Importing Google Fonts for high-quality typography
+import 'package:flutter_web_plugins/url_strategy.dart'; // Importing for clean URL strategy (no #)
 
 import 'utils/web_loader.dart' if (dart.library.html) 'utils/web_loader_web.dart';
 
@@ -28,7 +29,8 @@ import 'screens/contact_screen.dart'; // Importing the contact screen class
 import 'screens/donate_screen.dart'; // Importing the donate screen class
 import 'admin/admin_login_screen.dart'; // Importing admin login screen
 import 'admin/admin_dashboard_screen.dart'; // Importing admin dashboard
-import 'providers/dynamic_content_provider.dart'; // Importing dynamic content provider
+import 'providers/dynamic_content_provider.dart';
+import 'models/content_model.dart'; // Importing dynamic content provider
 import 'providers/admin_provider.dart'; // Importing admin provider
 import 'package:firebase_core/firebase_core.dart'; // Importing Firebase Core
 import 'firebase_options.dart'; // Importing generated Firebase options
@@ -38,13 +40,25 @@ import 'utils/responsive.dart'; // Importing the responsive utility for layout d
 // ─── MAINUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to main.dart.
 class MainUIConfig {
-  // Brand Colors used locally
-  static const Color accentGold = Color(0xFFF5A623);
-  static const Color darkGreen = Color(0xFF0D3320);
-  static const Color lightTeal = Color(0xFFE8F5F3);
-  static const Color textLight = Color(0xFF888888);
-  static const Color white = Color(0xFFFFFFFF);
+  // Brand Colors mapped to dynamic settings
+  static Color accentGold(BuildContext context) => _hexToColor(_t(context).accentColorHex);
+  static Color darkGreen(BuildContext context) => _hexToColor(_t(context).primaryColorHex);
+  static Color lightTeal(BuildContext context) => const Color(0xFFE8F5F3);
+  static Color textLight(BuildContext context) => _hexToColor(_t(context).textLightHex);
+  static Color textDark(BuildContext context) => _hexToColor(_t(context).textDarkHex);
+  static Color white(BuildContext context) => _hexToColor(_t(context).cardBackgroundColorHex);
 
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  static Color _hexToColor(String hex) {
+    final buffer = StringBuffer();
+    if (hex.length == 6 || hex.length == 7) buffer.write('ff');
+    buffer.write(hex.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _t(context).fontFamilyBody;
 }
 
 
@@ -53,6 +67,9 @@ class MainUIConfig {
 void main() async {
   // Ensure that Flutter bindings are initialized before Firebase
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Implement path URL strategy to remove the '#' from the URL for better SEO
+  usePathUrlStrategy();
 
   // Initializing Firebase with the generated options for the current platform
   await Firebase.initializeApp(
@@ -152,7 +169,7 @@ class MainNavigator extends StatelessWidget {
         // we display a blank dark green container because the HTML loader 
         // is still covering the screen!
         if (dynamicContent.isLoading) {
-          return Scaffold(backgroundColor: MainUIConfig.darkGreen, body: Container());
+          return Scaffold(backgroundColor: MainUIConfig.darkGreen(context), body: Container());
         }
 
         // Data is fully loaded. We can now safely hide the HTML web loader 
@@ -174,7 +191,7 @@ class MainNavigator extends StatelessWidget {
         // The Scaffold provides the standard visual structural layout of the page
         return Scaffold(
           // Setting a consistent white background across the entire app
-          backgroundColor: MainUIConfig.white,
+          backgroundColor: MainUIConfig.white(context),
           // Conditionally showing the sidebar drawer for mobile navigation
           drawer: isTabletOrDesktop
               ? null // No drawer on desktop/tablet as we have a top bar
@@ -208,7 +225,7 @@ class MainNavigator extends StatelessWidget {
     // Returning a standard AppBar with specific styling
     return AppBar(
       // Setting a dark green background for high contrast
-      backgroundColor: MainUIConfig.darkGreen,
+      backgroundColor: MainUIConfig.darkGreen(context),
       // Building the leading icon (hamburger menu)
       leading: Builder(
         // Using a nested builder to get the correct context for Scaffold.of()
@@ -220,7 +237,7 @@ class MainNavigator extends StatelessWidget {
             // Open the navigation drawer when tapped
             onTap: () => Scaffold.of(context).openDrawer(),
             // Displaying the menu icon in white
-            child: const Icon(Icons.menu, color: MainUIConfig.white),
+            child: Icon(Icons.menu, color: MainUIConfig.white(context)),
           ),
         ),
       ),
@@ -250,7 +267,7 @@ class MainNavigator extends StatelessWidget {
               // Border and rounded corners for a premium feel
               decoration: BoxDecoration(
                 // Gold border matching the branding
-                border: Border.all(color: MainUIConfig.accentGold),
+                border: Border.all(color: MainUIConfig.accentGold(context)),
                 // Smoothly rounded edges
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -259,16 +276,17 @@ class MainNavigator extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min, // Squeezing to content size
                 children: [
                   // Heart icon representing support/donation
-                  const Icon(Icons.favorite,
-                      color: MainUIConfig.accentGold, size: 13),
+                  Icon(Icons.favorite,
+                      color: MainUIConfig.accentGold(context), size: 13),
                   // Small horizontal gap
                   const SizedBox(width: 4),
                   // Label for the button using Inter font
                   Flexible(
                     child: Text(
                       'Donate',
-                      style: GoogleFonts.inter(
-                        color: MainUIConfig.accentGold, // Consistent gold color
+                      style: GoogleFonts.getFont(
+                        MainUIConfig.fontFamily(context),
+                        color: MainUIConfig.accentGold(context), // Consistent gold color
                         fontSize: 11, // Small but legible on mobile
                         fontWeight: FontWeight.w600, // Bold weight for emphasis
                       ),
@@ -325,7 +343,7 @@ class MainNavigator extends StatelessWidget {
     // Wrapping everything in a visual container with shadow
     return Container(
       decoration: BoxDecoration(
-        color: MainUIConfig.white, // Clean white background
+        color: MainUIConfig.white(context), // Clean white background
         boxShadow: [
           // Adding a soft shadow for depth effect
           BoxShadow(
@@ -362,7 +380,7 @@ class MainNavigator extends StatelessWidget {
                     // Highlighting the active item with a light teal background
                     decoration: isActive
                         ? BoxDecoration(
-                            color: MainUIConfig.lightTeal, // Subtle highlight
+                            color: MainUIConfig.lightTeal(context), // Subtle highlight
                             borderRadius:
                                 BorderRadius.circular(16), // Rounded pill shape
                           )
@@ -379,10 +397,8 @@ class MainNavigator extends StatelessWidget {
                               : item['icon']
                                   as IconData, // Use outlined icon if inactive
                           color: isActive
-                              ? AppColors
-                                  .darkGreen // Primary brand color for active items
-                              : AppColors
-                                  .textLight, // Muted grey for inactive items
+                              ? MainUIConfig.darkGreen(context) // Primary brand color for active items
+                              : MainUIConfig.textDark(context).withOpacity(0.5), // Muted for inactive items
                           size: 22, // Consistent sizing
                         ),
                         // Dynamic vertical gap
@@ -390,10 +406,11 @@ class MainNavigator extends StatelessWidget {
                          // Displaying the section label
                         Text(
                           item['label'] as String,
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.getFont(
+                            MainUIConfig.fontFamily(context),
                             color: isActive
-                                ? MainUIConfig.darkGreen // Matching icon color
-                                : MainUIConfig.textLight, // Matching icon color
+                                ? MainUIConfig.darkGreen(context) // Matching icon color
+                                : MainUIConfig.textDark(context).withOpacity(0.5), // Matching icon color
                             fontSize: 10, // Small text for mobile navigation
                             fontWeight: isActive
                                 ? FontWeight.w700

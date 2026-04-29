@@ -8,24 +8,34 @@
 ///   - USED BY: main.dart → MainNavigator Scaffold drawer (mobile/tablet only)
 ///   - READS FROM: providers/dynamic_content_provider.dart → logoPath, appTitle
 ///   - WRITES TO: providers/app_state.dart → navigate() for page switching
-///   - DEPENDS ON: google_fonts → GoogleFonts.inter
+///   - DEPENDS ON: google_fonts package
 /// ═══════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart'; // Flutter core for Drawer, ListTile, ElevatedButton, etc.
-import 'package:google_fonts/google_fonts.dart'; // Google Fonts for Inter (Latin) typography
+import 'package:google_fonts/google_fonts.dart'; // Google Fonts for dynamic typography
 import 'package:provider/provider.dart'; // Provider for Consumer and context.read state access
 import '../../providers/app_state.dart'; // AppState: navigate() for global page switching
-import '../../providers/dynamic_content_provider.dart'; // DynamicContentProvider: logoPath, appTitle
+import '../../providers/dynamic_content_provider.dart';
+import '../../models/content_model.dart'; // DynamicContentProvider: logoPath, appTitle
 
 
 // ─── APPDRAWERUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to hunarmand_drawer.dart.
 class AppDrawerUIConfig {
-  // Brand Colors used locally
-  static const Color accentGold = Color(0xFFF5A623);
-  static const Color darkGreen = Color(0xFF0D3320);
-  static const Color mediumGreen = Color(0xFF1A4A2E);
-  static const Color white = Color(0xFFFFFFFF);
+  // Brand Colors mapped to dynamic settings
+  static Color accentGold(BuildContext context) => _hexToColor(_t(context).accentColorHex);
+  static Color darkGreen(BuildContext context) => _hexToColor(_t(context).primaryColorHex);
+  static Color mediumGreen(BuildContext context) => darkGreen(context).withOpacity(0.85);
+  static Color white(BuildContext context) => _hexToColor(_t(context).cardBackgroundColorHex);
+
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  static Color _hexToColor(String hex) {
+    final buffer = StringBuffer();
+    if (hex.length == 6 || hex.length == 7) buffer.write('ff');
+    buffer.write(hex.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
 
   // Dimensions, Spacing & Typography
   static const double fontBodyMedium = 14.0;
@@ -35,6 +45,9 @@ class AppDrawerUIConfig {
   static const double radiusLarge = 30.0;
   static const double spacerMedium = 16.0;
   static const double spacerSmall = 8.0;
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _t(context).fontFamilyBody;
 }
 
 
@@ -55,7 +68,7 @@ class HunarmandDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: AppDrawerUIConfig.darkGreen, // Dark green background matching the app bar
+      backgroundColor: AppDrawerUIConfig.darkGreen(context), // Dark green background matching the app bar
       child: Column(
         children: [
           // ── TOP: Drawer Header with Branding ──
@@ -86,7 +99,7 @@ class HunarmandDrawer extends StatelessWidget {
   Widget _buildDrawerHeader(BuildContext context) {
     return DrawerHeader(
       // Slightly lighter green background to distinguish header from nav items
-      decoration: const BoxDecoration(color: AppDrawerUIConfig.mediumGreen),
+      decoration: BoxDecoration(color: AppDrawerUIConfig.mediumGreen(context)),
       child: Center(
         child: Consumer<DynamicContentProvider>(
           builder: (context, provider, _) => Column(
@@ -105,7 +118,8 @@ class HunarmandDrawer extends StatelessWidget {
               // App title text below the logo
               Text(
                 provider.content.appTitle, // Title from Firestore via DynamicContentProvider
-                style: GoogleFonts.inter(
+                style: GoogleFonts.getFont(
+                  AppDrawerUIConfig.fontFamily(context),
                   color: Colors.white70, // Semi-transparent white for subtitle feel
                   fontSize: AppDrawerUIConfig.fontBodyMedium, // 14px body text size
                 ),
@@ -137,13 +151,14 @@ class HunarmandDrawer extends StatelessWidget {
     return ListTile(
       leading: Icon(
         icon, // Navigation icon (e.g., Icons.home_outlined)
-        color: AppDrawerUIConfig.accentGold, // Gold icons for visual consistency with branding
+        color: AppDrawerUIConfig.accentGold(context), // Gold icons for visual consistency with branding
         size: AppDrawerUIConfig.iconSizeMedium - 4, // 20px slightly smaller than standard
       ),
       title: Text(
         label, // Navigation label text
-        style: GoogleFonts.inter(
-          color: AppDrawerUIConfig.white, // White text on dark background
+        style: GoogleFonts.getFont(
+          AppDrawerUIConfig.fontFamily(context),
+          color: AppDrawerUIConfig.white(context), // White text on dark background
           fontSize: AppDrawerUIConfig.fontBodyMedium, // 14px body text size
           fontWeight: FontWeight.w500, // Medium weight for readability
         ),
@@ -172,8 +187,8 @@ class HunarmandDrawer extends StatelessWidget {
             context.read<AppState>().navigate('contact'); // Then navigate to enrollment page
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppDrawerUIConfig.accentGold, // Gold fill for high visibility
-            foregroundColor: AppDrawerUIConfig.darkGreen, // Dark green text for contrast
+            backgroundColor: AppDrawerUIConfig.accentGold(context), // Gold fill for high visibility
+            foregroundColor: AppDrawerUIConfig.darkGreen(context), // Dark green text for contrast
             shape: RoundedRectangleBorder(
                 // Pill-shaped button using large radius from design tokens
                 borderRadius: BorderRadius.circular(AppDrawerUIConfig.radiusLarge)),
@@ -183,7 +198,10 @@ class HunarmandDrawer extends StatelessWidget {
           ),
           child: Text(
             'Join Now', // CTA label encouraging enrollment
-            style: GoogleFonts.inter(fontWeight: FontWeight.w700), // Bold for emphasis
+            style: GoogleFonts.getFont(
+              AppDrawerUIConfig.fontFamily(context),
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ),

@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import '../../providers/dynamic_content_provider.dart';
 import '../../models/content_model.dart';
 import '../../widgets/utils/dynamic_icon.dart';
+import '../../utils/responsive.dart';
 
 // ─── HOMEEDITORUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to home_editor.dart.
@@ -190,24 +191,52 @@ class _HomeEditorState extends State<HomeEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Features',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: HomeEditorUIConfig.textDark,
+        if (Responsive.isMobile(context))
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Features',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: HomeEditorUIConfig.textDark,
+                ),
               ),
-            ),
-            TextButton.icon(
-              onPressed: () => _showFeatureDialog(context),
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('Add Feature'),
-            ),
-          ],
-        ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton.icon(
+                  onPressed: () => _showFeatureDialog(context),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add Feature'),
+                  style: TextButton.styleFrom(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          )
+        else
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Features',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: HomeEditorUIConfig.textDark,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () => _showFeatureDialog(context),
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Add Feature'),
+              ),
+            ],
+          ),
         const SizedBox(height: 8),
         if (features.isEmpty)
           const Text('No features added yet.')
@@ -257,24 +286,52 @@ class _HomeEditorState extends State<HomeEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Key Statistics',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: HomeEditorUIConfig.textDark,
+        if (Responsive.isMobile(context))
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Key Statistics',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: HomeEditorUIConfig.textDark,
+                ),
               ),
-            ),
-            TextButton.icon(
-              onPressed: () => _showStatDialog(context),
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('Add Stat'),
-            ),
-          ],
-        ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton.icon(
+                  onPressed: () => _showStatDialog(context),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add Stat'),
+                  style: TextButton.styleFrom(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          )
+        else
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Key Statistics',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: HomeEditorUIConfig.textDark,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () => _showStatDialog(context),
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Add Stat'),
+              ),
+            ],
+          ),
         const SizedBox(height: 8),
         if (stats.isEmpty)
           const Text('No stats added yet.')

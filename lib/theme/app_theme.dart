@@ -6,7 +6,7 @@
 /// CONNECTIONS:
 ///   - USED BY: main.dart → MaterialApp(theme: AppTheme.theme)
 ///   - USED BY: Every widget/screen file → references AppColors.* for consistent styling
-///   - DEPENDS ON: google_fonts package → GoogleFonts.inter
+///   - DEPENDS ON: google_fonts package
 /// ═══════════════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart'; // Flutter core for Color, ThemeData, etc.
@@ -134,33 +134,39 @@ class AppTheme {
         onSurface: textDark,
       ),
 
-      textTheme: GoogleFonts.interTextTheme().copyWith(
-        displayLarge: GoogleFonts.inter(
-          fontSize: ThemeUIConfig.fontDisplay,
+      textTheme: GoogleFonts.getTextTheme(config.fontFamilyBody).copyWith(
+        displayLarge: GoogleFonts.getFont(
+          config.fontFamilyHeadings,
+          fontSize: config.fontDisplayDesktop,
           fontWeight: FontWeight.bold,
           color: textLight,
         ),
-        headlineLarge: GoogleFonts.inter(
-          fontSize: ThemeUIConfig.fontHeadlineLarge,
+        headlineLarge: GoogleFonts.getFont(
+          config.fontFamilyHeadings,
+          fontSize: config.fontHeadlineLarge,
           fontWeight: FontWeight.bold,
           color: primaryColor,
         ),
-        headlineMedium: GoogleFonts.inter(
-          fontSize: ThemeUIConfig.fontHeadlineMedium,
+        headlineMedium: GoogleFonts.getFont(
+          config.fontFamilyHeadings,
+          fontSize: config.fontHeadlineMedium,
           fontWeight: FontWeight.bold,
           color: primaryColor,
         ),
-        bodyLarge: GoogleFonts.inter(
-          fontSize: ThemeUIConfig.fontBodyLarge,
+        bodyLarge: GoogleFonts.getFont(
+          config.fontFamilyBody,
+          fontSize: config.fontBodyLarge,
           color: textDark.withOpacity(0.8),
           height: 1.6,
         ),
-        bodyMedium: GoogleFonts.inter(
-          fontSize: ThemeUIConfig.fontBodyMedium,
+        bodyMedium: GoogleFonts.getFont(
+          config.fontFamilyBody,
+          fontSize: config.fontBodyMedium,
           color: textDark.withOpacity(0.7),
         ),
-        labelLarge: GoogleFonts.inter(
-          fontSize: ThemeUIConfig.fontLabelLarge,
+        labelLarge: GoogleFonts.getFont(
+          config.fontFamilyBody,
+          fontSize: config.fontLabelLarge,
           fontWeight: FontWeight.w600,
           color: textLight,
         ),
@@ -175,7 +181,8 @@ class AppTheme {
         foregroundColor: textLight,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: GoogleFonts.inter(
+        titleTextStyle: GoogleFonts.getFont(
+          config.fontFamilyBody,
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: textLight,
@@ -193,8 +200,9 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(config.buttonBorderRadius),
           ),
-          textStyle: GoogleFonts.inter(
-            fontSize: ThemeUIConfig.fontLabelLarge,
+          textStyle: GoogleFonts.getFont(
+            config.fontFamilyBody,
+            fontSize: config.fontLabelLarge,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -223,9 +231,10 @@ class AppTheme {
           borderRadius: BorderRadius.circular(config.cardBorderRadius / 2),
           borderSide: BorderSide(color: primaryColor, width: 1.5),
         ),
-        hintStyle: GoogleFonts.inter(
+        hintStyle: GoogleFonts.getFont(
+          config.fontFamilyBody,
           color: textDark.withOpacity(0.4),
-          fontSize: ThemeUIConfig.fontBodyMedium,
+          fontSize: config.fontBodyMedium,
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: ThemeUIConfig.spacerMedium,

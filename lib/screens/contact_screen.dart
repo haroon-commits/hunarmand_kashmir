@@ -17,26 +17,48 @@ import '../widgets/common/contact_info_tile.dart';
 import '../utils/responsive.dart';
 import 'package:provider/provider.dart';
 import '../providers/dynamic_content_provider.dart';
+import '../models/content_model.dart';
 
 // ─── CONTACTUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to contact_screen.dart.
 class ContactUIConfig {
-  // Brand Colors used locally
-  static const Color accentGold = Color(0xFFF5A623);
-  static const Color darkGreen = Color(0xFF0D3320);
+  // Helper to access current screen settings
+  static ScreenSettings _s(BuildContext context) => context.read<DynamicContentProvider>().content.contactSettings;
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  // Brand Colors mapped to dynamic settings
+  static Color accentGold(BuildContext context) => _hexToColor(_t(context).accentColorHex);
+  static Color darkGreen(BuildContext context) => _hexToColor(_t(context).primaryColorHex);
   static const Color lightGrey = Color(0xFFF2F2F2);
   static const Color lightTeal = Color(0xFFE8F5F3);
-  static const Color textDark = Color(0xFF1A1A1A);
-  static const Color textMedium = Color(0xFF555555);
-  static const Color white = Color(0xFFFFFFFF);
+  static Color offWhite(BuildContext context) => _hexToColor(_s(context).backgroundColorHex);
+  static Color textDark(BuildContext context) => _hexToColor(_s(context).titleColorHex);
+  static Color titleColor(BuildContext context) => _hexToColor(_s(context).titleColorHex);
+  static Color bodyColor(BuildContext context) => _hexToColor(_s(context).bodyColorHex);
+  static Color buttonColor(BuildContext context) => _hexToColor(_s(context).buttonColorHex);
+  static Color buttonTextColor(BuildContext context) => _hexToColor(_s(context).buttonTextColorHex);
+  static Color textMedium(BuildContext context) => bodyColor(context);
+  static Color white(BuildContext context) => _hexToColor(_t(context).cardBackgroundColorHex);
+
+  static Color _hexToColor(String hex) {
+    final buffer = StringBuffer();
+    if (hex.length == 6 || hex.length == 7) buffer.write('ff');
+    buffer.write(hex.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
 
   // Dimensions, Spacing & Typography
   static const double cardIconSize = 60.0;
   static const double cardPadding = 24.0;
-  static const double fontDisplayMobile = 82.0;
-  static const double fontHeadlineMedium = 32.0;
-  static const double fontLabelLarge = 14.0;
-  static const double fontLabelSmall = 12.0;
+  static double fontDisplay(BuildContext context) => _s(context).titleFontSize + 8;
+  static double fontHeadlineMedium(BuildContext context) => _s(context).titleFontSize;
+  static double fontBodyMedium(BuildContext context) => _s(context).bodyFontSize;
+  static double fontLabelLarge(BuildContext context) => _s(context).subtitleFontSize;
+  static double fontLabelSmall(BuildContext context) => _s(context).bodyFontSize - 4;
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _s(context).fontFamily;
+
   static const double maxContentWidth = 1200.0;
   static const double paddingButtonLargeH = 50.0;
   static const double paddingButtonSmallV = 22.0;
@@ -44,9 +66,9 @@ class ContactUIConfig {
   static const double paddingSectionVertical = 64.0;
   static const double radiusExtraLarge = 40.0;
   static const double radiusExtraSmall = 8.0;
-  static const double radiusLarge = 30.0;
-  static const double radiusMedium = 20.0;
-  static const double radiusSmall = 12.0;
+  static double radiusLarge(BuildContext context) => _t(context).buttonBorderRadius;
+  static double radiusMedium(BuildContext context) => _t(context).cardBorderRadius;
+  static double radiusSmall(BuildContext context) => _t(context).cardBorderRadius - 8;
   static const double spacerDisplay = 32.0;
   static const double spacerLarge = 24.0;
   static const double spacerMedium = 16.0;
@@ -130,36 +152,40 @@ class _ContactScreenState extends State<ContactScreen> {
     final hPad = Responsive.contentPaddingH(context);
     final isWide = Responsive.isTabletOrDesktop(context);
 
-    return Center(
-      child: ConstrainedBox(
-        constraints:
-            const BoxConstraints(maxWidth: ContactUIConfig.maxContentWidth),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: hPad,
-            vertical: ContactUIConfig.paddingHeroMobile,
+    return Container(
+      color: ContactUIConfig.offWhite(context),
+      child: Center(
+        child: ConstrainedBox(
+          constraints:
+              const BoxConstraints(maxWidth: ContactUIConfig.maxContentWidth),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: hPad,
+              vertical: ContactUIConfig.paddingHeroMobile,
+            ),
+            child: isWide
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                          flex: 4,
+                          child: _buildCampusInfo(address, phone, email)),
+                      const SizedBox(width: ContactUIConfig.spacerLarge + 4),
+                      Expanded(
+                        flex: 5,
+                        child: _submitted ? _buildSuccess() : _buildForm(context),
+                      ),
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildCampusInfo(address, phone, email),
+                      const SizedBox(height: ContactUIConfig.spacerLarge),
+                      _submitted ? _buildSuccess() : _buildForm(context),
+                    ],
+                  ),
           ),
-          child: isWide
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                        flex: 4,
-                        child: _buildCampusInfo(address, phone, email)),
-                    const SizedBox(width: ContactUIConfig.spacerLarge + 4),
-                    Expanded(
-                      flex: 5,
-                      child: _submitted ? _buildSuccess() : _buildForm(context),
-                    ),
-                  ],
-                )
-              : Column(
-                  children: [
-                    _buildCampusInfo(address, phone, email),
-                    const SizedBox(height: ContactUIConfig.spacerLarge),
-                    _submitted ? _buildSuccess() : _buildForm(context),
-                  ],
-                ),
         ),
       ),
     );
@@ -170,8 +196,8 @@ class _ContactScreenState extends State<ContactScreen> {
     return Container(
       padding: const EdgeInsets.all(ContactUIConfig.cardPadding),
       decoration: BoxDecoration(
-        color: ContactUIConfig.white,
-        borderRadius: BorderRadius.circular(ContactUIConfig.radiusSmall + 4),
+        color: ContactUIConfig.white(context),
+        borderRadius: BorderRadius.circular(ContactUIConfig.radiusSmall(context) + 4),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -185,18 +211,20 @@ class _ContactScreenState extends State<ContactScreen> {
         children: [
           Text(
             'Visit Our Campus',
-            style: GoogleFonts.inter(
-              color: ContactUIConfig.darkGreen,
-              fontSize: ContactUIConfig.fontHeadlineMedium,
+            style: GoogleFonts.getFont(
+              ContactUIConfig.fontFamily(context),
+              color: ContactUIConfig.titleColor(context),
+              fontSize: ContactUIConfig.fontHeadlineMedium(context),
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: ContactUIConfig.spacerSmall + 2),
           Text(
             'Our doors are always open for students and parents. Come see our labs, meet mentors, and feel the energy of innovation.',
-            style: GoogleFonts.inter(
-              color: ContactUIConfig.textMedium,
-              fontSize: ContactUIConfig.fontLabelSmall + 1,
+            style: GoogleFonts.getFont(
+              ContactUIConfig.fontFamily(context),
+              color: ContactUIConfig.bodyColor(context),
+              fontSize: ContactUIConfig.fontLabelSmall(context) + 1,
               height: 1.6,
             ),
           ),
@@ -231,8 +259,8 @@ class _ContactScreenState extends State<ContactScreen> {
     return Container(
       padding: const EdgeInsets.all(ContactUIConfig.cardPadding),
       decoration: BoxDecoration(
-        color: ContactUIConfig.white,
-        borderRadius: BorderRadius.circular(ContactUIConfig.radiusSmall + 4),
+        color: ContactUIConfig.white(context),
+        borderRadius: BorderRadius.circular(ContactUIConfig.radiusSmall(context) + 4),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -246,13 +274,14 @@ class _ContactScreenState extends State<ContactScreen> {
         children: [
           Text(
             'Send us a message',
-            style: GoogleFonts.inter(
-              fontSize: ContactUIConfig.radiusMedium,
+            style: GoogleFonts.getFont(
+              ContactUIConfig.fontFamily(context),
+              fontSize: ContactUIConfig.radiusMedium(context),
               fontWeight: FontWeight.w700,
-              color: ContactUIConfig.textDark,
+              color: ContactUIConfig.titleColor(context),
             ),
           ),
-          const SizedBox(height: ContactUIConfig.radiusMedium),
+          SizedBox(height: ContactUIConfig.radiusMedium(context)),
           if (isMobile) ...[
             _field('Full Name', 'Enter your name', _nameController),
             const SizedBox(height: ContactUIConfig.spacerMedium - 2),
@@ -285,18 +314,19 @@ class _ContactScreenState extends State<ContactScreen> {
                 onPressed: _submit,
                 icon: const Icon(Icons.send_outlined, size: 18),
                 label: Text('Submit Application',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.getFont(
+                      ContactUIConfig.fontFamily(context),
+                      color: ContactUIConfig.buttonTextColor(context),
                       fontWeight: FontWeight.w700,
-                      fontSize: ContactUIConfig.fontLabelLarge + 1,
+                      fontSize: ContactUIConfig.fontLabelLarge(context) + 1,
                     )),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ContactUIConfig.darkGreen,
-                  padding: const EdgeInsets.symmetric(
-                      vertical: ContactUIConfig.paddingSectionVertical / 4),
-                  shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(ContactUIConfig.radiusSmall)),
-                ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ContactUIConfig.buttonColor(context),
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(ContactUIConfig.radiusSmall(context))),
+                  ),
               ),
             ),
           ),
@@ -311,21 +341,22 @@ class _ContactScreenState extends State<ContactScreen> {
       padding: const EdgeInsets.all(ContactUIConfig.paddingButtonLargeH),
       decoration: BoxDecoration(
         color: ContactUIConfig.lightTeal,
-        borderRadius: BorderRadius.circular(ContactUIConfig.radiusSmall + 4),
+        borderRadius: BorderRadius.circular(ContactUIConfig.radiusSmall(context) + 4),
       ),
       child: Column(
         children: [
-          const Icon(Icons.check_circle,
-              color: ContactUIConfig.darkGreen,
+          Icon(Icons.check_circle,
+              color: ContactUIConfig.darkGreen(context),
               size: ContactUIConfig.cardIconSize + 4),
           const SizedBox(height: ContactUIConfig.spacerMedium + 2),
           Text(
             'Application Submitted!',
-            style: GoogleFonts.inter(
-              color: ContactUIConfig.darkGreen,
+            style: GoogleFonts.getFont(
+              ContactUIConfig.fontFamily(context),
+              color: ContactUIConfig.titleColor(context),
               fontSize: Responsive.isDesktop(context)
-                  ? ContactUIConfig.fontDisplayMobile + 2
-                  : ContactUIConfig.fontDisplayMobile,
+                  ? ContactUIConfig.fontDisplay(context) + 2
+                  : ContactUIConfig.fontDisplay(context),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -333,9 +364,10 @@ class _ContactScreenState extends State<ContactScreen> {
           Text(
             'We have received your application. Our team will contact you within 24 hours. JazakAllah Khair!',
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              color: ContactUIConfig.textMedium,
-              fontSize: ContactUIConfig.fontLabelSmall + 2,
+            style: GoogleFonts.getFont(
+              ContactUIConfig.fontFamily(context),
+              color: ContactUIConfig.bodyColor(context),
+              fontSize: ContactUIConfig.fontLabelSmall(context) + 2,
               height: 1.6,
             ),
           ),
@@ -343,17 +375,18 @@ class _ContactScreenState extends State<ContactScreen> {
           ElevatedButton(
             onPressed: () => setState(() => _submitted = false),
             style: ElevatedButton.styleFrom(
-              backgroundColor: ContactUIConfig.darkGreen,
+              backgroundColor: ContactUIConfig.darkGreen(context),
               padding: const EdgeInsets.symmetric(
                 horizontal: ContactUIConfig.spacerDisplay,
                 vertical: ContactUIConfig.paddingButtonSmallV + 2,
               ),
               shape: RoundedRectangleBorder(
                   borderRadius:
-                      BorderRadius.circular(ContactUIConfig.radiusLarge - 5)),
+                      BorderRadius.circular(ContactUIConfig.radiusLarge(context) - 5)),
             ),
             child: Text('Submit Another',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                style: GoogleFonts.getFont(ContactUIConfig.fontFamily(context),
+                    fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -367,10 +400,11 @@ class _ContactScreenState extends State<ContactScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: GoogleFonts.inter(
-                fontSize: ContactUIConfig.fontLabelSmall + 1,
+            style: GoogleFonts.getFont(
+                ContactUIConfig.fontFamily(context),
+                fontSize: ContactUIConfig.fontLabelSmall(context) + 1,
                 fontWeight: FontWeight.w600,
-                color: ContactUIConfig.textDark)),
+                color: ContactUIConfig.titleColor(context))),
         const SizedBox(height: ContactUIConfig.spacerSmall - 2),
         _AnimatedTextField(
           controller: controller,
@@ -391,10 +425,11 @@ class _ContactScreenState extends State<ContactScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Interested Course',
-            style: GoogleFonts.inter(
-                fontSize: ContactUIConfig.fontLabelSmall + 1,
+            style: GoogleFonts.getFont(
+                ContactUIConfig.fontFamily(context),
+                fontSize: ContactUIConfig.fontLabelSmall(context) + 1,
                 fontWeight: FontWeight.w600,
-                color: ContactUIConfig.textDark)),
+                color: ContactUIConfig.titleColor(context))),
         const SizedBox(height: ContactUIConfig.spacerSmall - 2),
         Container(
           padding: const EdgeInsets.symmetric(
@@ -409,9 +444,10 @@ class _ContactScreenState extends State<ContactScreen> {
             child: DropdownButton<String>(
               value: _selectedCourse,
               isExpanded: true,
-              style: GoogleFonts.inter(
-                  fontSize: ContactUIConfig.fontLabelSmall + 1,
-                  color: ContactUIConfig.textDark),
+              style: GoogleFonts.getFont(
+                  ContactUIConfig.fontFamily(context),
+                  fontSize: ContactUIConfig.fontLabelSmall(context) + 1,
+                  color: ContactUIConfig.titleColor(context)),
               items: _courses
                   .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                   .toList(),
@@ -429,10 +465,11 @@ class _ContactScreenState extends State<ContactScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Message',
-            style: GoogleFonts.inter(
-                fontSize: ContactUIConfig.fontLabelSmall + 1,
+            style: GoogleFonts.getFont(
+                ContactUIConfig.fontFamily(context),
+                fontSize: ContactUIConfig.fontLabelSmall(context) + 1,
                 fontWeight: FontWeight.w600,
-                color: ContactUIConfig.textDark)),
+                color: ContactUIConfig.titleColor(context))),
         const SizedBox(height: ContactUIConfig.spacerSmall - 2),
         _AnimatedTextField(
           controller: _messageController,
@@ -449,7 +486,7 @@ class _ContactScreenState extends State<ContactScreen> {
     if (_nameController.text.isEmpty || _phoneController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Please fill in all required fields.',
-            style: GoogleFonts.inter()),
+            style: GoogleFonts.getFont(ContactUIConfig.fontFamily(context))),
         backgroundColor: Colors.red.shade600,
       ));
       return;
@@ -510,13 +547,13 @@ class _AnimatedTextFieldState extends State<_AnimatedTextField> {
         borderRadius:
             BorderRadius.circular(ContactUIConfig.radiusExtraSmall + 2),
         border: Border.all(
-          color: _isFocused ? ContactUIConfig.darkGreen : Colors.grey.shade200,
+          color: _isFocused ? ContactUIConfig.darkGreen(context) : Colors.grey.shade200,
           width: _isFocused ? 1.5 : 1.0,
         ),
         boxShadow: [
           if (_isFocused)
             BoxShadow(
-              color: ContactUIConfig.darkGreen.withOpacity(0.1),
+              color: ContactUIConfig.darkGreen(context).withOpacity(0.1),
               blurRadius: 8,
               spreadRadius: 1,
             )
@@ -527,9 +564,10 @@ class _AnimatedTextFieldState extends State<_AnimatedTextField> {
         controller: widget.controller,
         keyboardType: widget.keyboardType,
         maxLines: widget.maxLines,
-        style: GoogleFonts.inter(
-            fontSize: ContactUIConfig.fontLabelSmall + 1,
-            color: ContactUIConfig.textDark),
+        style: GoogleFonts.getFont(
+            ContactUIConfig.fontFamily(context),
+            fontSize: ContactUIConfig.fontLabelSmall(context) + 1,
+            color: ContactUIConfig.titleColor(context)),
         decoration: InputDecoration(
           hintText: widget.hint,
           border: InputBorder.none,
@@ -573,14 +611,14 @@ class _MapPreviewWidgetState extends State<MapPreviewWidget>
     return Container(
       height: 140,
       decoration: BoxDecoration(
-        color: ContactUIConfig.darkGreen,
-        borderRadius: BorderRadius.circular(ContactUIConfig.radiusSmall),
+        color: ContactUIConfig.darkGreen(context),
+        borderRadius: BorderRadius.circular(ContactUIConfig.radiusSmall(context)),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            ContactUIConfig.darkGreen,
-            ContactUIConfig.darkGreen.withOpacity(0.8),
+            ContactUIConfig.darkGreen(context),
+            ContactUIConfig.darkGreen(context).withOpacity(0.8),
           ],
         ),
       ),
@@ -595,7 +633,7 @@ class _MapPreviewWidgetState extends State<MapPreviewWidget>
                 height: 60 + (_pulseController.value * 20),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: ContactUIConfig.accentGold
+                  color: ContactUIConfig.accentGold(context)
                       .withOpacity(0.2 - (_pulseController.value * 0.2)),
                 ),
               );
@@ -604,16 +642,17 @@ class _MapPreviewWidgetState extends State<MapPreviewWidget>
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.location_on,
-                  color: ContactUIConfig.accentGold,
+              Icon(Icons.location_on,
+                  color: ContactUIConfig.accentGold(context),
                   size: ContactUIConfig.spacerDisplay + 4),
               const SizedBox(height: 6),
               Text(
                 'SCO Software Technology Park\nMirpur, AJK',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                    color: ContactUIConfig.white,
-                    fontSize: ContactUIConfig.fontLabelSmall,
+                style: GoogleFonts.getFont(
+                    ContactUIConfig.fontFamily(context),
+                    color: ContactUIConfig.white(context),
+                    fontSize: ContactUIConfig.fontLabelSmall(context),
                     fontWeight: FontWeight.w600,
                     shadows: [
                       Shadow(

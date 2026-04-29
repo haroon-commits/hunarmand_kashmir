@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../providers/dynamic_content_provider.dart';
 import '../../models/content_model.dart';
+import '../../utils/responsive.dart';
 
 // ─── DONATEEDITORUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to donate_editor.dart.
@@ -90,24 +91,52 @@ class _DonateEditorState extends State<DonateEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Recurring Tiers',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: DonateEditorUIConfig.textDark,
+        if (Responsive.isMobile(context))
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Recurring Tiers',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: DonateEditorUIConfig.textDark,
+                ),
               ),
-            ),
-            TextButton.icon(
-              onPressed: () => _showTierDialog(context),
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('Add Tier'),
-            ),
-          ],
-        ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton.icon(
+                  onPressed: () => _showTierDialog(context),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add Tier'),
+                  style: TextButton.styleFrom(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          )
+        else
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Recurring Tiers',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: DonateEditorUIConfig.textDark,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () => _showTierDialog(context),
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Add Tier'),
+              ),
+            ],
+          ),
         const SizedBox(height: 8),
         if (tiers.isEmpty)
           const Text('No tiers added yet.')

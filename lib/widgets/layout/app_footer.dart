@@ -18,26 +18,39 @@ import 'package:google_fonts/google_fonts.dart'; // Google Fonts for AmiriQuran 
 import 'package:provider/provider.dart'; // Provider for Consumer and context.read state access
 import '../../utils/responsive.dart'; // Responsive: isDesktop(), isTablet(), contentPaddingH()
 import '../../providers/app_state.dart'; // AppState: navigate() for quick link page switching
-import '../../providers/dynamic_content_provider.dart'; // DynamicContentProvider: footerDescription, contact*
+import '../../providers/dynamic_content_provider.dart';
+import '../../models/content_model.dart'; // DynamicContentProvider: footerDescription, contact*
 
 
 // ─── APPFOOTERUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to app_footer.dart.
 class AppFooterUIConfig {
-  // Brand Colors used locally
-  static const Color accentGold = Color(0xFFF5A623);
-  static const Color darkGreen = Color(0xFF0D3320);
+  // Brand Colors mapped to dynamic settings
+  static Color accentGold(BuildContext context) => _hexToColor(_t(context).accentColorHex);
+  static Color darkGreen(BuildContext context) => _hexToColor(_t(context).primaryColorHex);
+
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  static Color _hexToColor(String hex) {
+    final buffer = StringBuffer();
+    if (hex.length == 6 || hex.length == 7) buffer.write('ff');
+    buffer.write(hex.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
 
   // Dimensions, Spacing & Typography
-  static const double fontBodyMedium = 14.0;
-  static const double fontHeadlineLarge = 38.0;
-  static const double fontLabelSmall = 12.0;
+  static double fontBodyMedium(BuildContext context) => _t(context).fontBodyMedium;
+  static double fontHeadlineLarge(BuildContext context) => _t(context).fontHeadlineLarge;
+  static double fontLabelSmall(BuildContext context) => _t(context).fontLabelSmall;
   static const double maxContentWidth = 1200.0;
   static const double radiusMedium = 20.0;
   static const double spacerExtraLarge = 48.0;
   static const double spacerLarge = 24.0;
   static const double spacerMedium = 16.0;
   static const double spacerSmall = 8.0;
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _t(context).fontFamilyBody;
 }
 
 
@@ -64,7 +77,7 @@ class AppFooter extends StatelessWidget {
     final hPad = Responsive.contentPaddingH(context); // Adaptive horizontal padding (48/32/20px)
 
     return Container(
-      color: AppFooterUIConfig.darkGreen, // Dark green background matching app bar branding
+      color: AppFooterUIConfig.darkGreen(context), // Dark green background matching app bar branding
       child: Center(
         child: ConstrainedBox(
           // Cap content width at 1200px to prevent ultra-wide stretching
@@ -157,9 +170,10 @@ class AppFooter extends StatelessWidget {
             // Footer description: short brand narrative
             Text(
               content.footerDescription, // Full description from Firestore
-              style: GoogleFonts.inter(
+              style: GoogleFonts.getFont(
+                AppFooterUIConfig.fontFamily(context),
                 color: Colors.white54, // Semi-transparent for secondary importance
-                fontSize: AppFooterUIConfig.fontLabelSmall, // 12px small text
+                fontSize: AppFooterUIConfig.fontLabelSmall(context), // 12px small text
                 height: 1.7, // Generous line height for readability
               ),
             ),
@@ -186,9 +200,10 @@ class AppFooter extends StatelessWidget {
         // Section header in gold
         Text(
           'Quick Links', // Section title
-          style: GoogleFonts.inter(
-            color: AppFooterUIConfig.accentGold, // Gold accent for section headers
-            fontSize: AppFooterUIConfig.fontBodyMedium, // 14px
+          style: GoogleFonts.getFont(
+            AppFooterUIConfig.fontFamily(context),
+            color: AppFooterUIConfig.accentGold(context), // Gold accent for section headers
+            fontSize: AppFooterUIConfig.fontBodyMedium(context), // 14px
             fontWeight: FontWeight.w700, // Bold section title
           ),
         ),
@@ -215,19 +230,20 @@ class AppFooter extends StatelessWidget {
             // Section header in gold
             Text(
               'Get in Touch', // Section title
-              style: GoogleFonts.inter(
-                color: AppFooterUIConfig.accentGold, // Gold accent
-                fontSize: AppFooterUIConfig.fontBodyMedium, // 14px
+              style: GoogleFonts.getFont(
+                AppFooterUIConfig.fontFamily(context),
+                color: AppFooterUIConfig.accentGold(context), // Gold accent
+                fontSize: AppFooterUIConfig.fontBodyMedium(context), // 14px
                 fontWeight: FontWeight.w700, // Bold section title
               ),
             ),
             const SizedBox(height: AppFooterUIConfig.spacerSmall + 4), // 12px gap after header
             // Contact items with icons
-            _footerContact(Icons.location_on_outlined, content.contactAddress), // Address
+            _footerContact(context, Icons.location_on_outlined, content.contactAddress), // Address
             const SizedBox(height: AppFooterUIConfig.spacerSmall), // 8px gap
-            _footerContact(Icons.phone_outlined, content.contactPhone), // Phone
+            _footerContact(context, Icons.phone_outlined, content.contactPhone), // Phone
             const SizedBox(height: AppFooterUIConfig.spacerSmall), // 8px gap
-            _footerContact(Icons.email_outlined, content.contactEmail), // Email
+            _footerContact(context, Icons.email_outlined, content.contactEmail), // Email
           ],
         );
       },
@@ -247,9 +263,10 @@ class AppFooter extends StatelessWidget {
         // Copyright text on the left
         Text(
           '© 2026 Hunarmand Kashmir. All rights reserved.', // Copyright notice
-          style: GoogleFonts.inter(
+          style: GoogleFonts.getFont(
+            AppFooterUIConfig.fontFamily(context),
             color: Colors.white38, // Very subtle color for non-critical info
-            fontSize: AppFooterUIConfig.fontLabelSmall - 1, // 11px tiny text
+            fontSize: AppFooterUIConfig.fontLabelSmall(context) - 1, // 11px tiny text
           ),
         ),
         Row(
@@ -265,9 +282,10 @@ class AppFooter extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 16), // 16px gap before social icons
                   child: Text(
                     'Admin Portal', // Discreet admin access label
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.getFont(
+                      AppFooterUIConfig.fontFamily(context),
                       color: Colors.white24, // Very low contrast (intentionally hidden)
-                      fontSize: AppFooterUIConfig.fontLabelSmall - 2, // 10px tiny text
+                      fontSize: AppFooterUIConfig.fontLabelSmall(context) - 2, // 10px tiny text
                       fontWeight: FontWeight.w500, // Medium weight
                     ),
                   ),
@@ -275,11 +293,11 @@ class AppFooter extends StatelessWidget {
               ),
             ),
             // Social media icon placeholders
-            _socialIcon(Icons.camera_alt_outlined), // Instagram placeholder
+            _socialIcon(context, Icons.camera_alt_outlined), // Instagram placeholder
             const SizedBox(width: AppFooterUIConfig.spacerSmall + 4), // 12px gap
-            _socialIcon(Icons.facebook_outlined), // Facebook placeholder
+            _socialIcon(context, Icons.facebook_outlined), // Facebook placeholder
             const SizedBox(width: AppFooterUIConfig.spacerSmall + 4), // 12px gap
-            _socialIcon(Icons.alternate_email), // Twitter/X placeholder
+            _socialIcon(context, Icons.alternate_email), // Twitter/X placeholder
           ],
         ),
       ],
@@ -298,9 +316,10 @@ class AppFooter extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 4), // 4px vertical spacing between links
           child: Text(
             label, // Link display text (e.g., 'Our Story', 'All Courses')
-            style: GoogleFonts.inter(
+            style: GoogleFonts.getFont(
+              AppFooterUIConfig.fontFamily(context),
               color: Colors.white70, // Semi-transparent white for secondary links
-              fontSize: AppFooterUIConfig.fontLabelSmall, // 12px small link text
+              fontSize: AppFooterUIConfig.fontLabelSmall(context), // 12px small link text
             ),
           ),
         ),
@@ -310,18 +329,19 @@ class AppFooter extends StatelessWidget {
 
   /// Minimal contact item helper with icon + text row layout.
   /// Used for compact display of address, phone, and email information.
-  Widget _footerContact(IconData icon, String text) {
+  Widget _footerContact(BuildContext context, IconData icon, String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start, // Top-align icon with multi-line text
       children: [
-        Icon(icon, color: Colors.white54, size: AppFooterUIConfig.fontBodyMedium), // 14px icon
+        Icon(icon, color: Colors.white54, size: AppFooterUIConfig.fontBodyMedium(context)), // 14px icon
         const SizedBox(width: 6), // 6px gap between icon and text
         Expanded(
           child: Text(
             text, // Contact information string (address, phone, or email)
-            style: GoogleFonts.inter(
+            style: GoogleFonts.getFont(
+              AppFooterUIConfig.fontFamily(context),
               color: Colors.white70, // Semi-transparent white
-              fontSize: AppFooterUIConfig.fontLabelSmall - 1, // 11px tiny text
+              fontSize: AppFooterUIConfig.fontLabelSmall(context) - 1, // 11px tiny text
               height: 1.4, // Comfortable line height for multi-line addresses
             ),
           ),
@@ -333,14 +353,14 @@ class AppFooter extends StatelessWidget {
   /// Tiny social media icon orb helper.
   /// Creates a circular bordered container with a small icon inside.
   /// Currently placeholder icons; can be linked to actual social URLs later.
-  Widget _socialIcon(IconData icon) {
+  Widget _socialIcon(BuildContext context, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(6), // 6px internal padding
       decoration: BoxDecoration(
         border: Border.all(color: Colors.white24), // Subtle white border
         shape: BoxShape.circle, // Circular container
       ),
-      child: Icon(icon, color: Colors.white54, size: AppFooterUIConfig.fontLabelSmall + 2), // 14px social icon
+      child: Icon(icon, color: Colors.white54, size: AppFooterUIConfig.fontLabelSmall(context) + 2), // 14px social icon
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/content_model.dart';
 import '../../providers/dynamic_content_provider.dart';
+import '../../utils/responsive.dart';
 
 class ThemeEditor extends StatefulWidget {
   const ThemeEditor({super.key});
@@ -21,6 +22,19 @@ class _ThemeEditorState extends State<ThemeEditor> {
   late String _textLightHex;
   late double _cardBorderRadius;
   late double _buttonBorderRadius;
+
+  late double _fontDisplayDesktop;
+  late double _fontDisplayTablet;
+  late double _fontDisplayMobile;
+  late double _fontHeadlineLarge;
+  late double _fontHeadlineMedium;
+  late double _fontBodyLarge;
+  late double _fontBodyMedium;
+  late double _fontLabelLarge;
+  late double _fontLabelSmall;
+
+  late String _fontFamilyHeadings;
+  late String _fontFamilyBody;
 
   late bool _showHomeCourses;
   late bool _showHomeFeatures;
@@ -44,6 +58,19 @@ class _ThemeEditorState extends State<ThemeEditor> {
     _textLightHex = theme.textLightHex;
     _cardBorderRadius = theme.cardBorderRadius;
     _buttonBorderRadius = theme.buttonBorderRadius;
+
+    _fontDisplayDesktop = theme.fontDisplayDesktop;
+    _fontDisplayTablet = theme.fontDisplayTablet;
+    _fontDisplayMobile = theme.fontDisplayMobile;
+    _fontHeadlineLarge = theme.fontHeadlineLarge;
+    _fontHeadlineMedium = theme.fontHeadlineMedium;
+    _fontBodyLarge = theme.fontBodyLarge;
+    _fontBodyMedium = theme.fontBodyMedium;
+    _fontLabelLarge = theme.fontLabelLarge;
+    _fontLabelSmall = theme.fontLabelSmall;
+
+    _fontFamilyHeadings = theme.fontFamilyHeadings;
+    _fontFamilyBody = theme.fontFamilyBody;
 
     final layout = context.read<DynamicContentProvider>().content.layoutConfig;
     _showHomeCourses = layout.showHomeCourses;
@@ -78,6 +105,17 @@ class _ThemeEditorState extends State<ThemeEditor> {
       textLightHex: _textLightHex,
       cardBorderRadius: _cardBorderRadius,
       buttonBorderRadius: _buttonBorderRadius,
+      fontDisplayDesktop: _fontDisplayDesktop,
+      fontDisplayTablet: _fontDisplayTablet,
+      fontDisplayMobile: _fontDisplayMobile,
+      fontHeadlineLarge: _fontHeadlineLarge,
+      fontHeadlineMedium: _fontHeadlineMedium,
+      fontBodyLarge: _fontBodyLarge,
+      fontBodyMedium: _fontBodyMedium,
+      fontLabelLarge: _fontLabelLarge,
+      fontLabelSmall: _fontLabelSmall,
+      fontFamilyHeadings: _fontFamilyHeadings,
+      fontFamilyBody: _fontFamilyBody,
     );
 
     final newLayout = LayoutConfig(
@@ -213,37 +251,83 @@ class _ThemeEditorState extends State<ThemeEditor> {
     );
   }
 
+  Widget _buildFontSelector(String label, String currentFont, Function(String) onChanged) {
+    final fonts = ['Inter', 'Playfair Display', 'Roboto', 'Outfit', 'Montserrat', 'Poppins'];
+    return ListTile(
+      title: Text(label, style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+      trailing: DropdownButton<String>(
+        value: fonts.contains(currentFont) ? currentFont : 'Inter',
+        items: fonts.map((f) => DropdownMenuItem(value: f, child: Text(f))).toList(),
+        onChanged: (val) => onChanged(val!),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isMobile = Responsive.isMobile(context);
     return ListView(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Theme & Layout CMS',
-              style:
-                  GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            ElevatedButton.icon(
-              onPressed: _isSaving ? null : _saveTheme,
-              icon: _isSaving
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white))
-                  : const Icon(Icons.save),
-              label: Text(_isSaving ? 'Saving...' : 'Save Theme'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0D3320),
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        if (isMobile)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Theme & Layout CMS',
+                style: GoogleFonts.inter(
+                    fontSize: 24, fontWeight: FontWeight.bold),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _isSaving ? null : _saveTheme,
+                  icon: _isSaving
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white))
+                      : const Icon(Icons.save),
+                  label: Text(_isSaving ? 'Saving...' : 'Save Theme'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0D3320),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 16),
+                  ),
+                ),
+              ),
+            ],
+          )
+        else
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Theme & Layout CMS',
+                style: GoogleFonts.inter(
+                    fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              ElevatedButton.icon(
+                onPressed: _isSaving ? null : _saveTheme,
+                icon: _isSaving
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
+                    : const Icon(Icons.save),
+                label: Text(_isSaving ? 'Saving...' : 'Save Theme'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0D3320),
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                ),
+              ),
+            ],
+          ),
         const SizedBox(height: 32),
         Card(
           elevation: 0,
@@ -318,6 +402,109 @@ class _ThemeEditorState extends State<ThemeEditor> {
                     0,
                     40,
                     (v) => setState(() => _buttonBorderRadius = v)),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: Colors.grey.shade200),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Global Typography',
+                    style: GoogleFonts.inter(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+                const Divider(height: 32),
+                _buildFontSelector('Headings Font Family', _fontFamilyHeadings, (v) => setState(() => _fontFamilyHeadings = v)),
+                _buildFontSelector('Body Font Family', _fontFamilyBody, (v) => setState(() => _fontFamilyBody = v)),
+                const SizedBox(height: 24),
+                Text('Hero & Display (Large Text)',
+                    style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF0D3320))),
+                const SizedBox(height: 8),
+                _buildSliderTile(
+                    'Display Desktop',
+                    'Size for large hero headers on monitors.',
+                    _fontDisplayDesktop,
+                    20,
+                    120,
+                    (v) => setState(() => _fontDisplayDesktop = v)),
+                _buildSliderTile(
+                    'Display Tablet',
+                    'Size for large hero headers on tablets.',
+                    _fontDisplayTablet,
+                    20,
+                    100,
+                    (v) => setState(() => _fontDisplayTablet = v)),
+                _buildSliderTile(
+                    'Display Mobile',
+                    'Size for large hero headers on phones.',
+                    _fontDisplayMobile,
+                    18,
+                    80,
+                    (v) => setState(() => _fontDisplayMobile = v)),
+                const SizedBox(height: 16),
+                Text('Section Headers',
+                    style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF0D3320))),
+                const SizedBox(height: 8),
+                _buildSliderTile(
+                    'Headline Large',
+                    'Main section titles on desktop.',
+                    _fontHeadlineLarge,
+                    16,
+                    64,
+                    (v) => setState(() => _fontHeadlineLarge = v)),
+                _buildSliderTile(
+                    'Headline Medium',
+                    'Section titles on tablet/mobile.',
+                    _fontHeadlineMedium,
+                    14,
+                    48,
+                    (v) => setState(() => _fontHeadlineMedium = v)),
+                const SizedBox(height: 16),
+                Text('Body & Labels',
+                    style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF0D3320))),
+                const SizedBox(height: 8),
+                _buildSliderTile(
+                    'Body Large',
+                    'Primary readable text / Stat values.',
+                    _fontBodyLarge,
+                    14,
+                    36,
+                    (v) => setState(() => _fontBodyLarge = v)),
+                _buildSliderTile(
+                    'Body Medium',
+                    'Main descriptive text blocks.',
+                    _fontBodyMedium,
+                    10,
+                    24,
+                    (v) => setState(() => _fontBodyMedium = v)),
+                _buildSliderTile(
+                    'Label Large',
+                    'Card titles and navigation items.',
+                    _fontLabelLarge,
+                    10,
+                    24,
+                    (v) => setState(() => _fontLabelLarge = v)),
+                _buildSliderTile(
+                    'Label Small',
+                    'Supporting labels and small metadata.',
+                    _fontLabelSmall,
+                    8,
+                    18,
+                    (v) => setState(() => _fontLabelSmall = v)),
               ],
             ),
           ),

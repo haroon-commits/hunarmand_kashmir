@@ -8,17 +8,32 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../providers/dynamic_content_provider.dart';
+import '../../models/content_model.dart';
 
 
 // ─── SECTIONLABELUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to section_label.dart.
 class SectionLabelUIConfig {
-  // Brand Colors used locally
-  static const Color accentGold = Color(0xFFF5A623);
+  // Brand Colors mapped to dynamic settings
+  static Color accentGold(BuildContext context) => _hexToColor(_t(context).accentColorHex);
+
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  static Color _hexToColor(String hex) {
+    final buffer = StringBuffer();
+    if (hex.length == 6 || hex.length == 7) buffer.write('ff');
+    buffer.write(hex.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
 
   // Dimensions, Spacing & Typography
-  static const double fontLabelSmall = 12.0;
+  static double fontLabelSmall(BuildContext context) => _t(context).fontLabelSmall;
   static const double spacerSmall = 8.0;
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _t(context).fontFamilyBody;
 }
 
 
@@ -46,9 +61,10 @@ class SectionLabel extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: GoogleFonts.inter(
-            color: SectionLabelUIConfig.accentGold,
-            fontSize: SectionLabelUIConfig.fontLabelSmall - 1,
+          style: GoogleFonts.getFont(
+            SectionLabelUIConfig.fontFamily(context),
+            color: SectionLabelUIConfig.accentGold(context),
+            fontSize: SectionLabelUIConfig.fontLabelSmall(context) - 1,
             fontWeight: FontWeight.w700,
             letterSpacing: 1.2,
           ),

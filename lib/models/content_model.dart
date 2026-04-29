@@ -289,8 +289,21 @@ class ThemeConfig {
   final String textDarkHex;
   final String textLightHex;
 
+  final double fontDisplayDesktop;
+  final double fontDisplayTablet;
+  final double fontDisplayMobile;
+  final double fontHeadlineLarge;
+  final double fontHeadlineMedium;
+  final double fontBodyLarge;
+  final double fontBodyMedium;
+  final double fontLabelLarge;
+  final double fontLabelSmall;
+
   final double cardBorderRadius;
   final double buttonBorderRadius;
+
+  final String fontFamilyHeadings;
+  final String fontFamilyBody;
 
   ThemeConfig({
     required this.primaryColorHex,
@@ -301,6 +314,17 @@ class ThemeConfig {
     required this.textLightHex,
     required this.cardBorderRadius,
     required this.buttonBorderRadius,
+    required this.fontDisplayDesktop,
+    required this.fontDisplayTablet,
+    required this.fontDisplayMobile,
+    required this.fontHeadlineLarge,
+    required this.fontHeadlineMedium,
+    required this.fontBodyLarge,
+    required this.fontBodyMedium,
+    required this.fontLabelLarge,
+    required this.fontLabelSmall,
+    required this.fontFamilyHeadings,
+    required this.fontFamilyBody,
   });
 
   Map<String, dynamic> toJson() => {
@@ -312,6 +336,17 @@ class ThemeConfig {
         'textLightHex': textLightHex,
         'cardBorderRadius': cardBorderRadius,
         'buttonBorderRadius': buttonBorderRadius,
+        'fontDisplayDesktop': fontDisplayDesktop,
+        'fontDisplayTablet': fontDisplayTablet,
+        'fontDisplayMobile': fontDisplayMobile,
+        'fontHeadlineLarge': fontHeadlineLarge,
+        'fontHeadlineMedium': fontHeadlineMedium,
+        'fontBodyLarge': fontBodyLarge,
+        'fontBodyMedium': fontBodyMedium,
+        'fontLabelLarge': fontLabelLarge,
+        'fontLabelSmall': fontLabelSmall,
+        'fontFamilyHeadings': fontFamilyHeadings,
+        'fontFamilyBody': fontFamilyBody,
       };
 
   factory ThemeConfig.fromJson(Map<String, dynamic>? json) => ThemeConfig(
@@ -323,6 +358,17 @@ class ThemeConfig {
         textLightHex: json?['textLightHex'] ?? '#FFFFFF',
         cardBorderRadius: (json?['cardBorderRadius'] ?? 20.0).toDouble(),
         buttonBorderRadius: (json?['buttonBorderRadius'] ?? 16.0).toDouble(),
+        fontDisplayDesktop: (json?['fontDisplayDesktop'] ?? 82.0).toDouble(),
+        fontDisplayTablet: (json?['fontDisplayTablet'] ?? 56.0).toDouble(),
+        fontDisplayMobile: (json?['fontDisplayMobile'] ?? 42.0).toDouble(),
+        fontHeadlineLarge: (json?['fontHeadlineLarge'] ?? 42.0).toDouble(),
+        fontHeadlineMedium: (json?['fontHeadlineMedium'] ?? 32.0).toDouble(),
+        fontBodyLarge: (json?['fontBodyLarge'] ?? 26.0).toDouble(),
+        fontBodyMedium: (json?['fontBodyMedium'] ?? 16.0).toDouble(),
+        fontLabelLarge: (json?['fontLabelLarge'] ?? 16.0).toDouble(),
+        fontLabelSmall: (json?['fontLabelSmall'] ?? 12.0).toDouble(),
+        fontFamilyHeadings: json?['fontFamilyHeadings'] ?? 'Playfair Display',
+        fontFamilyBody: json?['fontFamilyBody'] ?? 'Inter',
       );
 }
 
@@ -365,6 +411,68 @@ class LayoutConfig {
         showAboutTeam: json?['showAboutTeam'] ?? true,
         showIconsInCards: json?['showIconsInCards'] ?? true,
       );
+}
+
+/// Granular settings for an individual screen.
+/// Allows overriding global theme defaults for specific pages.
+class ScreenSettings {
+  final String backgroundColorHex;
+  final String titleColorHex;
+  final String bodyColorHex;
+  final String buttonColorHex;
+  final String buttonTextColorHex;
+  
+  final double titleFontSize;
+  final double bodyFontSize;
+  final double subtitleFontSize;
+  
+  final String fontFamily;
+  
+  ScreenSettings({
+    required this.backgroundColorHex,
+    required this.titleColorHex,
+    required this.bodyColorHex,
+    required this.buttonColorHex,
+    required this.buttonTextColorHex,
+    required this.titleFontSize,
+    required this.bodyFontSize,
+    required this.subtitleFontSize,
+    required this.fontFamily,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'backgroundColorHex': backgroundColorHex,
+    'titleColorHex': titleColorHex,
+    'bodyColorHex': bodyColorHex,
+    'buttonColorHex': buttonColorHex,
+    'buttonTextColorHex': buttonTextColorHex,
+    'titleFontSize': titleFontSize,
+    'bodyFontSize': bodyFontSize,
+    'subtitleFontSize': subtitleFontSize,
+    'fontFamily': fontFamily,
+  };
+
+  factory ScreenSettings.fromJson(Map<String, dynamic>? json, {
+    required String defaultBg,
+    required String defaultTitleColor,
+    required String defaultBodyColor,
+    required String defaultBtnColor,
+    required String defaultBtnTextColor,
+    required double defaultTitleSize,
+    required double defaultBodySize,
+    required double defaultSubtitleSize,
+    required String defaultFont,
+  }) => ScreenSettings(
+    backgroundColorHex: json?['backgroundColorHex'] ?? defaultBg,
+    titleColorHex: json?['titleColorHex'] ?? defaultTitleColor,
+    bodyColorHex: json?['bodyColorHex'] ?? defaultBodyColor,
+    buttonColorHex: json?['buttonColorHex'] ?? defaultBtnColor,
+    buttonTextColorHex: json?['buttonTextColorHex'] ?? defaultBtnTextColor,
+    titleFontSize: (json?['titleFontSize'] ?? defaultTitleSize).toDouble(),
+    bodyFontSize: (json?['bodyFontSize'] ?? defaultBodySize).toDouble(),
+    subtitleFontSize: (json?['subtitleFontSize'] ?? defaultSubtitleSize).toDouble(),
+    fontFamily: json?['fontFamily'] ?? defaultFont,
+  );
 }
 
 /// The root model representing the entire dynamic content state of the platform.
@@ -515,6 +623,15 @@ class AppContent {
   /// Structural visibility toggles (hide/show sections).
   final LayoutConfig layoutConfig;
 
+  final ScreenSettings homeSettings;
+  final ScreenSettings aboutSettings;
+  final ScreenSettings coursesSettings;
+  final ScreenSettings gallerySettings;
+  final ScreenSettings contactSettings;
+  final ScreenSettings donateSettings;
+
+  final Map<String, ScreenSettings> sectionStyles;
+
   /// Master constructor requiring all content fields.
   /// Called by fromJson() (Firestore load) and _getDefaults() (first-run seeding).
   AppContent({
@@ -569,17 +686,16 @@ class AppContent {
     required this.galleryImages,
     required this.themeConfig,
     required this.layoutConfig,
+    required this.homeSettings,
+    required this.aboutSettings,
+    required this.coursesSettings,
+    required this.gallerySettings,
+    required this.contactSettings,
+    required this.donateSettings,
+    required this.sectionStyles,
   });
 
   /// Creates a copy of the current AppContent with modified values.
-  /// Facilitates the 'immutability and update' pattern used in state management.
-  ///
-  /// CALLED BY: Every update*() method in DynamicContentProvider.
-  /// PATTERN: Old state → copyWith(changedField: newValue) → new AppContent instance
-  /// This ensures the old state is never mutated, enabling clean state transitions.
-  ///
-  /// Each parameter is optional (nullable). If null, the current value is preserved.
-  /// If a new value is provided, it replaces the old one in the returned copy.
   AppContent copyWith({
     String? appTitle,
     String? logoPath,
@@ -632,23 +748,28 @@ class AppContent {
     List<GalleryImage>? galleryImages,
     ThemeConfig? themeConfig,
     LayoutConfig? layoutConfig,
+    ScreenSettings? homeSettings,
+    ScreenSettings? aboutSettings,
+    ScreenSettings? coursesSettings,
+    ScreenSettings? gallerySettings,
+    ScreenSettings? contactSettings,
+    ScreenSettings? donateSettings,
+    Map<String, ScreenSettings>? sectionStyles,
   }) {
-    // Creating a brand-new AppContent instance.
-    // For each field: use the new value if provided, otherwise keep the existing value (this.*).
     return AppContent(
-      appTitle: appTitle ?? this.appTitle, // Keep old if null
-      logoPath: logoPath ?? this.logoPath, // Keep old if null
-      heroHeadline: heroHeadline ?? this.heroHeadline, // Keep old if null
-      heroSubheadline: heroSubheadline ?? this.heroSubheadline, // Keep old if null
-      courses: courses ?? this.courses, // Keep old list if null
-      stats: stats ?? this.stats, // Keep old list if null
-      features: features ?? this.features, // Keep old list if null
-      donationTiers: donationTiers ?? this.donationTiers, // Keep old list if null
-      teamMembers: teamMembers ?? this.teamMembers, // Keep old list if null
-      footerDescription: footerDescription ?? this.footerDescription, // Keep old if null
-      contactAddress: contactAddress ?? this.contactAddress, // Keep old if null
-      contactPhone: contactPhone ?? this.contactPhone, // Keep old if null
-      contactEmail: contactEmail ?? this.contactEmail, // Keep old if null
+      appTitle: appTitle ?? this.appTitle,
+      logoPath: logoPath ?? this.logoPath,
+      heroHeadline: heroHeadline ?? this.heroHeadline,
+      heroSubheadline: heroSubheadline ?? this.heroSubheadline,
+      courses: courses ?? this.courses,
+      stats: stats ?? this.stats,
+      features: features ?? this.features,
+      donationTiers: donationTiers ?? this.donationTiers,
+      teamMembers: teamMembers ?? this.teamMembers,
+      footerDescription: footerDescription ?? this.footerDescription,
+      contactAddress: contactAddress ?? this.contactAddress,
+      contactPhone: contactPhone ?? this.contactPhone,
+      contactEmail: contactEmail ?? this.contactEmail,
       aboutStoryHeadline: aboutStoryHeadline ?? this.aboutStoryHeadline,
       aboutStoryText: aboutStoryText ?? this.aboutStoryText,
       aboutMissionText: aboutMissionText ?? this.aboutMissionText,
@@ -656,15 +777,15 @@ class AppContent {
       aboutVisionText: aboutVisionText ?? this.aboutVisionText,
       aboutVisionIcon: aboutVisionIcon ?? this.aboutVisionIcon,
       aboutValuesText: aboutValuesText ?? this.aboutValuesText,
-      aboutValuesIcon: aboutValuesIcon ?? this.aboutValuesIcon, // Keep old if null
-      donateHeroTitle: donateHeroTitle ?? this.donateHeroTitle, // Keep old if null
-      donateHeroDescription: donateHeroDescription ?? this.donateHeroDescription, // Keep old if null
-      contactHeroTitle: contactHeroTitle ?? this.contactHeroTitle, // Keep old if null
-      contactHeroDescription: contactHeroDescription ?? this.contactHeroDescription, // Keep old if null
-      homeWhyTitle: homeWhyTitle ?? this.homeWhyTitle, // Keep old if null
-      homeWhyDescription: homeWhyDescription ?? this.homeWhyDescription, // Keep old if null
-      homeCtaTitle: homeCtaTitle ?? this.homeCtaTitle, // Keep old if null
-      homeCtaDescription: homeCtaDescription ?? this.homeCtaDescription, // Keep old if null
+      aboutValuesIcon: aboutValuesIcon ?? this.aboutValuesIcon,
+      donateHeroTitle: donateHeroTitle ?? this.donateHeroTitle,
+      donateHeroDescription: donateHeroDescription ?? this.donateHeroDescription,
+      contactHeroTitle: contactHeroTitle ?? this.contactHeroTitle,
+      contactHeroDescription: contactHeroDescription ?? this.contactHeroDescription,
+      homeWhyTitle: homeWhyTitle ?? this.homeWhyTitle,
+      homeWhyDescription: homeWhyDescription ?? this.homeWhyDescription,
+      homeCtaTitle: homeCtaTitle ?? this.homeCtaTitle,
+      homeCtaDescription: homeCtaDescription ?? this.homeCtaDescription,
       courseLearningChoiceTitle: courseLearningChoiceTitle ?? this.courseLearningChoiceTitle,
       courseLearningChoiceDescription: courseLearningChoiceDescription ?? this.courseLearningChoiceDescription,
       courseLocation1Icon: courseLocation1Icon ?? this.courseLocation1Icon,
@@ -682,31 +803,35 @@ class AppContent {
       courseOrphanSupportIcon: courseOrphanSupportIcon ?? this.courseOrphanSupportIcon,
       courseOrphanSupportTitle: courseOrphanSupportTitle ?? this.courseOrphanSupportTitle,
       courseOrphanSupportDescription: courseOrphanSupportDescription ?? this.courseOrphanSupportDescription,
-      galleryHeroTitle: galleryHeroTitle ?? this.galleryHeroTitle, // Keep old if null
-      galleryHeroDescription: galleryHeroDescription ?? this.galleryHeroDescription, // Keep old if null
-      galleryImages: galleryImages ?? this.galleryImages, // Keep old list if null
-      themeConfig: themeConfig ?? this.themeConfig, // Keep old config if null
-      layoutConfig: layoutConfig ?? this.layoutConfig, // Keep old layout if null
+      galleryHeroTitle: galleryHeroTitle ?? this.galleryHeroTitle,
+      galleryHeroDescription: galleryHeroDescription ?? this.galleryHeroDescription,
+      galleryImages: galleryImages ?? this.galleryImages,
+      themeConfig: themeConfig ?? this.themeConfig,
+      layoutConfig: layoutConfig ?? this.layoutConfig,
+      homeSettings: homeSettings ?? this.homeSettings,
+      aboutSettings: aboutSettings ?? this.aboutSettings,
+      coursesSettings: coursesSettings ?? this.coursesSettings,
+      gallerySettings: gallerySettings ?? this.gallerySettings,
+      contactSettings: contactSettings ?? this.contactSettings,
+      donateSettings: donateSettings ?? this.donateSettings,
+      sectionStyles: sectionStyles ?? this.sectionStyles,
     );
   }
 
-  /// Serializes the entire application content to a JSON map.
-  /// Called by DynamicContentProvider.saveContent() to persist state to Firestore.
-  /// Each nested model (Course, Feature, etc.) calls its own toJson() method.
   Map<String, dynamic> toJson() => {
-        'appTitle': appTitle, // Serializes the app title string
-        'logoPath': logoPath, // Serializes the optional logo URL (can be null)
-        'heroHeadline': heroHeadline, // Serializes the hero headline
-        'heroSubheadline': heroSubheadline, // Serializes the hero subheadline
-        'courses': courses.map((x) => x.toJson()).toList(), // Converts each Course to JSON map, then collects into a List
-        'stats': stats.map((x) => x.toJson()).toList(), // Converts each Stat to JSON map
-        'features': features.map((x) => x.toJson()).toList(), // Converts each Feature to JSON map
-        'donationTiers': donationTiers.map((x) => x.toJson()).toList(), // Converts each DonationTier to JSON map
-        'teamMembers': teamMembers.map((x) => x.toJson()).toList(), // Converts each TeamMember to JSON map
-        'footerDescription': footerDescription, // Serializes footer text
-        'contactAddress': contactAddress, // Serializes address string
-        'contactPhone': contactPhone, // Serializes phone string
-        'contactEmail': contactEmail, // Serializes email string
+        'appTitle': appTitle,
+        'logoPath': logoPath,
+        'heroHeadline': heroHeadline,
+        'heroSubheadline': heroSubheadline,
+        'courses': courses.map((x) => x.toJson()).toList(),
+        'stats': stats.map((x) => x.toJson()).toList(),
+        'features': features.map((x) => x.toJson()).toList(),
+        'donationTiers': donationTiers.map((x) => x.toJson()).toList(),
+        'teamMembers': teamMembers.map((x) => x.toJson()).toList(),
+        'footerDescription': footerDescription,
+        'contactAddress': contactAddress,
+        'contactPhone': contactPhone,
+        'contactEmail': contactEmail,
         'aboutStoryHeadline': aboutStoryHeadline,
         'aboutStoryText': aboutStoryText,
         'aboutMissionText': aboutMissionText,
@@ -714,15 +839,15 @@ class AppContent {
         'aboutVisionText': aboutVisionText,
         'aboutVisionIcon': aboutVisionIcon,
         'aboutValuesText': aboutValuesText,
-        'aboutValuesIcon': aboutValuesIcon, // Serializes values narrative
-        'donateHeroTitle': donateHeroTitle, // Serializes donate page title
-        'donateHeroDescription': donateHeroDescription, // Serializes donate page description
-        'contactHeroTitle': contactHeroTitle, // Serializes contact page title
-        'contactHeroDescription': contactHeroDescription, // Serializes contact page description
-        'homeWhyTitle': homeWhyTitle, // Serializes 'Why Us' title
-        'homeWhyDescription': homeWhyDescription, // Serializes 'Why Us' description
-        'homeCtaTitle': homeCtaTitle, // Serializes CTA title
-        'homeCtaDescription': homeCtaDescription, // Serializes CTA description
+        'aboutValuesIcon': aboutValuesIcon,
+        'donateHeroTitle': donateHeroTitle,
+        'donateHeroDescription': donateHeroDescription,
+        'contactHeroTitle': contactHeroTitle,
+        'contactHeroDescription': contactHeroDescription,
+        'homeWhyTitle': homeWhyTitle,
+        'homeWhyDescription': homeWhyDescription,
+        'homeCtaTitle': homeCtaTitle,
+        'homeCtaDescription': homeCtaDescription,
         'courseLearningChoiceTitle': courseLearningChoiceTitle,
         'courseLearningChoiceDescription': courseLearningChoiceDescription,
         'courseLocation1Icon': courseLocation1Icon,
@@ -740,38 +865,34 @@ class AppContent {
         'courseOrphanSupportIcon': courseOrphanSupportIcon,
         'courseOrphanSupportTitle': courseOrphanSupportTitle,
         'courseOrphanSupportDescription': courseOrphanSupportDescription,
-        'galleryHeroTitle': galleryHeroTitle, // Serializes gallery title
-        'galleryHeroDescription': galleryHeroDescription, // Serializes gallery description
-        'galleryImages': galleryImages.map((x) => x.toJson()).toList(), // Converts each GalleryImage to JSON map
-        'themeConfig': themeConfig.toJson(), // Serializes theme config
-        'layoutConfig': layoutConfig.toJson(), // Serializes layout config
+        'galleryHeroTitle': galleryHeroTitle,
+        'galleryHeroDescription': galleryHeroDescription,
+        'galleryImages': galleryImages.map((x) => x.toJson()).toList(),
+        'themeConfig': themeConfig.toJson(),
+        'layoutConfig': layoutConfig.toJson(),
+        'homeSettings': homeSettings.toJson(),
+        'aboutSettings': aboutSettings.toJson(),
+        'coursesSettings': coursesSettings.toJson(),
+        'gallerySettings': gallerySettings.toJson(),
+        'contactSettings': contactSettings.toJson(),
+        'donateSettings': donateSettings.toJson(),
+        'sectionStyles': sectionStyles.map((k, v) => MapEntry(k, v.toJson())),
       };
 
-  /// Main factory constructor for synchronizing state with Firestore.
-  /// Called by DynamicContentProvider._loadFromFirestore() when a Firestore snapshot arrives.
-  /// Each field reads from the JSON map with safe fallback defaults for backward compatibility.
-  ///
-  /// PATTERN: Firestore document → Map<String, dynamic> → AppContent.fromJson(map) → _content
   factory AppContent.fromJson(Map<String, dynamic> json) => AppContent(
-        appTitle: json['appTitle'], // Reads global app title from Firestore
-        logoPath: json['logoPath'], // Reads optional logo URL (may be null)
-        heroHeadline: json['heroHeadline'], // Reads hero headline
-        heroSubheadline: json['heroSubheadline'], // Reads hero subheadline
-        // Deserializes each course JSON map into a Course object, then collects into a typed List
+        appTitle: json['appTitle'],
+        logoPath: json['logoPath'],
+        heroHeadline: json['heroHeadline'],
+        heroSubheadline: json['heroSubheadline'],
         courses: List<Course>.from(json['courses'].map((x) => Course.fromJson(x))),
-        // Deserializes each stat JSON map into a Stat object
         stats: List<Stat>.from((json['stats'] ?? []).map((x) => Stat.fromJson(x))),
-        // Deserializes each feature JSON map into a Feature object
         features: List<Feature>.from(json['features'].map((x) => Feature.fromJson(x))),
-        // Deserializes each donation tier JSON map into a DonationTier object
         donationTiers: List<DonationTier>.from(json['donationTiers'].map((x) => DonationTier.fromJson(x))),
-        // Deserializes each team member JSON map into a TeamMember object
         teamMembers: List<TeamMember>.from(json['teamMembers'].map((x) => TeamMember.fromJson(x))),
-        footerDescription: json['footerDescription'], // Reads footer description from Firestore
-        contactAddress: json['contactAddress'], // Reads contact address from Firestore
-        contactPhone: json['contactPhone'], // Reads phone number from Firestore
-        contactEmail: json['contactEmail'], // Reads email address from Firestore
-        // All About-page fields have '' fallbacks for backward compatibility with older Firestore documents
+        footerDescription: json['footerDescription'],
+        contactAddress: json['contactAddress'],
+        contactPhone: json['contactPhone'],
+        contactEmail: json['contactEmail'],
         aboutStoryHeadline: json['aboutStoryHeadline'] ?? '',
         aboutStoryText: json['aboutStoryText'] ?? '',
         aboutMissionText: json['aboutMissionText'] ?? '',
@@ -779,21 +900,17 @@ class AppContent {
         aboutVisionText: json['aboutVisionText'] ?? '',
         aboutVisionIcon: json['aboutVisionIcon'] ?? 'material:favorite',
         aboutValuesText: json['aboutValuesText'] ?? '',
-        aboutValuesIcon: json['aboutValuesIcon'] ?? 'material:diversity', // Fallback: empty string
-        // Donate page fields have descriptive fallback text for first-time deployments
+        aboutValuesIcon: json['aboutValuesIcon'] ?? 'material:diversity',
         donateHeroTitle: json['donateHeroTitle'] ?? 'Invest in Dignity, Not Dependency.',
-        donateHeroDescription: json['donateHeroDescription'] ?? 'Your contribution unlocks futures. Help empower youth in Kashmir to earn a livelihood and build self-reliant communities.',
-        // Contact page fields with descriptive fallback text
+        donateHeroDescription: json['donateHeroDescription'] ?? 'Your contribution unlocks futures.',
         contactHeroTitle: json['contactHeroTitle'] ?? 'Get in Touch',
-        contactHeroDescription: json['contactHeroDescription'] ?? 'Have questions? We are here to help you start your journey or discuss collaboration opportunities.',
-        // Home page 'Why Us' section with descriptive fallback text
+        contactHeroDescription: json['contactHeroDescription'] ?? 'Have questions?',
         homeWhyTitle: json['homeWhyTitle'] ?? 'Why Hunarmand Kashmir?',
-        homeWhyDescription: json['homeWhyDescription'] ?? 'We believe in "Skills over Degrees". In a rapidly changing world, we provide practical, hands-on training that the industry demands, right here in Mirpur.',
-        // Home page CTA section with descriptive fallback text
+        homeWhyDescription: json['homeWhyDescription'] ?? 'We believe in "Skills over Degrees".',
         homeCtaTitle: json['homeCtaTitle'] ?? 'Your Journey Begins Here',
-        homeCtaDescription: json['homeCtaDescription'] ?? "Don't let lack of opportunity hold you back. Join Hunarmand Kashmir today and unlock a future of dignity, independence, and success.",
+        homeCtaDescription: json['homeCtaDescription'] ?? "Don't let lack of opportunity hold you back.",
         courseLearningChoiceTitle: json['courseLearningChoiceTitle'] ?? 'Your Learning, Your Choice',
-        courseLearningChoiceDescription: json['courseLearningChoiceDescription'] ?? 'Choose the location and schedule that fits your routine.',
+        courseLearningChoiceDescription: json['courseLearningChoiceDescription'] ?? 'Choose the location and schedule.',
         courseLocation1Icon: json['courseLocation1Icon'] ?? 'material:school',
         courseLocation1Title: json['courseLocation1Title'] ?? 'Freelancing Hub (HFK)',
         courseLocation1Text: json['courseLocation1Text'] ?? 'Hassan Colony, Mirpur',
@@ -808,15 +925,91 @@ class AppContent {
         courseLocation3Timing: json['courseLocation3Timing'] ?? 'Flexible Timings',
         courseOrphanSupportIcon: json['courseOrphanSupportIcon'] ?? '❤️',
         courseOrphanSupportTitle: json['courseOrphanSupportTitle'] ?? 'Support for Orphans',
-        courseOrphanSupportDescription: json['courseOrphanSupportDescription'] ?? 'We provide a 100% Fee Waiver for orphan students to ensure they have the same opportunities as everyone else.',
-        // Gallery page fields with descriptive fallback text
+        courseOrphanSupportDescription: json['courseOrphanSupportDescription'] ?? 'We provide a 100% Fee Waiver.',
         galleryHeroTitle: json['galleryHeroTitle'] ?? 'Moments of Hope',
-        galleryHeroDescription: json['galleryHeroDescription'] ?? 'Witness the journey of transformation. From Mirpur to Bhimber, empowering every corner of Kashmir.',
-        // Gallery images: checks if the field exists, deserializes if so, otherwise empty list
+        galleryHeroDescription: json['galleryHeroDescription'] ?? 'Witness the journey of transformation.',
         galleryImages: json['galleryImages'] != null
             ? List<GalleryImage>.from(json['galleryImages'].map((x) => GalleryImage.fromJson(x)))
-            : [], // Fallback: empty gallery for older Firestore documents
-        themeConfig: ThemeConfig.fromJson(json['themeConfig']), // Safe deserialization
-        layoutConfig: LayoutConfig.fromJson(json['layoutConfig']), // Safe deserialization
+            : [],
+        themeConfig: ThemeConfig.fromJson(json['themeConfig']),
+        layoutConfig: LayoutConfig.fromJson(json['layoutConfig']),
+        homeSettings: ScreenSettings.fromJson(json['homeSettings'],
+            defaultBg: '#FAFAFA',
+            defaultTitleColor: '#1A1A1A',
+            defaultBodyColor: '#555555',
+            defaultBtnColor: '#0D3320',
+            defaultBtnTextColor: '#FFFFFF',
+            defaultTitleSize: 42.0,
+            defaultBodySize: 16.0,
+            defaultSubtitleSize: 18.0,
+            defaultFont: 'Inter'),
+        aboutSettings: ScreenSettings.fromJson(json['aboutSettings'],
+            defaultBg: '#FAFAFA',
+            defaultTitleColor: '#1A1A1A',
+            defaultBodyColor: '#555555',
+            defaultBtnColor: '#0D3320',
+            defaultBtnTextColor: '#FFFFFF',
+            defaultTitleSize: 42.0,
+            defaultBodySize: 16.0,
+            defaultSubtitleSize: 18.0,
+            defaultFont: 'Inter'),
+        coursesSettings: ScreenSettings.fromJson(json['coursesSettings'],
+            defaultBg: '#FAFAFA',
+            defaultTitleColor: '#1A1A1A',
+            defaultBodyColor: '#555555',
+            defaultBtnColor: '#0D3320',
+            defaultBtnTextColor: '#FFFFFF',
+            defaultTitleSize: 42.0,
+            defaultBodySize: 16.0,
+            defaultSubtitleSize: 18.0,
+            defaultFont: 'Inter'),
+        gallerySettings: ScreenSettings.fromJson(json['gallerySettings'],
+            defaultBg: '#FAFAFA',
+            defaultTitleColor: '#1A1A1A',
+            defaultBodyColor: '#555555',
+            defaultBtnColor: '#0D3320',
+            defaultBtnTextColor: '#FFFFFF',
+            defaultTitleSize: 42.0,
+            defaultBodySize: 16.0,
+            defaultSubtitleSize: 18.0,
+            defaultFont: 'Inter'),
+        contactSettings: ScreenSettings.fromJson(json['contactSettings'],
+            defaultBg: '#FAFAFA',
+            defaultTitleColor: '#1A1A1A',
+            defaultBodyColor: '#555555',
+            defaultBtnColor: '#0D3320',
+            defaultBtnTextColor: '#FFFFFF',
+            defaultTitleSize: 42.0,
+            defaultBodySize: 16.0,
+            defaultSubtitleSize: 18.0,
+            defaultFont: 'Inter'),
+        donateSettings: ScreenSettings.fromJson(json['donateSettings'],
+            defaultBg: '#1A4A2E',
+            defaultTitleColor: '#FFFFFF',
+            defaultBodyColor: '#E0E0E0',
+            defaultBtnColor: '#F5A623',
+            defaultBtnTextColor: '#0D3320',
+            defaultTitleSize: 42.0,
+            defaultBodySize: 16.0,
+            defaultSubtitleSize: 18.0,
+            defaultFont: 'Inter'),
+        sectionStyles: (json['sectionStyles'] as Map<String, dynamic>?)?.map(
+              (k, v) => MapEntry(
+                k,
+                ScreenSettings.fromJson(
+                  v as Map<String, dynamic>,
+                  defaultBg: '#FAFAFA',
+                  defaultTitleColor: '#1A1A1A',
+                  defaultBodyColor: '#555555',
+                  defaultBtnColor: '#0D3320',
+                  defaultBtnTextColor: '#FFFFFF',
+                  defaultTitleSize: 32.0,
+                  defaultBodySize: 16.0,
+                  defaultSubtitleSize: 18.0,
+                  defaultFont: 'Inter',
+                ),
+              ),
+            ) ??
+            {},
       );
 }

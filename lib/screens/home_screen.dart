@@ -17,6 +17,7 @@ import '../widgets/common/responsive_grid.dart';
 import '../providers/dynamic_content_provider.dart';
 import '../utils/responsive.dart';
 import '../widgets/utils/dynamic_icon.dart';
+import '../utils/color_utils.dart';
 
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
@@ -26,15 +27,22 @@ import '../models/content_model.dart';
 /// Isolated UI configuration specific to only the Home Screen.
 /// Modifying these will only change the Home Screen visually.
 class HomeUIConfig {
+  // Helper to access current screen settings
+  static ScreenSettings _s(BuildContext context) => context.read<DynamicContentProvider>().content.homeSettings;
+  static ScreenSettings _sec(BuildContext context, String id) => 
+      context.read<DynamicContentProvider>().content.sectionStyles[id] ?? _s(context);
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
   // Colors specific to Home
-  static const Color darkGreen = Color(0xFF0D3320);
-  static const Color mediumGreen = Color(0xFF1A4A2E);
-  static const Color accentGold = Color(0xFFF5A623);
-  static const Color white = Color(0xFFFFFFFF);
-  static const Color white70 = Color(0xB3FFFFFF); // 70% opacity white
-  static const Color white38 = Color(0x61FFFFFF); // 38% opacity white
-  static const Color offWhite = Color(0xFFF9F9F9);
-  static const Color textMedium = Color(0xFF555555);
+  static Color darkGreen(BuildContext context) => hexToColor(_t(context).primaryColorHex);
+  static Color mediumGreen(BuildContext context) => darkGreen(context).withOpacity(0.85);
+  static Color accentGold(BuildContext context) => hexToColor(_t(context).accentColorHex);
+  static Color white(BuildContext context) => hexToColor(_t(context).cardBackgroundColorHex);
+  static Color backgroundColor(BuildContext context) => hexToColor(_s(context).backgroundColorHex);
+  static Color titleColor(BuildContext context) => hexToColor(_s(context).titleColorHex);
+  static Color bodyColor(BuildContext context) => hexToColor(_s(context).bodyColorHex);
+  static Color buttonColor(BuildContext context) => hexToColor(_s(context).buttonColorHex);
+  static Color buttonTextColor(BuildContext context) => hexToColor(_s(context).buttonTextColorHex);
 
   // Dimensions and Constraints
   static const double maxContentWidth = 1200.0;
@@ -54,26 +62,26 @@ class HomeUIConfig {
   static const double spacerDisplay = 32.0;
 
   // Typography - Hero Section
-  static const double fontHeroDesktop = 102.0;
-  static const double fontHeroTablet = 114.0;
-  static const double fontHeroMobile = 106.0;
+  static double fontHero(BuildContext context) => _s(context).titleFontSize * 1.5;
 
   // Typography - Displays & Headlines
-  static const double fontDisplayDesktop = 82.0;
-  static const double fontDisplayTablet = 76.0;
-  static const double fontDisplayMobile = 72.0;
-  static const double fontHeadlineLarge = 38.0;
-  static const double fontHeadlineMedium = 32.0;
+  static double fontDisplay(BuildContext context) => _s(context).titleFontSize;
+  static double fontHeadlineLarge(BuildContext context) => _s(context).titleFontSize;
+  static double fontHeadlineMedium(BuildContext context) => _s(context).subtitleFontSize;
 
   // Typography - Body & Labels
-  static const double fontBodyLarge = 26.0;
-  static const double fontBodyMedium = 14.0;
-  static const double fontLabelLarge = 14.0;
-  static const double fontLabelSmall = 12.0;
+  static double fontBodyLarge(BuildContext context) => _s(context).bodyFontSize + 4;
+  static double fontBodyMedium(BuildContext context) => _s(context).bodyFontSize;
+  static double fontLabelLarge(BuildContext context) => _s(context).bodyFontSize;
+  static double fontLabelSmall(BuildContext context) => _s(context).bodyFontSize - 4;
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _s(context).fontFamily;
 
   // Component Specifics
   static const double iconSizeSmall = 18.0;
-  static const double radiusLarge = 30.0; // Button radius
+  static double radiusLarge(BuildContext context) => _t(context).buttonBorderRadius;
+  static double cardRadius(BuildContext context) => _t(context).cardBorderRadius;
 
   // Button Paddings
   static const double paddingButtonLargeH = 50.0;
@@ -201,21 +209,8 @@ class _HeroSection extends StatelessWidget {
     final isDesktop = Responsive.isDesktop(context);
     final isTablet = Responsive.isTablet(context);
 
-    // Adaptive sizing using AppUIConfig markers
-    final titleSize = isDesktop
-        ? HomeUIConfig.fontHeroDesktop
-        : isTablet
-            ? HomeUIConfig.fontHeroTablet
-            : HomeUIConfig.fontHeroMobile;
-
-    final subtitleSize = isDesktop
-        ? HomeUIConfig.fontDisplayDesktop
-        : isTablet
-            ? HomeUIConfig.fontDisplayTablet
-            : HomeUIConfig.fontDisplayMobile;
-
-    final bodySize =
-        isDesktop ? HomeUIConfig.fontBodyLarge : HomeUIConfig.fontBodyMedium;
+    final hPad = Responsive.contentPaddingH(context);
+    final secStyle = HomeUIConfig._sec(context, 'home_hero');
 
     final vPad = isDesktop
         ? HomeUIConfig.paddingHeroDesktop + 24
@@ -223,11 +218,9 @@ class _HeroSection extends StatelessWidget {
             ? HomeUIConfig.paddingHeroTablet + 16
             : HomeUIConfig.paddingHeroMobile + 8;
 
-    final hPad = Responsive.contentPaddingH(context);
-
     return Container(
       width: double.infinity,
-      color: HomeUIConfig.darkGreen,
+      color: hexToColor(secStyle.backgroundColorHex),
       child: Stack(
         children: [
           // Visual diagonal decoration
@@ -237,7 +230,7 @@ class _HeroSection extends StatelessWidget {
             right: 0,
             child: CustomPaint(
               size: const Size(double.infinity, 0),
-              painter: _DiagonalPainter(),
+              painter: _DiagonalPainter(HomeUIConfig.backgroundColor(context)),
             ),
           ),
           Center(
@@ -256,16 +249,17 @@ class _HeroSection extends StatelessWidget {
                         // Brand logo image in hero
                         Image.asset(
                           'assets/images/main_logo.png',
-                          height: titleSize * 0.7, // Proportional to hero text size
+                          height: secStyle.titleFontSize * 0.7, // Proportional to hero text size
                           fit: BoxFit.contain,
                         ),
                         const SizedBox(height: HomeUIConfig.spacerLarge),
                         Text(
                           headline,
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
-                            color: HomeUIConfig.white,
-                            fontSize: subtitleSize,
+                          style: GoogleFonts.getFont(
+                            secStyle.fontFamily,
+                            color: hexToColor(secStyle.titleColorHex),
+                            fontSize: secStyle.titleFontSize,
                             fontWeight: FontWeight.bold,
                             height: 1.3,
                           ),
@@ -277,9 +271,10 @@ class _HeroSection extends StatelessWidget {
                           child: Text(
                             subheadline,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(
-                              color: HomeUIConfig.white70,
-                              fontSize: bodySize,
+                            style: GoogleFonts.getFont(
+                              secStyle.fontFamily,
+                              color: hexToColor(secStyle.bodyColorHex),
+                              fontSize: secStyle.bodyFontSize,
                               height: 1.7,
                             ),
                           ),
@@ -334,13 +329,11 @@ class _WhySectionSliver extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hPad = Responsive.contentPaddingH(context);
-    final titleSize = Responsive.isDesktop(context)
-        ? HomeUIConfig.fontDisplayDesktop
-        : HomeUIConfig.fontDisplayTablet;
+    final secStyle = HomeUIConfig._sec(context, 'home_why');
 
     return SliverToBoxAdapter(
       child: Container(
-        color: HomeUIConfig.offWhite,
+        color: hexToColor(secStyle.backgroundColorHex),
         child: Center(
           child: ConstrainedBox(
             constraints:
@@ -355,9 +348,10 @@ class _WhySectionSliver extends StatelessWidget {
                   Text(
                     title,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      color: HomeUIConfig.darkGreen,
-                      fontSize: titleSize,
+                    style: GoogleFonts.getFont(
+                      secStyle.fontFamily,
+                      color: hexToColor(secStyle.titleColorHex),
+                      fontSize: secStyle.titleFontSize,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -367,7 +361,7 @@ class _WhySectionSliver extends StatelessWidget {
                     width: 48,
                     height: 3,
                     decoration: BoxDecoration(
-                      color: HomeUIConfig.accentGold,
+                      color: HomeUIConfig.accentGold(context),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -378,9 +372,10 @@ class _WhySectionSliver extends StatelessWidget {
                     child: Text(
                       description,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        color: HomeUIConfig.textMedium,
-                        fontSize: HomeUIConfig.fontBodyMedium,
+                      style: GoogleFonts.getFont(
+                        secStyle.fontFamily,
+                        color: hexToColor(secStyle.bodyColorHex),
+                        fontSize: secStyle.bodyFontSize,
                         height: 1.7,
                       ),
                     ),
@@ -424,7 +419,7 @@ class _CoursesSectionSliver extends StatelessWidget {
 
     return SliverToBoxAdapter(
       child: Container(
-        color: HomeUIConfig.white,
+        color: HomeUIConfig.white(context),
         child: Center(
           child: ConstrainedBox(
             constraints:
@@ -439,9 +434,10 @@ class _CoursesSectionSliver extends StatelessWidget {
                 children: [
                   Text(
                     'OUR PROGRAMS',
-                    style: GoogleFonts.inter(
-                      color: HomeUIConfig.accentGold,
-                      fontSize: HomeUIConfig.fontLabelSmall - 1,
+                    style: GoogleFonts.getFont(
+                      HomeUIConfig.fontFamily(context),
+                      color: HomeUIConfig.accentGold(context),
+                      fontSize: HomeUIConfig.fontLabelSmall(context) - 1,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.5,
                     ),
@@ -480,18 +476,19 @@ class _CoursesSectionSliver extends StatelessWidget {
                         onPressed: () =>
                             context.read<AppState>().navigate('courses'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: HomeUIConfig.darkGreen,
-                          side: const BorderSide(color: HomeUIConfig.darkGreen),
+                          foregroundColor: HomeUIConfig.darkGreen(context),
+                          side: BorderSide(color: HomeUIConfig.darkGreen(context)),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
-                                  HomeUIConfig.radiusLarge)),
+                                  HomeUIConfig.radiusLarge(context))),
                         ),
                         child: Text(
                           'View All Courses →',
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.getFont(
+                            HomeUIConfig.fontFamily(context),
                             fontWeight: FontWeight.w600,
-                            fontSize: HomeUIConfig.fontLabelLarge,
+                            fontSize: HomeUIConfig.fontLabelLarge(context),
                           ),
                         ),
                       ),
@@ -519,10 +516,11 @@ class _CtaSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hPad = Responsive.contentPaddingH(context);
+    final secStyle = HomeUIConfig._sec(context, 'home_cta');
 
     return Container(
       width: double.infinity,
-      color: HomeUIConfig.darkGreen,
+      color: hexToColor(secStyle.backgroundColorHex),
       child: Center(
         child: ConstrainedBox(
           constraints:
@@ -537,9 +535,10 @@ class _CtaSection extends StatelessWidget {
                 Text(
                   title,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: HomeUIConfig.white,
-                    fontSize: HomeUIConfig.fontHeadlineLarge,
+                  style: GoogleFonts.getFont(
+                    secStyle.fontFamily,
+                    color: hexToColor(secStyle.titleColorHex),
+                    fontSize: secStyle.titleFontSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -550,9 +549,10 @@ class _CtaSection extends StatelessWidget {
                   child: Text(
                     description,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      color: HomeUIConfig.white70,
-                      fontSize: HomeUIConfig.fontBodyMedium,
+                    style: GoogleFonts.getFont(
+                      secStyle.fontFamily,
+                      color: hexToColor(secStyle.bodyColorHex),
+                      fontSize: secStyle.bodyFontSize,
                       height: 1.6,
                     ),
                   ),
@@ -584,8 +584,8 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fontSize = Responsive.isDesktop(context)
-        ? HomeUIConfig.fontHeadlineLarge
-        : HomeUIConfig.fontHeadlineMedium;
+        ? HomeUIConfig.fontHeadlineLarge(context)
+        : HomeUIConfig.fontHeadlineMedium(context);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -593,8 +593,9 @@ class _SectionHeader extends StatelessWidget {
         Expanded(
           child: Text(
             title,
-            style: GoogleFonts.inter(
-              color: HomeUIConfig.darkGreen,
+            style: GoogleFonts.getFont(
+              HomeUIConfig.fontFamily(context),
+              color: HomeUIConfig.titleColor(context),
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
             ),
@@ -610,16 +611,17 @@ class _SectionHeader extends StatelessWidget {
               children: [
                 Text(
                   'View all',
-                  style: GoogleFonts.inter(
-                    color: HomeUIConfig.darkGreen,
-                    fontSize: HomeUIConfig.fontBodyMedium - 1,
+                  style: GoogleFonts.getFont(
+                    HomeUIConfig.fontFamily(context),
+                    color: HomeUIConfig.titleColor(context),
+                    fontSize: HomeUIConfig.fontBodyMedium(context) - 1,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.arrow_forward,
                   size: HomeUIConfig.iconSizeSmall + 1,
-                  color: HomeUIConfig.darkGreen,
+                  color: HomeUIConfig.darkGreen(context),
                 ),
               ],
             ),
@@ -642,7 +644,7 @@ class _StatsSectionSliver extends StatelessWidget {
 
     return SliverToBoxAdapter(
       child: Container(
-        color: HomeUIConfig.darkGreen,
+        color: HomeUIConfig.darkGreen(context),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: HomeUIConfig.maxContentWidth),
@@ -684,9 +686,19 @@ class _StatCardState extends State<_StatCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        transform: Matrix4.identity()
+          ..translate(0.0, _isHovered ? -6.0 : 0.0),
         decoration: BoxDecoration(
-          color: _isHovered ? Colors.white.withOpacity(0.05) : Colors.transparent,
-          borderRadius: BorderRadius.circular(HomeUIConfig.radiusLarge / 2),
+          color: _isHovered ? Colors.white.withOpacity(0.08) : Colors.transparent,
+          borderRadius: BorderRadius.circular(HomeUIConfig.radiusLarge(context) / 2),
+          boxShadow: [
+            if (_isHovered)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
+              ),
+          ],
         ),
         child: Column(
           children: [
@@ -695,25 +707,27 @@ class _StatCardState extends State<_StatCard> {
               duration: const Duration(milliseconds: 200),
               child: renderDynamicIcon(
                 widget.stat.icon,
-                color: HomeUIConfig.accentGold,
+                color: HomeUIConfig.accentGold(context),
                 size: HomeUIConfig.spacerExtraLarge,
               ),
             ),
             const SizedBox(height: HomeUIConfig.spacerMedium),
             Text(
               widget.stat.value,
-              style: GoogleFonts.inter(
-                color: HomeUIConfig.white,
-                fontSize: HomeUIConfig.fontHeadlineLarge,
+              style: GoogleFonts.getFont(
+                HomeUIConfig.fontFamily(context),
+                color: HomeUIConfig.white(context),
+                fontSize: HomeUIConfig.fontHeadlineLarge(context),
                 fontWeight: FontWeight.w800,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               widget.stat.label.toUpperCase(),
-              style: GoogleFonts.inter(
-                color: HomeUIConfig.white38,
-                fontSize: HomeUIConfig.fontLabelSmall - 2,
+              style: GoogleFonts.getFont(
+                HomeUIConfig.fontFamily(context),
+                color: HomeUIConfig.white(context).withOpacity(0.38),
+                fontSize: HomeUIConfig.fontLabelSmall(context) - 2,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.2,
               ),
@@ -753,17 +767,18 @@ class _PrimaryButton extends StatelessWidget {
                 : HomeUIConfig.paddingButtonSmallV, // ← same as secondary
           ),
           decoration: BoxDecoration(
-            color: HomeUIConfig.accentGold,
-            borderRadius: BorderRadius.circular(HomeUIConfig.radiusLarge),
+            color: HomeUIConfig.buttonColor(context),
+            borderRadius: BorderRadius.circular(HomeUIConfig.radiusLarge(context)),
           ),
           child: Text(
             label,
-            style: GoogleFonts.inter(
-              color: HomeUIConfig.darkGreen,
+            style: GoogleFonts.getFont(
+              HomeUIConfig.fontFamily(context),
+              color: HomeUIConfig.buttonTextColor(context),
               fontWeight: FontWeight.w700,
               fontSize: large
-                  ? HomeUIConfig.fontBodyLarge
-                  : HomeUIConfig.fontBodyMedium,
+                  ? HomeUIConfig.fontBodyLarge(context)
+                  : HomeUIConfig.fontBodyMedium(context),
             ),
           ),
         ),
@@ -797,17 +812,18 @@ class _SecondaryButton extends StatelessWidget {
                 : HomeUIConfig.paddingButtonSmallV, // ← removed the extra + 2
           ),
           decoration: BoxDecoration(
-            border: Border.all(color: HomeUIConfig.white38),
-            borderRadius: BorderRadius.circular(HomeUIConfig.radiusLarge),
+            border: Border.all(color: HomeUIConfig.white(context).withOpacity(0.38)),
+            borderRadius: BorderRadius.circular(HomeUIConfig.radiusLarge(context)),
           ),
           child: Text(
             label,
-            style: GoogleFonts.inter(
-              color: HomeUIConfig.white,
+            style: GoogleFonts.getFont(
+              HomeUIConfig.fontFamily(context),
+              color: HomeUIConfig.white(context),
               fontWeight: FontWeight.w700, // ← matched to primary
               fontSize: large
-                  ? HomeUIConfig.fontBodyLarge
-                  : HomeUIConfig.fontBodyMedium,
+                  ? HomeUIConfig.fontBodyLarge(context)
+                  : HomeUIConfig.fontBodyMedium(context),
             ),
           ),
         ),
@@ -820,9 +836,12 @@ class _SecondaryButton extends StatelessWidget {
 
 /// A custom painter that provides a modern diagonal edge transition between sections.
 class _DiagonalPainter extends CustomPainter {
+  final Color color;
+  _DiagonalPainter(this.color);
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = HomeUIConfig.offWhite;
+    final paint = Paint()..color = color;
     final path = Path()
       ..moveTo(0, size.height)
       ..lineTo(size.width, 0)

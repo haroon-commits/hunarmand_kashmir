@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../providers/dynamic_content_provider.dart';
 import '../../models/content_model.dart';
+import '../../utils/responsive.dart';
 
 // ─── GALLERYEDITORUICONFIG ──────────────────────────────
 class GalleryEditorUIConfig {
@@ -134,51 +135,103 @@ class _GalleryEditorState extends State<GalleryEditor> {
   Widget _buildGalleryOrganizer() {
     final provider = context.watch<DynamicContentProvider>();
     final images = provider.content.galleryImages;
+    final isMobile = Responsive.isMobile(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Header row: count badge + Add button
-        Row(
-          children: [
-            Text(
-              'Images',
-              style: GoogleFonts.inter(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: GalleryEditorUIConfig.textDark,
+        if (isMobile)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    'Images',
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: GalleryEditorUIConfig.textDark,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: GalleryEditorUIConfig.lightTeal,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '${images.length}',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: GalleryEditorUIConfig.darkGreen,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(width: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-              decoration: BoxDecoration(
-                color: GalleryEditorUIConfig.lightTeal,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                '${images.length}',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: GalleryEditorUIConfig.darkGreen,
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => _showImageDialog(context),
+                  icon: const Icon(Icons.add_photo_alternate, size: 18),
+                  label: const Text('Add Image'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: GalleryEditorUIConfig.accentGold,
+                    foregroundColor: GalleryEditorUIConfig.darkGreen,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
                 ),
               ),
-            ),
-            const Spacer(),
-            ElevatedButton.icon(
-              onPressed: () => _showImageDialog(context),
-              icon: const Icon(Icons.add_photo_alternate, size: 18),
-              label: const Text('Add Image'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: GalleryEditorUIConfig.accentGold,
-                foregroundColor: GalleryEditorUIConfig.darkGreen,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+            ],
+          )
+        else
+          Row(
+            children: [
+              Text(
+                'Images',
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: GalleryEditorUIConfig.textDark,
+                ),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(width: 10),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                decoration: BoxDecoration(
+                  color: GalleryEditorUIConfig.lightTeal,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '${images.length}',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: GalleryEditorUIConfig.darkGreen,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              ElevatedButton.icon(
+                onPressed: () => _showImageDialog(context),
+                icon: const Icon(Icons.add_photo_alternate, size: 18),
+                label: const Text('Add Image'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: GalleryEditorUIConfig.accentGold,
+                  foregroundColor: GalleryEditorUIConfig.darkGreen,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                ),
+              ),
+            ],
+          ),
         const SizedBox(height: 16),
 
         // Empty state

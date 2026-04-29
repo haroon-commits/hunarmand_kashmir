@@ -11,28 +11,41 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../utils/responsive.dart';
+import '../utils/color_utils.dart';
 import '../widgets/layout/page_header.dart';
 import '../widgets/layout/app_footer.dart';
 import '../widgets/common/responsive_grid.dart';
 import '../widgets/cards/donation_tier_card.dart';
 import 'package:provider/provider.dart';
 import '../providers/dynamic_content_provider.dart';
+import '../models/content_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 
 // ─── DONATEUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to donate_screen.dart.
 class DonateUIConfig {
-  // Brand Colors used locally
-  static const Color accentGold   = Color(0xFFF5A623);
-  static const Color darkGreen    = Color(0xFF0D3320);
-  static const Color mediumGreen  = Color(0xFF1A4A2E);
-  static const Color offWhite     = Color(0xFFF8F6F0);
-  static const Color successGreen = Color(0xFF27AE60);
-  static const Color tealAccent   = Color(0xFF4ECDC4);
-  static const Color textDark     = Color(0xFF1A1A1A);
-  static const Color textMedium   = Color(0xFF555555);
-  static const Color white        = Color(0xFFFFFFFF);
+  // Helper to access current screen settings
+  static ScreenSettings _s(BuildContext context) => context.read<DynamicContentProvider>().content.donateSettings;
+  static ScreenSettings _sec(BuildContext context, String id) => 
+      context.read<DynamicContentProvider>().content.sectionStyles[id] ?? _s(context);
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  // Brand Colors mapped to dynamic settings
+  static Color accentGold(BuildContext context) => hexToColor(_t(context).accentColorHex);
+  static Color darkGreen(BuildContext context) => hexToColor(_t(context).primaryColorHex);
+  static Color mediumGreen(BuildContext context) => darkGreen(context).withOpacity(0.85);
+  static Color backgroundColor(BuildContext context) => hexToColor(_s(context).backgroundColorHex);
+  static Color titleColor(BuildContext context) => hexToColor(_s(context).titleColorHex);
+  static Color bodyColor(BuildContext context) => hexToColor(_s(context).bodyColorHex);
+  static Color buttonColor(BuildContext context) => hexToColor(_s(context).buttonColorHex);
+  static Color buttonTextColor(BuildContext context) => hexToColor(_s(context).buttonTextColorHex);
+  static Color white(BuildContext context) => hexToColor(_t(context).cardBackgroundColorHex);
+  static Color successGreen(BuildContext context) => const Color(0xFF27AE60);
+  static Color tealAccent(BuildContext context) => const Color(0xFF4ECDC4);
+  static Color offWhite(BuildContext context) => backgroundColor(context);
+  static Color textMedium(BuildContext context) => bodyColor(context);
+  static Color textDark(BuildContext context) => titleColor(context);
 
   // Dimensions & Spacing
   static const double maxContentWidth      = 1200.0;
@@ -40,22 +53,23 @@ class DonateUIConfig {
   static const double paddingSectionVMob   = 40.0;
   static const double cardPadding         = 24.0;
   static const double radiusExtraSmall    = 8.0;
-  static const double radiusLarge         = 30.0;
-  static const double radiusMedium        = 20.0;
-  static const double radiusSmall         = 12.0;
+  static double radiusLarge(BuildContext context) => _t(context).buttonBorderRadius;
+  static double radiusMedium(BuildContext context) => _t(context).cardBorderRadius;
+  static double radiusSmall(BuildContext context) => _t(context).cardBorderRadius - 8;
   static const double spacerDisplay       = 32.0;
   static const double spacerMedium        = 16.0;
   static const double spacerSmall         = 8.0;
   static const double spacerExtraLarge    = 48.0;
 
   // Typography — responsive sizes
-  static const double fontSectionDesktop  = 42.0;
-  static const double fontSectionTablet   = 32.0;
-  static const double fontSectionMobile   = 26.0;
-  static const double fontBodyMedium      = 14.0;
-  static const double fontLabelSmall      = 12.0;
-  static const double fontCardTitle       = 17.0;
-  static const double fontLabelLarge      = 14.0;
+  static double fontSection(BuildContext context) => _s(context).titleFontSize;
+  static double fontBodyMedium(BuildContext context) => _s(context).bodyFontSize;
+  static double fontLabelSmall(BuildContext context) => _s(context).bodyFontSize - 4;
+  static double fontCardTitle(BuildContext context) => _s(context).subtitleFontSize;
+  static double fontLabelLarge(BuildContext context) => _s(context).subtitleFontSize;
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _s(context).fontFamily;
 
   // Button
   static const double paddingButtonLargeH = 48.0;
@@ -90,6 +104,7 @@ class DonateScreen extends StatelessWidget {
             SliverGreenPageHeader(
               title: content.donateHeroTitle,
               subtitle: content.donateHeroDescription,
+              sectionId: 'donate_hero',
             ),
             // Qualitative impact analysis
             SliverToBoxAdapter(child: _buildImpactCards(context)),
@@ -112,9 +127,9 @@ class DonateScreen extends StatelessWidget {
 
   /// Adaptive section title size — matches about_screen pattern.
   double _sectionFontSize(BuildContext context) {
-    if (Responsive.isDesktop(context)) return DonateUIConfig.fontSectionDesktop;
-    if (Responsive.isTablet(context))  return DonateUIConfig.fontSectionTablet;
-    return DonateUIConfig.fontSectionMobile;
+    if (Responsive.isDesktop(context)) return DonateUIConfig.fontSection(context);
+    if (Responsive.isTablet(context))  return DonateUIConfig.fontSection(context);
+    return DonateUIConfig.fontSection(context);
   }
 
   /// Adaptive section vertical padding — matches about_screen pattern.
@@ -124,22 +139,23 @@ class DonateScreen extends StatelessWidget {
           : DonateUIConfig.paddingSectionVMob;
 
   /// Gold section label (uppercase tracking) — matches home/about pattern.
-  Widget _sectionLabel(String text) => Text(
+  Widget _sectionLabel(BuildContext context, String text) => Text(
         text,
-        style: GoogleFonts.inter(
-          color: DonateUIConfig.accentGold,
-          fontSize: DonateUIConfig.fontLabelSmall - 1,
+        style: GoogleFonts.getFont(
+          DonateUIConfig.fontFamily(context),
+          color: DonateUIConfig.accentGold(context),
+          fontSize: DonateUIConfig.fontLabelSmall(context) - 1,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.5,
         ),
       );
 
   /// Accent underline bar — matches about_screen pattern.
-  Widget _accentBar() => Container(
+  Widget _accentBar(BuildContext context) => Container(
         width: 48,
         height: 3,
         decoration: BoxDecoration(
-          color: DonateUIConfig.accentGold,
+          color: DonateUIConfig.accentGold(context),
           borderRadius: BorderRadius.circular(2),
         ),
       );
@@ -150,6 +166,7 @@ class DonateScreen extends StatelessWidget {
   Widget _buildImpactCards(BuildContext context) {
     final hPad = Responsive.contentPaddingH(context);
     final vPad = _sectionVPad(context);
+    final secStyle = DonateUIConfig._sec(context, 'donate_impact');
 
     final impacts = [
       Impact(
@@ -173,7 +190,7 @@ class DonateScreen extends StatelessWidget {
     ];
 
     return Container(
-      color: DonateUIConfig.white,
+      color: hexToColor(secStyle.backgroundColorHex),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: DonateUIConfig.maxContentWidth),
@@ -181,19 +198,20 @@ class DonateScreen extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
             child: Column(
               children: [
-                _sectionLabel('YOUR IMPACT'),
+                _sectionLabel(context, 'YOUR IMPACT'),
                 const SizedBox(height: DonateUIConfig.spacerSmall),
                 Text(
                   'What Your Donation Funds',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: DonateUIConfig.darkGreen,
+                  style: GoogleFonts.getFont(
+                    DonateUIConfig.fontFamily(context),
+                    color: DonateUIConfig.titleColor(context),
                     fontSize: _sectionFontSize(context),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
-                _accentBar(),
+                _accentBar(context),
                 const SizedBox(height: DonateUIConfig.spacerExtraLarge - 12),
                 ResponsiveCardGrid(
                   mobileCols: 1,
@@ -218,9 +236,9 @@ class DonateScreen extends StatelessWidget {
     final isWide  = Responsive.isDesktop(context);
 
     final fundUsage = [
-      FundUsage(label: 'Student Scholarships & Training', percent: 70, color: DonateUIConfig.darkGreen),
-      FundUsage(label: 'Infrastructure & Tools',          percent: 20, color: DonateUIConfig.accentGold),
-      FundUsage(label: 'Community Outreach & Operations', percent: 10, color: DonateUIConfig.tealAccent),
+      FundUsage(label: 'Student Scholarships & Training', percent: 70, color: DonateUIConfig.darkGreen(context)),
+      FundUsage(label: 'Infrastructure & Tools',          percent: 20, color: DonateUIConfig.accentGold(context)),
+      FundUsage(label: 'Community Outreach & Operations', percent: 10, color: DonateUIConfig.tealAccent(context)),
     ];
 
     final notes = [
@@ -233,25 +251,27 @@ class DonateScreen extends StatelessWidget {
     final notesColumn = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionLabel('ACCOUNTABILITY'),
+        _sectionLabel(context, 'ACCOUNTABILITY'),
         const SizedBox(height: DonateUIConfig.spacerSmall),
         Text(
           'Our Promise of Transparency',
-          style: GoogleFonts.inter(
-            color: DonateUIConfig.darkGreen,
+          style: GoogleFonts.getFont(
+            DonateUIConfig.fontFamily(context),
+            color: DonateUIConfig.titleColor(context),
             fontSize: _sectionFontSize(context),
             fontWeight: FontWeight.bold,
             height: 1.25,
           ),
         ),
         const SizedBox(height: 8),
-        _accentBar(),
+        _accentBar(context),
         const SizedBox(height: DonateUIConfig.spacerMedium),
         Text(
           'Every rupee is accounted for with ethical allocation.',
-          style: GoogleFonts.inter(
-            color: DonateUIConfig.textMedium,
-            fontSize: DonateUIConfig.fontBodyMedium,
+          style: GoogleFonts.getFont(
+            DonateUIConfig.fontFamily(context),
+            color: DonateUIConfig.bodyColor(context),
+            fontSize: DonateUIConfig.fontBodyMedium(context),
             height: 1.6,
           ),
         ),
@@ -261,16 +281,17 @@ class DonateScreen extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.check_circle_outline,
-                      color: DonateUIConfig.successGreen,
-                      size: DonateUIConfig.fontLabelLarge + 2),
+                  Icon(Icons.check_circle_outline,
+                      color: DonateUIConfig.successGreen(context),
+                      size: DonateUIConfig.fontLabelLarge(context) + 2),
                   const SizedBox(width: DonateUIConfig.spacerSmall),
                   Expanded(
                     child: Text(
                       note,
-                      style: GoogleFonts.inter(
-                        fontSize: DonateUIConfig.fontBodyMedium,
-                        color: DonateUIConfig.textMedium,
+                      style: GoogleFonts.getFont(
+                        DonateUIConfig.fontFamily(context),
+                        fontSize: DonateUIConfig.fontBodyMedium(context),
+                        color: DonateUIConfig.bodyColor(context),
                         height: 1.5,
                       ),
                     ),
@@ -284,8 +305,8 @@ class DonateScreen extends StatelessWidget {
     final fundColumn = Container(
       padding: const EdgeInsets.all(DonateUIConfig.spacerMedium + 2),
       decoration: BoxDecoration(
-        color: DonateUIConfig.white,
-        borderRadius: BorderRadius.circular(DonateUIConfig.radiusSmall + 2),
+        color: DonateUIConfig.white(context),
+        borderRadius: BorderRadius.circular(DonateUIConfig.radiusSmall(context) + 2),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
@@ -299,20 +320,21 @@ class DonateScreen extends StatelessWidget {
         children: [
           Text(
             'Fund Allocation',
-            style: GoogleFonts.inter(
-              color: DonateUIConfig.darkGreen,
-              fontSize: DonateUIConfig.fontLabelLarge + 2,
+            style: GoogleFonts.getFont(
+              DonateUIConfig.fontFamily(context),
+              color: DonateUIConfig.titleColor(context),
+              fontSize: DonateUIConfig.fontLabelLarge(context) + 2,
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: DonateUIConfig.spacerMedium),
-          ...fundUsage.map((item) => _fundUsageRow(item)),
+          ...fundUsage.map((item) => _fundUsageRow(context, item)),
         ],
       ),
     );
 
     return Container(
-      color: DonateUIConfig.offWhite,
+      color: DonateUIConfig.offWhite(context),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: DonateUIConfig.maxContentWidth),
@@ -344,7 +366,7 @@ class DonateScreen extends StatelessWidget {
   }
 
   /// Helper to build a labeled progress bar for a specific budget allocation.
-  Widget _fundUsageRow(FundUsage item) {
+  Widget _fundUsageRow(BuildContext context, FundUsage item) {
     return Padding(
       padding: const EdgeInsets.only(bottom: DonateUIConfig.spacerMedium - 2),
       child: Column(
@@ -356,19 +378,21 @@ class DonateScreen extends StatelessWidget {
               Expanded(
                 child: Text(
                   item.label,
-                  style: GoogleFonts.inter(
-                    fontSize: DonateUIConfig.fontLabelSmall,
-                    color: DonateUIConfig.textMedium,
+                  style: GoogleFonts.getFont(
+                    DonateUIConfig.fontFamily(context),
+                    fontSize: DonateUIConfig.fontLabelSmall(context),
+                    color: DonateUIConfig.bodyColor(context),
                   ),
                 ),
               ),
               const SizedBox(width: 8),
               Text(
                 '${item.percent}%',
-                style: GoogleFonts.inter(
-                  fontSize: DonateUIConfig.fontLabelSmall + 1,
+                style: GoogleFonts.getFont(
+                  DonateUIConfig.fontFamily(context),
+                  fontSize: DonateUIConfig.fontLabelSmall(context) + 1,
                   fontWeight: FontWeight.w700,
-                  color: DonateUIConfig.textDark,
+                  color: DonateUIConfig.titleColor(context),
                 ),
               ),
             ],
@@ -394,9 +418,10 @@ class DonateScreen extends StatelessWidget {
   Widget _buildDonationTiers(BuildContext context, List<dynamic> tiers) {
     final hPad = Responsive.contentPaddingH(context);
     final vPad = _sectionVPad(context);
+    final secStyle = DonateUIConfig._sec(context, 'donate_tiers');
 
     return Container(
-      color: DonateUIConfig.white,
+      color: hexToColor(secStyle.backgroundColorHex),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: DonateUIConfig.maxContentWidth),
@@ -404,26 +429,28 @@ class DonateScreen extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
             child: Column(
               children: [
-                _sectionLabel('GIVE TODAY'),
+                _sectionLabel(context, 'GIVE TODAY'),
                 const SizedBox(height: DonateUIConfig.spacerSmall),
                 Text(
                   'Ways to Contribute',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: DonateUIConfig.darkGreen,
-                    fontSize: _sectionFontSize(context),
+                  style: GoogleFonts.getFont(
+                    secStyle.fontFamily,
+                    color: hexToColor(secStyle.titleColorHex),
+                    fontSize: secStyle.titleFontSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
-                _accentBar(),
+                _accentBar(context),
                 const SizedBox(height: DonateUIConfig.spacerSmall + 4),
                 Text(
                   'Every amount counts towards building a skilled Kashmir.',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: DonateUIConfig.textMedium,
-                    fontSize: DonateUIConfig.fontBodyMedium,
+                  style: GoogleFonts.getFont(
+                    DonateUIConfig.fontFamily(context),
+                    color: DonateUIConfig.bodyColor(context),
+                    fontSize: DonateUIConfig.fontBodyMedium(context),
                     height: 1.6,
                   ),
                 ),
@@ -455,7 +482,7 @@ class DonateScreen extends StatelessWidget {
     final vPad = _sectionVPad(context);
 
     return Container(
-      color: DonateUIConfig.offWhite,
+      color: DonateUIConfig.offWhite(context),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: DonateUIConfig.maxContentWidth),
@@ -465,40 +492,43 @@ class DonateScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(DonateUIConfig.cardPadding + 4),
               decoration: BoxDecoration(
-                color: DonateUIConfig.darkGreen,
-                borderRadius: BorderRadius.circular(DonateUIConfig.radiusSmall + 4),
+                color: DonateUIConfig.darkGreen(context),
+                borderRadius: BorderRadius.circular(DonateUIConfig.radiusSmall(context) + 4),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Direct Bank Transfer',
-                    style: GoogleFonts.inter(
-                      color: DonateUIConfig.white,
-                      fontSize: DonateUIConfig.fontLabelLarge + 4,
+                    style: GoogleFonts.getFont(
+                      DonateUIConfig.fontFamily(context),
+                      color: DonateUIConfig.white(context),
+                      fontSize: DonateUIConfig.fontLabelLarge(context) + 4,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: DonateUIConfig.spacerSmall - 2),
                   Text(
                     'Transfer directly and share receipt via WhatsApp.',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.getFont(
+                      DonateUIConfig.fontFamily(context),
                       color: Colors.white70,
-                      fontSize: DonateUIConfig.fontBodyMedium,
+                      fontSize: DonateUIConfig.fontBodyMedium(context),
                       height: 1.5,
                     ),
                   ),
                   const SizedBox(height: DonateUIConfig.spacerMedium),
-                  _bankInfoCard(),
+                  _bankInfoCard(context),
                   const SizedBox(height: DonateUIConfig.spacerMedium),
                   const Divider(color: Colors.white12),
                   const SizedBox(height: DonateUIConfig.spacerSmall),
                   Text(
                     '"Charity does not decrease wealth."',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      color: DonateUIConfig.accentGold,
-                      fontSize: DonateUIConfig.fontBodyMedium,
+                    style: GoogleFonts.getFont(
+                      DonateUIConfig.fontFamily(context),
+                      color: DonateUIConfig.accentGold(context),
+                      fontSize: DonateUIConfig.fontBodyMedium(context),
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -515,7 +545,7 @@ class DonateScreen extends StatelessWidget {
   }
 
   /// Builds a stylistic card containing the Trust's bank account details.
-  Widget _bankInfoCard() {
+  Widget _bankInfoCard(BuildContext context) {
     final bankDetails = {
       'Account Name:': 'Hunarmand Kashmir Trust',
       'Account No:':   '1234 5678 9012',
@@ -526,28 +556,29 @@ class DonateScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(DonateUIConfig.spacerMedium),
       decoration: BoxDecoration(
-        color: DonateUIConfig.mediumGreen,
+        color: DonateUIConfig.mediumGreen(context),
         borderRadius: BorderRadius.circular(DonateUIConfig.radiusExtraSmall + 2),
       ),
       child: Column(
         children: bankDetails.entries
-            .map((entry) => _bankRow(entry.key, entry.value))
+            .map((entry) => _bankRow(context, entry.key, entry.value))
             .toList(),
       ),
     );
   }
 
   /// Helper to build a specific row of financial metadata.
-  Widget _bankRow(String label, String value) {
+  Widget _bankRow(BuildContext context, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
           Text(
             label,
-            style: GoogleFonts.inter(
-              color: DonateUIConfig.accentGold,
-              fontSize: DonateUIConfig.fontLabelSmall,
+            style: GoogleFonts.getFont(
+              DonateUIConfig.fontFamily(context),
+              color: DonateUIConfig.accentGold(context),
+              fontSize: DonateUIConfig.fontLabelSmall(context),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -555,9 +586,10 @@ class DonateScreen extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.getFont(
+                DonateUIConfig.fontFamily(context),
                 color: Colors.white70,
-                fontSize: DonateUIConfig.fontLabelSmall,
+                fontSize: DonateUIConfig.fontLabelSmall(context),
               ),
             ),
           ),
@@ -576,7 +608,7 @@ class DonateScreen extends StatelessWidget {
       builder: (ctx) => Container(
         padding: const EdgeInsets.all(DonateUIConfig.cardPadding),
         decoration: BoxDecoration(
-          color: DonateUIConfig.white,
+          color: DonateUIConfig.white(context),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(DonateUIConfig.cardPadding)),
         ),
         child: Column(
@@ -592,18 +624,20 @@ class DonateScreen extends StatelessWidget {
             const SizedBox(height: DonateUIConfig.spacerMedium + 4),
             Text(
               'Donate: $title',
-              style: GoogleFonts.inter(
-                color: DonateUIConfig.darkGreen,
-                fontSize: DonateUIConfig.fontSectionMobile + 6,
+              style: GoogleFonts.getFont(
+                DonateUIConfig.fontFamily(context),
+                color: DonateUIConfig.titleColor(context),
+                fontSize: DonateUIConfig.fontSection(context) + 6,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: DonateUIConfig.spacerSmall),
             Text(
               amount,
-              style: GoogleFonts.inter(
-                color: DonateUIConfig.accentGold,
-                fontSize: DonateUIConfig.fontSectionDesktop + 8,
+              style: GoogleFonts.getFont(
+                DonateUIConfig.fontFamily(context),
+                color: DonateUIConfig.accentGold(context),
+                fontSize: DonateUIConfig.fontSection(context) + 8,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -611,9 +645,10 @@ class DonateScreen extends StatelessWidget {
             Text(
               'Transfer to the account above and share receipt via WhatsApp.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                color: DonateUIConfig.textMedium,
-                fontSize: DonateUIConfig.fontBodyMedium,
+              style: GoogleFonts.getFont(
+                DonateUIConfig.fontFamily(context),
+                color: DonateUIConfig.bodyColor(context),
+                fontSize: DonateUIConfig.fontBodyMedium(context),
                 height: 1.6,
               ),
             ),
@@ -635,17 +670,19 @@ class DonateScreen extends StatelessWidget {
         child: ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: DonateUIConfig.successGreen,
+            backgroundColor: DonateUIConfig.successGreen(context),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DonateUIConfig.radiusLarge - 5),
+              borderRadius: BorderRadius.circular(DonateUIConfig.radiusLarge(context) - 5),
             ),
             padding: const EdgeInsets.symmetric(vertical: DonateUIConfig.paddingButtonV + 4),
           ),
           child: Text(
             label,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.getFont(
+              DonateUIConfig.fontFamily(context),
+              color: DonateUIConfig.buttonTextColor(context),
               fontWeight: FontWeight.w700,
-              fontSize: DonateUIConfig.fontBodyMedium + 1,
+              fontSize: DonateUIConfig.fontBodyMedium(context) + 1,
             ),
           ),
         ),
@@ -699,17 +736,17 @@ class _ImpactCardState extends State<ImpactCard> {
           margin: const EdgeInsets.only(bottom: DonateUIConfig.spacerMedium - 2),
           padding: const EdgeInsets.all(DonateUIConfig.cardPadding),
           decoration: BoxDecoration(
-            color: DonateUIConfig.white,
-            borderRadius: BorderRadius.circular(DonateUIConfig.radiusSmall + 4),
+            color: DonateUIConfig.white(context),
+            borderRadius: BorderRadius.circular(DonateUIConfig.radiusSmall(context) + 4),
             border: Border.all(
               color: _isHovered
-                  ? DonateUIConfig.accentGold.withOpacity(0.5)
+                  ? DonateUIConfig.accentGold(context).withOpacity(0.5)
                   : Colors.grey.shade200,
             ),
             boxShadow: [
               BoxShadow(
                 color: _isHovered
-                    ? DonateUIConfig.darkGreen.withOpacity(0.08)
+                    ? DonateUIConfig.darkGreen(context).withOpacity(0.08)
                     : Colors.black.withOpacity(0.03),
                 blurRadius: _isHovered ? 16 : 6,
                 offset: Offset(0, _isHovered ? 8 : 2),
@@ -730,18 +767,20 @@ class _ImpactCardState extends State<ImpactCard> {
               const SizedBox(height: DonateUIConfig.spacerSmall + 2),
               Text(
                 widget.impact.title,
-                style: GoogleFonts.inter(
-                  fontSize: DonateUIConfig.fontCardTitle,
+                style: GoogleFonts.getFont(
+                  DonateUIConfig.fontFamily(context),
+                  fontSize: DonateUIConfig.fontCardTitle(context),
                   fontWeight: FontWeight.w700,
-                  color: DonateUIConfig.textDark,
+                  color: DonateUIConfig.titleColor(context),
                 ),
               ),
               const SizedBox(height: 6),
               Text(
                 widget.impact.description,
-                style: GoogleFonts.inter(
-                  color: DonateUIConfig.textMedium,
-                  fontSize: DonateUIConfig.fontBodyMedium,
+                style: GoogleFonts.getFont(
+                  DonateUIConfig.fontFamily(context),
+                  color: DonateUIConfig.bodyColor(context),
+                  fontSize: DonateUIConfig.fontBodyMedium(context),
                   height: 1.55,
                 ),
               ),

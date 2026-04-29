@@ -16,6 +16,7 @@ import '../widgets/layout/page_header.dart';
 import '../widgets/layout/app_footer.dart';
 import '../widgets/common/responsive_grid.dart';
 import '../utils/responsive.dart';
+import '../utils/color_utils.dart';
 
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
@@ -25,14 +26,24 @@ import '../models/content_model.dart';
 // ─── ABOUTUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to about_screen.dart.
 class AboutUIConfig {
-  // Brand Colors used locally
-  static const Color accentGold = Color(0xFFF5A623);
-  static const Color darkGreen = Color(0xFF0D3320);
-  static const Color mediumGreen = Color(0xFF1A4A2E);
-  static const Color offWhite = Color(0xFFF8F6F0);
-  static const Color textDark = Color(0xFF1A1A1A);
-  static const Color textMedium = Color(0xFF555555);
-  static const Color white = Color(0xFFFFFFFF);
+  // Helper to access current screen settings
+  static ScreenSettings _s(BuildContext context) => context.read<DynamicContentProvider>().content.aboutSettings;
+  static ScreenSettings _sec(BuildContext context, String id) => 
+      context.read<DynamicContentProvider>().content.sectionStyles[id] ?? _s(context);
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  // Brand Colors mapped to dynamic settings
+  static Color accentGold(BuildContext context) => hexToColor(_t(context).accentColorHex);
+  static Color darkGreen(BuildContext context) => hexToColor(_t(context).primaryColorHex);
+  static Color mediumGreen(BuildContext context) => darkGreen(context).withOpacity(0.85);
+  static Color backgroundColor(BuildContext context) => hexToColor(_s(context).backgroundColorHex);
+  static Color titleColor(BuildContext context) => hexToColor(_s(context).titleColorHex);
+  static Color bodyColor(BuildContext context) => hexToColor(_s(context).bodyColorHex);
+  static Color buttonColor(BuildContext context) => hexToColor(_s(context).buttonColorHex);
+  static Color buttonTextColor(BuildContext context) => hexToColor(_s(context).buttonTextColorHex);
+  static Color white(BuildContext context) => hexToColor(_t(context).cardBackgroundColorHex);
+
+
 
   // Layout & spacing
   static const double maxContentWidth = 1200.0;
@@ -46,27 +57,24 @@ class AboutUIConfig {
   static const double spacerLarge = 24.0;
   static const double spacerMedium = 16.0;
   static const double spacerSmall = 8.0;
-  static const double radiusLarge = 30.0;
-  static const double radiusMedium = 20.0;
-  static const double radiusSmall = 12.0;
+  static double radiusLarge(BuildContext context) => _t(context).buttonBorderRadius;
+  static double radiusMedium(BuildContext context) => _t(context).cardBorderRadius;
+  static double radiusSmall(BuildContext context) => _t(context).cardBorderRadius - 8;
 
   // Responsive section heading sizes
-  static const double fontSectionDesktop = 42.0;
-  static const double fontSectionTablet = 32.0;
-  static const double fontSectionMobile = 26.0;
-
-  // Story headline sizes
-  static const double fontStoryDesktop = 36.0;
-  static const double fontStoryTablet = 28.0;
-  static const double fontStoryMobile = 22.0;
+  static double fontSection(BuildContext context) => _s(context).titleFontSize;
+  static double fontStory(BuildContext context) => _s(context).titleFontSize;
 
   // Body & card text
-  static const double fontBodyMedium = 14.0;
-  static const double fontCardTitle = 17.0;
-  static const double fontTeamName = 16.0;
-  static const double fontTeamRole = 13.0;
-  static const double fontLabelSmall = 12.0;
-  static const double fontCTATitle = 34.0;
+  static double fontBodyMedium(BuildContext context) => _s(context).bodyFontSize;
+  static double fontCardTitle(BuildContext context) => _s(context).subtitleFontSize;
+  static double fontTeamName(BuildContext context) => _s(context).subtitleFontSize;
+  static double fontTeamRole(BuildContext context) => _s(context).bodyFontSize - 2;
+  static double fontLabelSmall(BuildContext context) => _s(context).bodyFontSize - 4;
+  static double fontCTATitle(BuildContext context) => _s(context).titleFontSize;
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _s(context).fontFamily;
 
   // Button
   static const double paddingButtonLargeH = 48.0;
@@ -92,6 +100,7 @@ class AboutScreen extends StatelessWidget {
               title: 'Our Story',
               subtitle:
                   'Building a legacy of skill, self-reliance, and pride in the heart of Kashmir.',
+              sectionId: 'about_hero',
             ),
             // Primary narrative section (Foundational story)
             SliverToBoxAdapter(
@@ -119,9 +128,10 @@ class AboutScreen extends StatelessWidget {
       BuildContext context, String headline, String text) {
     final isDesktop = Responsive.isDesktop(context);
     final hPad = Responsive.contentPaddingH(context);
+    final secStyle = AboutUIConfig._sec(context, 'about_story');
 
     return Container(
-      color: AboutUIConfig.white,
+      color: hexToColor(secStyle.backgroundColorHex),
       child: Center(
         child: ConstrainedBox(
           constraints:
@@ -137,7 +147,7 @@ class AboutScreen extends StatelessWidget {
                     children: [
                       Expanded(flex: 3, child: _buildStoryText(context, headline, text)),
                       const SizedBox(width: AboutUIConfig.spacerExtraLarge),
-                      Expanded(flex: 2, child: _buildRightColumn()),
+                      Expanded(flex: 2, child: _buildRightColumn(context)),
                     ],
                   )
                 : Column(
@@ -145,7 +155,7 @@ class AboutScreen extends StatelessWidget {
                     children: [
                       _buildStoryText(context, headline, text),
                       const SizedBox(height: AboutUIConfig.spacerDisplay),
-                      _buildRightColumn(),
+                      _buildRightColumn(context),
                     ],
                   ),
           ),
@@ -156,13 +166,7 @@ class AboutScreen extends StatelessWidget {
 
   /// Organizes the primary narrative text blocks.
   Widget _buildStoryText(BuildContext context, String headline, String text) {
-    final isDesktop = Responsive.isDesktop(context);
-    final isTablet = Responsive.isTablet(context);
-    final headlineSize = isDesktop
-        ? AboutUIConfig.fontStoryDesktop
-        : isTablet
-            ? AboutUIConfig.fontStoryTablet
-            : AboutUIConfig.fontStoryMobile;
+    final secStyle = AboutUIConfig._sec(context, 'about_story');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,9 +174,10 @@ class AboutScreen extends StatelessWidget {
         // Gold uppercase label — matches home screen 'OUR PROGRAMS' pattern
         Text(
           'OUR STORY',
-          style: GoogleFonts.inter(
-            color: AboutUIConfig.accentGold,
-            fontSize: AboutUIConfig.fontLabelSmall - 1,
+          style: GoogleFonts.getFont(
+            secStyle.fontFamily,
+            color: AboutUIConfig.accentGold(context),
+            fontSize: AboutUIConfig.fontLabelSmall(context) - 1,
             fontWeight: FontWeight.w700,
             letterSpacing: 1.5,
           ),
@@ -180,9 +185,10 @@ class AboutScreen extends StatelessWidget {
         const SizedBox(height: AboutUIConfig.spacerSmall),
         Text(
           headline,
-          style: GoogleFonts.inter(
-            color: AboutUIConfig.darkGreen,
-            fontSize: headlineSize,
+          style: GoogleFonts.getFont(
+            secStyle.fontFamily,
+            color: hexToColor(secStyle.titleColorHex),
+            fontSize: secStyle.titleFontSize,
             fontWeight: FontWeight.bold,
             height: 1.3,
           ),
@@ -190,20 +196,21 @@ class AboutScreen extends StatelessWidget {
         const SizedBox(height: AboutUIConfig.spacerMedium),
         Text(
           text,
-          style: GoogleFonts.inter(
-            color: AboutUIConfig.textMedium,
-            fontSize: AboutUIConfig.fontBodyMedium,
+          style: GoogleFonts.getFont(
+            secStyle.fontFamily,
+            color: hexToColor(secStyle.bodyColorHex),
+            fontSize: secStyle.bodyFontSize,
             height: 1.8,
           ),
         ),
         const SizedBox(height: AboutUIConfig.spacerLarge),
-        _buildQuoteBlock(),
+        _buildQuoteBlock(context),
       ],
     );
   }
 
   /// Builds supplementary visual content for the right-hand side of the story.
-  Widget _buildRightColumn() {
+  Widget _buildRightColumn(BuildContext context) {
     return Column(
       children: [
         // Decorative branding card
@@ -213,19 +220,20 @@ class AboutScreen extends StatelessWidget {
   }
 
   /// A stylized blockquote for emphasizing the platform's core directive.
-  Widget _buildQuoteBlock() {
+  Widget _buildQuoteBlock(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AboutUIConfig.cardPadding - 2),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border:
-            Border(left: BorderSide(color: AboutUIConfig.accentGold, width: 4)),
-        color: AboutUIConfig.offWhite,
+            Border(left: BorderSide(color: AboutUIConfig.accentGold(context), width: 4)),
+        color: AboutUIConfig.backgroundColor(context),
       ),
       child: Text(
         '"At Hunarmand Kashmir, we don\'t just teach skills—we open doors, restore confidence, and help build futures rooted in dignity, independence, and global opportunity."',
-        style: GoogleFonts.inter(
-          color: AboutUIConfig.darkGreen,
-          fontSize: AboutUIConfig.fontLabelSmall + 1,
+        style: GoogleFonts.getFont(
+          AboutUIConfig.fontFamily(context),
+          color: AboutUIConfig.titleColor(context),
+          fontSize: AboutUIConfig.fontLabelSmall(context) + 1,
           fontStyle: FontStyle.italic,
           height: 1.7,
         ),
@@ -244,26 +252,26 @@ class AboutScreen extends StatelessWidget {
     final items = [
       {
         'icon': content.aboutMissionIcon,
-        'iconColor': AboutUIConfig.accentGold,
+        'iconColor': AboutUIConfig.accentGold(context),
         'title': 'Our Mission',
         'desc': content.aboutMissionText,
       },
       {
         'icon': content.aboutVisionIcon,
-        'iconColor': AboutUIConfig.darkGreen,
+        'iconColor': AboutUIConfig.darkGreen(context),
         'title': 'Our Vision',
         'desc': content.aboutVisionText,
       },
       {
         'icon': content.aboutValuesIcon,
-        'iconColor': AboutUIConfig.accentGold,
+        'iconColor': AboutUIConfig.accentGold(context),
         'title': 'Community',
         'desc': content.aboutValuesText,
       },
     ];
 
     return Container(
-      color: AboutUIConfig.offWhite,
+      color: AboutUIConfig.backgroundColor(context),
       child: Center(
         child: ConstrainedBox(
           constraints:
@@ -278,9 +286,10 @@ class AboutScreen extends StatelessWidget {
                 // Gold uppercase label — matches home screen pattern
                 Text(
                   'WHO WE ARE',
-                  style: GoogleFonts.inter(
-                    color: AboutUIConfig.accentGold,
-                    fontSize: AboutUIConfig.fontLabelSmall - 1,
+                  style: GoogleFonts.getFont(
+                    AboutUIConfig.fontFamily(context),
+                    color: AboutUIConfig.accentGold(context),
+                    fontSize: AboutUIConfig.fontLabelSmall(context) - 1,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.5,
                   ),
@@ -289,18 +298,19 @@ class AboutScreen extends StatelessWidget {
                 Text(
                   'Mission, Vision & Values',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: AboutUIConfig.darkGreen,
+                  style: GoogleFonts.getFont(
+                    AboutUIConfig.fontFamily(context),
+                    color: AboutUIConfig.titleColor(context),
                     fontSize: Responsive.isDesktop(context)
-                        ? AboutUIConfig.fontSectionDesktop
+                        ? AboutUIConfig.fontSection(context)
                         : Responsive.isTablet(context)
-                            ? AboutUIConfig.fontSectionTablet
-                            : AboutUIConfig.fontSectionMobile,
+                            ? AboutUIConfig.fontSection(context)
+                            : AboutUIConfig.fontSection(context),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
-                Container(width: 48, height: 3, decoration: BoxDecoration(color: AboutUIConfig.accentGold, borderRadius: BorderRadius.circular(2))),
+                Container(width: 48, height: 3, decoration: BoxDecoration(color: AboutUIConfig.accentGold(context), borderRadius: BorderRadius.circular(2))),
                 const SizedBox(height: AboutUIConfig.spacerExtraLarge - 12),
                 ResponsiveCardGrid(
                   mobileCols: 1,
@@ -320,10 +330,10 @@ class AboutScreen extends StatelessWidget {
   /// Builds a section highlighting the core team and mentors.
   Widget _buildTeamSection(BuildContext context, List<TeamMember> members) {
     final hPad = Responsive.contentPaddingH(context);
-    final isDesktop = Responsive.isDesktop(context);
+    final secStyle = AboutUIConfig._sec(context, 'about_team');
 
     return Container(
-      color: AboutUIConfig.white,
+      color: hexToColor(secStyle.backgroundColorHex),
       child: Center(
         child: ConstrainedBox(
           constraints:
@@ -339,9 +349,10 @@ class AboutScreen extends StatelessWidget {
                 Text(
                   'OUR TEAM',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: AboutUIConfig.accentGold,
-                    fontSize: AboutUIConfig.fontLabelSmall - 1,
+                  style: GoogleFonts.getFont(
+                    AboutUIConfig.fontFamily(context),
+                    color: AboutUIConfig.accentGold(context),
+                    fontSize: AboutUIConfig.fontLabelSmall(context) - 1,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.5,
                   ),
@@ -350,25 +361,23 @@ class AboutScreen extends StatelessWidget {
                 Text(
                   'Voices of Guidance',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: AboutUIConfig.darkGreen,
-                    fontSize: isDesktop
-                        ? AboutUIConfig.fontSectionDesktop
-                        : Responsive.isTablet(context)
-                            ? AboutUIConfig.fontSectionTablet
-                            : AboutUIConfig.fontSectionMobile,
+                  style: GoogleFonts.getFont(
+                    secStyle.fontFamily,
+                    color: hexToColor(secStyle.titleColorHex),
+                    fontSize: secStyle.titleFontSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
-                Container(width: 48, height: 3, decoration: BoxDecoration(color: AboutUIConfig.accentGold, borderRadius: BorderRadius.circular(2))),
+                Container(width: 48, height: 3, decoration: BoxDecoration(color: AboutUIConfig.accentGold(context), borderRadius: BorderRadius.circular(2))),
                 const SizedBox(height: AboutUIConfig.spacerSmall + 4),
                 Text(
                   'Our dedicated mentors and instructors bringing world-class expertise to Kashmir.',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: AboutUIConfig.textMedium,
-                    fontSize: AboutUIConfig.fontBodyMedium,
+                  style: GoogleFonts.getFont(
+                    secStyle.fontFamily,
+                    color: hexToColor(secStyle.bodyColorHex),
+                    fontSize: secStyle.bodyFontSize,
                     height: 1.6,
                   ),
                 ),
@@ -391,7 +400,7 @@ class AboutScreen extends StatelessWidget {
   Widget _buildCtaSection(BuildContext context) {
     final hPad = Responsive.contentPaddingH(context);
     return Container(
-      color: AboutUIConfig.white,
+      color: AboutUIConfig.white(context),
       child: Center(
         child: ConstrainedBox(
           constraints:
@@ -405,17 +414,18 @@ class AboutScreen extends StatelessWidget {
                   horizontal: AboutUIConfig.spacerDisplay,
                   vertical: AboutUIConfig.paddingHeroMobile),
               decoration: BoxDecoration(
-                color: AboutUIConfig.darkGreen,
-                borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium),
+                color: AboutUIConfig.darkGreen(context),
+                borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium(context)),
               ),
               child: Column(
                 children: [
                   Text(
                     'Be Part of the Change',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      color: AboutUIConfig.white,
-                      fontSize: AboutUIConfig.fontCTATitle, // was fontHeadlineLarge
+                    style: GoogleFonts.getFont(
+                      AboutUIConfig.fontFamily(context),
+                      color: AboutUIConfig.white(context),
+                      fontSize: AboutUIConfig.fontCTATitle(context), // was fontHeadlineLarge
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -425,9 +435,10 @@ class AboutScreen extends StatelessWidget {
                     child: Text(
                       'Whether you are a student looking to learn, or a professional looking to mentor, there is a place for you at Hunarmand Kashmir.',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.getFont(
+                        AboutUIConfig.fontFamily(context),
                         color: Colors.white70,
-                        fontSize: AboutUIConfig.fontBodyMedium,
+                        fontSize: AboutUIConfig.fontBodyMedium(context),
                         height: 1.6,
                       ),
                     ),
@@ -444,15 +455,16 @@ class AboutScreen extends StatelessWidget {
                           vertical: AboutUIConfig.paddingButtonV,
                         ),
                         decoration: BoxDecoration(
-                          color: AboutUIConfig.accentGold,
-                          borderRadius: BorderRadius.circular(AboutUIConfig.radiusLarge),
+                          color: AboutUIConfig.buttonColor(context),
+                          borderRadius: BorderRadius.circular(AboutUIConfig.radiusLarge(context)),
                         ),
                         child: Text(
                           'Contact Us Today →',
-                          style: GoogleFonts.inter(
-                            color: AboutUIConfig.darkGreen,
+                          style: GoogleFonts.getFont(
+                            AboutUIConfig.fontFamily(context),
+                            color: AboutUIConfig.buttonTextColor(context),
                             fontWeight: FontWeight.w700,
-                            fontSize: AboutUIConfig.fontBodyMedium + 2,
+                            fontSize: AboutUIConfig.fontBodyMedium(context) + 2,
                           ),
                         ),
                       ),
@@ -497,7 +509,7 @@ class _MissionCardState extends State<MissionCard> {
   Widget build(BuildContext context) {
     final String title = (widget.item['title'] as String?) ?? '';
     final Color iconColor =
-        (widget.item['iconColor'] as Color?) ?? AboutUIConfig.accentGold;
+        (widget.item['iconColor'] as Color?) ?? AboutUIConfig.accentGold(context);
 
     return RepaintBoundary(
       child: MouseRegion(
@@ -510,12 +522,12 @@ class _MissionCardState extends State<MissionCard> {
           transform: Matrix4.identity()
             ..translate(0.0, _isHovered ? -6.0 : 0.0),
           decoration: BoxDecoration(
-            color: AboutUIConfig.white,
-            borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium - 4),
+            color: AboutUIConfig.white(context),
+            borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium(context) - 4),
             boxShadow: [
               BoxShadow(
                 color: _isHovered
-                    ? AboutUIConfig.darkGreen.withOpacity(0.08)
+                    ? AboutUIConfig.darkGreen(context).withOpacity(0.08)
                     : Colors.black.withOpacity(0.04),
                 blurRadius: _isHovered ? 20 : 10,
                 offset: Offset(0, _isHovered ? 12 : 4),
@@ -523,14 +535,14 @@ class _MissionCardState extends State<MissionCard> {
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium - 4),
+            borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium(context) - 4),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               padding: const EdgeInsets.all(AboutUIConfig.cardPadding),
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
-                    color: _isHovered ? AboutUIConfig.darkGreen : AboutUIConfig.accentGold,
+                    color: _isHovered ? AboutUIConfig.darkGreen(context) : AboutUIConfig.accentGold(context),
                     width: 3,
                   ),
                   left: BorderSide(color: Colors.grey.shade100),
@@ -547,7 +559,7 @@ class _MissionCardState extends State<MissionCard> {
                     height: AboutUIConfig.cardIconSize,
                     decoration: BoxDecoration(
                       color: iconColor.withOpacity(_isHovered ? 0.15 : 0.08),
-                      borderRadius: BorderRadius.circular(AboutUIConfig.radiusSmall + 2),
+                      borderRadius: BorderRadius.circular(AboutUIConfig.radiusSmall(context) + 2),
                     ),
                     child: Center(
                       child: AnimatedScale(
@@ -555,7 +567,7 @@ class _MissionCardState extends State<MissionCard> {
                         duration: const Duration(milliseconds: 200),
                         child: Icon(
                           _getHardcodedIcon(title),
-                          color: _isHovered ? AboutUIConfig.darkGreen : iconColor,
+                          color: _isHovered ? AboutUIConfig.darkGreen(context) : iconColor,
                           size: AboutUIConfig.iconSizeMedium + 4,
                         ),
                       ),
@@ -564,18 +576,20 @@ class _MissionCardState extends State<MissionCard> {
                   const SizedBox(height: AboutUIConfig.spacerMedium),
                   Text(
                     title,
-                    style: GoogleFonts.inter(
-                      fontSize: AboutUIConfig.fontCardTitle,
+                    style: GoogleFonts.getFont(
+                      AboutUIConfig.fontFamily(context),
+                      fontSize: AboutUIConfig.fontCardTitle(context),
                       fontWeight: FontWeight.w700,
-                      color: AboutUIConfig.textDark,
+                      color: AboutUIConfig.titleColor(context),
                     ),
                   ),
                   const SizedBox(height: AboutUIConfig.spacerSmall + 2),
                   Text(
                     '${widget.item['desc']}',
-                    style: GoogleFonts.inter(
-                      color: AboutUIConfig.textMedium,
-                      fontSize: AboutUIConfig.fontLabelSmall + 1,
+                    style: GoogleFonts.getFont(
+                      AboutUIConfig.fontFamily(context),
+                      color: AboutUIConfig.bodyColor(context),
+                      fontSize: AboutUIConfig.fontLabelSmall(context) + 1,
                       height: 1.6,
                     ),
                   ),
@@ -612,19 +626,21 @@ class _TeamCardState extends State<TeamCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         padding: const EdgeInsets.all(AboutUIConfig.cardPadding),
+        transform: Matrix4.identity()
+          ..translate(0.0, _isHovered ? -6.0 : 0.0),
         decoration: BoxDecoration(
-          color: AboutUIConfig.white,
-          borderRadius: BorderRadius.circular(AboutUIConfig.radiusSmall + 4),
+          color: AboutUIConfig.white(context),
+          borderRadius: BorderRadius.circular(AboutUIConfig.radiusSmall(context) + 4),
           border: Border.all(
-            color: _isHovered ? AboutUIConfig.darkGreen : Colors.grey.shade100,
+            color: _isHovered ? AboutUIConfig.darkGreen(context) : Colors.grey.shade100,
           ),
           boxShadow: [
             BoxShadow(
               color: _isHovered
-                  ? AboutUIConfig.darkGreen.withOpacity(0.08)
+                  ? AboutUIConfig.darkGreen(context).withOpacity(0.12)
                   : Colors.black.withOpacity(0.04),
-              blurRadius: _isHovered ? 15 : 8,
-              offset: Offset(0, _isHovered ? 8 : 4),
+              blurRadius: _isHovered ? 20 : 8,
+              offset: Offset(0, _isHovered ? 12 : 4),
             ),
           ],
         ),
@@ -635,7 +651,7 @@ class _TeamCardState extends State<TeamCard> {
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: AboutUIConfig.accentGold, width: 2),
+                border: Border.all(color: AboutUIConfig.accentGold(context), width: 2),
               ),
               child: ClipOval(
                 child: widget.member.imageUrl.startsWith('http')
@@ -658,19 +674,21 @@ class _TeamCardState extends State<TeamCard> {
             Text(
               widget.member.name,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.getFont(
+                AboutUIConfig.fontFamily(context),
                 fontWeight: FontWeight.w700,
-                fontSize: AboutUIConfig.fontTeamName, // Fixed: was 26px, now 16px
-                color: AboutUIConfig.darkGreen,
+                fontSize: AboutUIConfig.fontTeamName(context), // Fixed: was 26px, now 16px
+                color: AboutUIConfig.titleColor(context),
               ),
             ),
             const SizedBox(height: 4),
             Text(
               widget.member.role,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: AboutUIConfig.fontTeamRole,
-                color: AboutUIConfig.accentGold,
+              style: GoogleFonts.getFont(
+                AboutUIConfig.fontFamily(context),
+                fontSize: AboutUIConfig.fontTeamRole(context),
+                color: AboutUIConfig.accentGold(context),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -707,22 +725,22 @@ class _WorkshopCardState extends State<WorkshopCard> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: _isHovered
-                  ? [AboutUIConfig.mediumGreen, AboutUIConfig.darkGreen]
-                  : [AboutUIConfig.darkGreen, AboutUIConfig.mediumGreen],
+                  ? [AboutUIConfig.mediumGreen(context), AboutUIConfig.darkGreen(context)]
+                  : [AboutUIConfig.darkGreen(context), AboutUIConfig.mediumGreen(context)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium),
+            borderRadius: BorderRadius.circular(AboutUIConfig.radiusMedium(context)),
             border: Border.all(
               color: _isHovered
-                  ? AboutUIConfig.accentGold
-                  : AboutUIConfig.accentGold.withOpacity(0.5),
+                  ? AboutUIConfig.accentGold(context)
+                  : AboutUIConfig.accentGold(context).withOpacity(0.5),
               width: _isHovered ? 3 : 2,
             ),
             boxShadow: [
               if (_isHovered)
                 BoxShadow(
-                  color: AboutUIConfig.accentGold.withOpacity(0.3),
+                  color: AboutUIConfig.accentGold(context).withOpacity(0.3),
                   blurRadius: 20,
                   spreadRadius: 2,
                 )
@@ -733,23 +751,24 @@ class _WorkshopCardState extends State<WorkshopCard> {
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
-                padding: const EdgeInsets.all(AboutUIConfig.radiusSmall),
+                padding: EdgeInsets.all(AboutUIConfig.radiusSmall(context)),
                 decoration: BoxDecoration(
                   color: _isHovered
-                      ? AboutUIConfig.accentGold.withOpacity(0.2)
-                      : AboutUIConfig.white.withOpacity(0.1),
+                      ? AboutUIConfig.accentGold(context).withOpacity(0.2)
+                      : AboutUIConfig.white(context).withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.workspace_premium,
-                    color: AboutUIConfig.accentGold,
+                child: Icon(Icons.workspace_premium,
+                    color: AboutUIConfig.accentGold(context),
                     size: AboutUIConfig.spacerExtraLarge),
               ),
               const SizedBox(height: AboutUIConfig.spacerMedium),
               Text(
                 'POWERED BY SKILLS',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  color: AboutUIConfig.accentGold,
+                style: GoogleFonts.getFont(
+                  AboutUIConfig.fontFamily(context),
+                  color: AboutUIConfig.accentGold(context),
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 2.5,
@@ -759,9 +778,10 @@ class _WorkshopCardState extends State<WorkshopCard> {
               Text(
                 'hunARMAND\namdesigns',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  color: AboutUIConfig.white,
-                  fontSize: AboutUIConfig.fontSectionMobile, // was fontHeadlineMedium (32px), now 26px
+                style: GoogleFonts.getFont(
+                  AboutUIConfig.fontFamily(context),
+                  color: AboutUIConfig.white(context),
+                  fontSize: AboutUIConfig.fontSection(context), // was fontHeadlineMedium (32px), now 26px
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.5,
                 ),

@@ -97,6 +97,7 @@ class ResponsiveCardGrid extends StatelessWidget {
 
         if (cols == 1) {
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: children
                 .map((child) => Padding(
                       padding: EdgeInsets.only(bottom: spacing),

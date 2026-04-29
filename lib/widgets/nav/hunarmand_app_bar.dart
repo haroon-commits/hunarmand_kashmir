@@ -17,15 +17,25 @@ import 'package:google_fonts/google_fonts.dart'; // Google Fonts for premium Int
 import 'package:hunarmand_kashmir/providers/dynamic_content_provider.dart';
 import 'package:provider/provider.dart'; // Provider package for Consumer and context.read state access
 import '../../utils/responsive.dart'; // Responsive: breakpoint utilities (isDesktop, contentPaddingH)
-import '../../providers/app_state.dart'; // AppState: provides navigate() for page switching
+import '../../providers/app_state.dart';
+import '../../models/content_model.dart'; // AppState: provides navigate() for page switching
 
 // ─── APPBARUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to hunarmand_app_bar.dart.
 class AppBarUIConfig {
   // Brand Colors used locally
-  static const Color accentGold = Color(0xFFF5A623);
-  static const Color darkGreen = Color(0xFF0D3320);
-  static const Color white = Color(0xFFFFFFFF);
+  static Color accentGold(BuildContext context) => _hexToColor(_t(context).accentColorHex);
+  static Color darkGreen(BuildContext context) => _hexToColor(_t(context).primaryColorHex);
+  static Color white(BuildContext context) => _hexToColor(_t(context).cardBackgroundColorHex);
+
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  static Color _hexToColor(String hex) {
+    final buffer = StringBuffer();
+    if (hex.length == 6 || hex.length == 7) buffer.write('ff');
+    buffer.write(hex.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
 
   // Dimensions, Spacing & Typography
   static const double appBarHeight = 74.0;
@@ -39,6 +49,9 @@ class AppBarUIConfig {
   static const double screenPadding = 24.0;
   static const double spacerMedium = 16.0;
   static const double spacerSmall = 8.0;
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _t(context).fontFamilyBody;
 }
 
 /// HunarmandAppBar - A premium, responsive top navigation bar.
@@ -78,7 +91,7 @@ class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return AppBar(
       backgroundColor: AppBarUIConfig
-          .darkGreen, // Dark green background from brand color palette
+          .darkGreen(context), // Dark green background from brand color palette
       elevation: 0, // Flat design: no shadow under the app bar
       titleSpacing: 0, // Remove default title spacing for custom layout control
       title: Center(
@@ -198,18 +211,19 @@ class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           // Active state decoration: gold bottom border for visual active indicator
           decoration: isActive
-              ? const BoxDecoration(
+              ? BoxDecoration(
                   border: Border(
                     bottom:
-                        BorderSide(color: AppBarUIConfig.accentGold, width: 2),
+                        BorderSide(color: AppBarUIConfig.accentGold(context), width: 2),
                   ),
                 )
               : null, // No decoration for inactive items
           child: Text(
             label, // Display text for the nav link
-            style: GoogleFonts.inter(
+            style: GoogleFonts.getFont(
+              AppBarUIConfig.fontFamily(context),
               // Active items are fully white; inactive items are semi-transparent
-              color: isActive ? AppBarUIConfig.white : Colors.white70,
+              color: isActive ? AppBarUIConfig.white(context) : Colors.white70,
               fontSize: AppBarUIConfig
                   .fontBodyMedium, // 14px consistent nav text size
               // Active items are semi-bold; inactive items are normal weight
@@ -238,15 +252,15 @@ class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           decoration: BoxDecoration(
             border: Border.all(
-                color: AppBarUIConfig.accentGold), // Gold outline border
+                color: AppBarUIConfig.accentGold(context)), // Gold outline border
             borderRadius: BorderRadius.circular(
                 AppBarUIConfig.radiusMedium), // 20px rounded
           ),
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.favorite, // Heart icon for donation emphasis
-                color: AppBarUIConfig.accentGold, // Gold to match the border
+                color: AppBarUIConfig.accentGold(context), // Gold to match the border
                 size: AppBarUIConfig.iconSizeSmall, // 14px compact icon
               ),
               const SizedBox(
@@ -254,9 +268,10 @@ class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
                       2), // 4px gap between icon and text
               Text(
                 'Donate', // Button label
-                style: GoogleFonts.inter(
+                style: GoogleFonts.getFont(
+                  AppBarUIConfig.fontFamily(context),
                   color: AppBarUIConfig
-                      .accentGold, // Gold text to match the outline
+                      .accentGold(context), // Gold text to match the outline
                   fontSize:
                       AppBarUIConfig.fontLabelSmall, // 12px compact button text
                   fontWeight: FontWeight.w600, // Semi-bold for legibility
@@ -286,15 +301,16 @@ class HunarmandAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           decoration: BoxDecoration(
             color:
-                AppBarUIConfig.white, // Solid white fill for maximum contrast
+                AppBarUIConfig.white(context), // Solid white fill for maximum contrast
             borderRadius: BorderRadius.circular(
                 AppBarUIConfig.radiusMedium), // 20px rounded
           ),
           child: Text(
             'Join Now', // Primary CTA label
-            style: GoogleFonts.inter(
+            style: GoogleFonts.getFont(
+              AppBarUIConfig.fontFamily(context),
               color: AppBarUIConfig
-                  .darkGreen, // Dark green text on white background
+                  .darkGreen(context), // Dark green text on white background
               fontSize:
                   AppBarUIConfig.fontLabelSmall, // 12px compact button text
               fontWeight: FontWeight.w700, // Bold for maximum emphasis

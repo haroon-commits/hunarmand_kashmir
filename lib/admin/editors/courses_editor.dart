@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import '../../providers/dynamic_content_provider.dart';
 import '../../models/content_model.dart';
 import '../../widgets/utils/dynamic_icon.dart';
+import '../../utils/responsive.dart';
 
 // ─── COURSESEDITORUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to courses_editor.dart.
@@ -31,32 +32,64 @@ class CoursesEditor extends StatelessWidget {
     final provider = context.watch<DynamicContentProvider>();
     final courses = provider.content.courses;
 
+    final isMobile = Responsive.isMobile(context);
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Courses Management',
-                style: GoogleFonts.inter(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  color: CoursesEditorUIConfig.textDark,
+          if (isMobile)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Courses Management',
+                  style: GoogleFonts.inter(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: CoursesEditorUIConfig.textDark,
+                  ),
                 ),
-              ),
-              ElevatedButton.icon(
-                onPressed: () => _showCourseDialog(context),
-                icon: const Icon(Icons.add),
-                label: const Text('Add New Course'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: CoursesEditorUIConfig.darkGreen,
-                  foregroundColor: Colors.white,
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showCourseDialog(context),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add New Course'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: CoursesEditorUIConfig.darkGreen,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            )
+          else
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Courses Management',
+                  style: GoogleFonts.inter(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                    color: CoursesEditorUIConfig.textDark,
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => _showCourseDialog(context),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add New Course'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: CoursesEditorUIConfig.darkGreen,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 16),
+                  ),
+                ),
+              ],
+            ),
           const SizedBox(height: 24),
 
           // ─── PAGE SECTION EDITOR ──────────────────────────────────────────

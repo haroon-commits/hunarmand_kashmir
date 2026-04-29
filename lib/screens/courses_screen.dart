@@ -14,12 +14,14 @@ import '../widgets/layout/page_header.dart';
 import '../widgets/layout/app_footer.dart';
 import '../widgets/common/gold_divider.dart';
 import '../utils/responsive.dart';
+import '../utils/color_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:animate_do/animate_do.dart';
 
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../providers/dynamic_content_provider.dart';
+import '../models/content_model.dart';
 import '../widgets/utils/dynamic_icon.dart';
 import '../widgets/common/responsive_grid.dart';
 
@@ -27,35 +29,48 @@ import '../widgets/common/responsive_grid.dart';
 // ─── COURSESUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to courses_screen.dart.
 class CoursesUIConfig {
-  // Brand Colors used locally
-  static const Color accentGold = Color(0xFFF5A623);
-  static const Color darkGreen = Color(0xFF0D3320);
+  // Helper to access current screen settings
+  static ScreenSettings _s(BuildContext context) => context.read<DynamicContentProvider>().content.coursesSettings;
+  static ScreenSettings _sec(BuildContext context, String id) => 
+      context.read<DynamicContentProvider>().content.sectionStyles[id] ?? _s(context);
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  // Brand Colors mapped to dynamic settings
+  static Color accentGold(BuildContext context) => hexToColor(_t(context).accentColorHex);
+  static Color darkGreen(BuildContext context) => hexToColor(_t(context).primaryColorHex);
   static const Color lightGrey = Color(0xFFF2F2F2);
   static const Color lightTeal = Color(0xFFE8F5F3);
-  static const Color offWhite = Color(0xFFF8F6F0);
+  static Color backgroundColor(BuildContext context) => hexToColor(_s(context).backgroundColorHex);
+  static Color titleColor(BuildContext context) => hexToColor(_s(context).titleColorHex);
+  static Color bodyColor(BuildContext context) => hexToColor(_s(context).bodyColorHex);
+  static Color buttonColor(BuildContext context) => hexToColor(_s(context).buttonColorHex);
+  static Color buttonTextColor(BuildContext context) => hexToColor(_s(context).buttonTextColorHex);
   static const Color successGreen = Color(0xFF27AE60);
-  static const Color textDark = Color(0xFF1A1A1A);
-  static const Color textMedium = Color(0xFF555555);
-  static const Color white = Color(0xFFFFFFFF);
+  static Color white(BuildContext context) => hexToColor(_t(context).cardBackgroundColorHex);
 
   // Dimensions, Spacing & Typography
   static const double cardPadding = 24.0;
-  static const double fontBodyLarge = 26.0;
-  static const double fontBodyMedium = 14.0;
-  static const double fontDisplayDesktop = 92.0;
-  static const double fontDisplayMobile = 82.0;
-  static const double fontHeadlineLarge = 38.0;
-  static const double fontHeadlineSmall = 28.0;
-  static const double fontLabelLarge = 14.0;
-  static const double fontLabelSmall = 12.0;
+  static double fontBodyLarge(BuildContext context) => _s(context).bodyFontSize + 4;
+  static double fontBodyMedium(BuildContext context) => _s(context).bodyFontSize;
+
+  static double fontDisplay(BuildContext context) => _s(context).titleFontSize;
+  static double fontHeadlineLarge(BuildContext context) => _s(context).titleFontSize;
+  static double fontHeadlineSmall(BuildContext context) => _s(context).subtitleFontSize;
+  static double fontLabelLarge(BuildContext context) => _s(context).bodyFontSize;
+  static double fontLabelSmall(BuildContext context) => _s(context).bodyFontSize - 4;
+  static double fontCardTitle(BuildContext context) => _s(context).subtitleFontSize;
+
+  // Font Family
+  static String fontFamily(BuildContext context) => _s(context).fontFamily;
+
   static const double gridSpacing = 16.0;
   static const double iconSizeMedium = 28.0;
   static const double maxContentWidth = 1200.0;
   static const double paddingButtonSmallV = 22.0;
   static const double paddingSectionVertical = 64.0;
-  static const double radiusLarge = 30.0;
-  static const double radiusMedium = 20.0;
-  static const double radiusSmall = 12.0;
+  static double radiusLarge(BuildContext context) => _t(context).buttonBorderRadius;
+  static double radiusMedium(BuildContext context) => _t(context).cardBorderRadius;
+  static double radiusSmall(BuildContext context) => _t(context).cardBorderRadius - 8;
   static const double sectionPadding = 48.0;
   static const double spacerExtraLarge = 48.0;
   static const double spacerLarge = 24.0;
@@ -116,9 +131,9 @@ class CoursesScreen extends StatelessWidget {
               title: 'Start Your Journey',
               subtitle:
                   'Hunarmand Kashmir offers practical digital courses designed to help you master modern skills and start earning from home.',
+              sectionId: 'courses_hero',
             ),
-            // Section highlighting the choice between Campus and Online learning
-            SliverToBoxAdapter(child: _buildLearningChoiceSection(context, provider)),
+            // Section removed: _buildLearningChoiceSection(context, provider)
             // The primary listing of all vocational programs and their fees
             SliverToBoxAdapter(
                 child: _buildCoursesAndFeesSection(context, content.courses)),
@@ -136,200 +151,16 @@ class CoursesScreen extends StatelessWidget {
     );
   }
 
-  /// Builds the 'Learning Choice' section that displays environment options.
-  Widget _buildLearningChoiceSection(BuildContext context, DynamicContentProvider provider) {
-    final hPad = Responsive.contentPaddingH(context);
-    final isDesktop = Responsive.isDesktop(context);
-    return Container(
-      color: CoursesUIConfig.white,
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: CoursesUIConfig.maxContentWidth),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: hPad, 
-              vertical: CoursesUIConfig.sectionPadding,
-            ),
-            child: Column(
-              children: [
-                FadeInDown(
-                  child: Text(
-                    provider.content.courseLearningChoiceTitle,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      color: CoursesUIConfig.darkGreen,
-                      fontSize: Responsive.isDesktop(context) 
-                          ? CoursesUIConfig.fontDisplayDesktop - 2
-                          : CoursesUIConfig.fontDisplayMobile,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: CoursesUIConfig.spacerSmall + 2),
-                FadeInDown(
-                  delay: const Duration(milliseconds: 100),
-                  child: Text(
-                    provider.content.courseLearningChoiceDescription,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                        color: CoursesUIConfig.textMedium, 
-                        fontSize: CoursesUIConfig.fontBodyMedium,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: CoursesUIConfig.spacerLarge + 4),
-                FadeInUp(
-                  delay: const Duration(milliseconds: 200),
-                  child: isDesktop
-                    ? IntrinsicHeight(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            child: _locationCard(
-                              provider.content.courseLocation1Icon,
-                              const Color(0xFFE91E8C), // pink accent
-                              provider.content.courseLocation1Title,
-                              provider.content.courseLocation1Text,
-                              provider.content.courseLocation1Timing,
-                            ),
-                          ),
-                          const SizedBox(width: CoursesUIConfig.spacerMedium),
-                          Expanded(
-                            child: _locationCard(
-                              provider.content.courseLocation2Icon,
-                              CoursesUIConfig.accentGold,
-                              provider.content.courseLocation2Title,
-                              provider.content.courseLocation2Text,
-                              provider.content.courseLocation2Timing,
-                            ),
-                          ),
-                          const SizedBox(width: CoursesUIConfig.spacerMedium),
-                          Expanded(
-                            child: _locationCard(
-                              provider.content.courseLocation3Icon,
-                              CoursesUIConfig.successGreen,
-                              provider.content.courseLocation3Title,
-                              provider.content.courseLocation3Text,
-                              provider.content.courseLocation3Timing,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : Column(
-                        children: [
-                          _locationCard(
-                            provider.content.courseLocation1Icon,
-                            const Color(0xFFE91E8C),
-                            provider.content.courseLocation1Title,
-                            provider.content.courseLocation1Text,
-                            provider.content.courseLocation1Timing,
-                          ),
-                          const SizedBox(height: CoursesUIConfig.spacerMedium),
-                          _locationCard(
-                            provider.content.courseLocation2Icon,
-                            CoursesUIConfig.accentGold,
-                            provider.content.courseLocation2Title,
-                            provider.content.courseLocation2Text,
-                            provider.content.courseLocation2Timing,
-                          ),
-                          const SizedBox(height: CoursesUIConfig.spacerMedium),
-                          _locationCard(
-                            provider.content.courseLocation3Icon,
-                            CoursesUIConfig.successGreen,
-                            provider.content.courseLocation3Title,
-                            provider.content.courseLocation3Text,
-                            provider.content.courseLocation3Timing,
-                          ),
-                        ],
-                      ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
-  /// Helper to build a stylistic card representing a learning location.
-  Widget _locationCard(
-    String icon,
-    Color accentColor,
-    String title,
-    String location,
-    String timing,
-  ) {
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: CoursesUIConfig.offWhite,
-        borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall + 4),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(height: 3, color: accentColor),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(CoursesUIConfig.radiusMedium),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-          renderDynamicIcon(icon, color: accentColor, size: CoursesUIConfig.iconSizeMedium + 4),
-          const SizedBox(height: CoursesUIConfig.spacerMedium - 4),
-          Text(
-            title,
-            style: GoogleFonts.inter(
-              fontSize: CoursesUIConfig.fontBodyLarge - 1,
-              fontWeight: FontWeight.w700,
-              color: CoursesUIConfig.darkGreen,
-            ),
-          ),
-          const SizedBox(height: CoursesUIConfig.spacerSmall - 2),
-          Text(
-            location,
-            style: GoogleFonts.inter(
-              fontSize: CoursesUIConfig.fontLabelSmall, 
-              color: CoursesUIConfig.textMedium, 
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: CoursesUIConfig.spacerSmall),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: CoursesUIConfig.spacerSmall + 4, vertical: 5),
-            decoration: BoxDecoration(
-              color: accentColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall),
-            ),
-            child: Text(
-              timing,
-              style: GoogleFonts.inter(
-                fontSize: CoursesUIConfig.fontLabelSmall - 1,
-                fontWeight: FontWeight.w600,
-                color: accentColor,
-              ),
-            ),
-          ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   /// Builds the core section comprising detailed course entries and fee breakdowns.
   Widget _buildCoursesAndFeesSection(BuildContext context, List<dynamic> courses) {
     final hPad = Responsive.contentPaddingH(context);
     final isDesktop = Responsive.isDesktop(context);
+    final secStyle = CoursesUIConfig._sec(context, 'courses_list');
+
     return Container(
-      color: CoursesUIConfig.offWhite,
+      color: hexToColor(secStyle.backgroundColorHex),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: CoursesUIConfig.maxContentWidth),
@@ -339,19 +170,22 @@ class CoursesScreen extends StatelessWidget {
               vertical: CoursesUIConfig.sectionPadding,
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
                   'Courses & Fees',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: CoursesUIConfig.darkGreen,
-                    fontSize: Responsive.isDesktop(context) 
-                        ? CoursesUIConfig.fontDisplayDesktop - 2
-                        : CoursesUIConfig.fontDisplayMobile,
+                  textAlign: TextAlign.start,
+                  style: GoogleFonts.getFont(
+                    secStyle.fontFamily,
+                    color: hexToColor(secStyle.titleColorHex),
+                    fontSize: secStyle.titleFontSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const GoldDivider(),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: GoldDivider(),
+                ),
                 const SizedBox(height: CoursesUIConfig.spacerMedium + 4),
                 if (isDesktop && courses.length >= 2)
                   _buildDesktopCourseGrid(context, courses)
@@ -406,9 +240,10 @@ class CoursesScreen extends StatelessWidget {
   Widget _expandedCourseCard(BuildContext context, course, [int index = 0]) {
     final numberLabel = (index + 1).toString().padLeft(2, '0');
     return Container(
+      padding: EdgeInsets.all(CoursesUIConfig.radiusMedium(context)),
       decoration: BoxDecoration(
-        color: CoursesUIConfig.white,
-        borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall + 4),
+        color: CoursesUIConfig.white(context),
+        borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall(context) + 4),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -417,190 +252,176 @@ class CoursesScreen extends StatelessWidget {
           ),
         ],
       ),
-      child: Theme(
-        data: ThemeData(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          leading: Container(
-            width: CoursesUIConfig.spacerExtraLarge,
-            height: CoursesUIConfig.spacerExtraLarge,
-            decoration: const BoxDecoration(
-                color: CoursesUIConfig.lightTeal, shape: BoxShape.circle),
-            child: Center(
-              child: renderDynamicIcon(
-                course.icon as String,
-                size: CoursesUIConfig.spacerMedium + 6,
-                color: CoursesUIConfig.darkGreen,
-              ),
-            ),
-          ),
-          title: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
               Expanded(
-                child: Text(
-                  course.title ?? '',
-                  style: GoogleFonts.inter(
-                    fontSize: CoursesUIConfig.fontBodyLarge - 1,
-                    fontWeight: FontWeight.w700,
-                    color: CoursesUIConfig.textDark,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      course.title ?? '',
+                      style: GoogleFonts.getFont(
+                        CoursesUIConfig.fontFamily(context),
+                        fontSize: CoursesUIConfig.fontBodyLarge(context) - 1,
+                        fontWeight: FontWeight.w700,
+                        color: CoursesUIConfig.titleColor(context),
+                      ),
+                    ),
+                    Text(
+                      '${course.duration ?? ''}  •  ${course.fee ?? ''}',
+                      style: GoogleFonts.getFont(
+                        CoursesUIConfig.fontFamily(context),
+                        fontSize: CoursesUIConfig.fontLabelSmall(context),
+                        color: CoursesUIConfig.accentGold(context),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               // Numbered badge
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: CoursesUIConfig.darkGreen.withOpacity(0.06),
-                  borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall),
+                  color: CoursesUIConfig.darkGreen(context).withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall(context)),
                 ),
                 child: Text(
                   numberLabel,
-                  style: GoogleFonts.inter(
-                    fontSize: CoursesUIConfig.fontLabelSmall + 2,
+                  style: GoogleFonts.getFont(
+                    CoursesUIConfig.fontFamily(context),
+                    fontSize: CoursesUIConfig.fontLabelSmall(context) + 2,
                     fontWeight: FontWeight.w800,
-                    color: CoursesUIConfig.darkGreen.withOpacity(0.4),
+                    color: CoursesUIConfig.darkGreen(context).withOpacity(0.4),
                   ),
                 ),
               ),
             ],
           ),
-          subtitle: Text(
-            '${course.duration ?? ''}  •  ${course.fee ?? ''}',
-            style: GoogleFonts.inter(
-              fontSize: CoursesUIConfig.fontLabelSmall,
-              color: CoursesUIConfig.accentGold,
-              fontWeight: FontWeight.w600,
+          const Divider(height: 32),
+          Text(
+            course.description ?? '',
+            style: GoogleFonts.getFont(
+              CoursesUIConfig.fontFamily(context),
+              color: CoursesUIConfig.bodyColor(context),
+              fontSize: CoursesUIConfig.fontLabelSmall(context) + 1,
+              height: 1.5,
             ),
           ),
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                CoursesUIConfig.spacerMedium, 
-                0, 
-                CoursesUIConfig.spacerMedium, 
-                CoursesUIConfig.radiusMedium,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: CoursesUIConfig.spacerMedium - 2),
+          Text(
+            'Topics Covered:',
+            style: GoogleFonts.getFont(
+              CoursesUIConfig.fontFamily(context),
+              fontSize: CoursesUIConfig.fontLabelSmall(context) + 1,
+              fontWeight: FontWeight.w700,
+              color: CoursesUIConfig.titleColor(context),
+            ),
+          ),
+          const SizedBox(height: CoursesUIConfig.spacerSmall),
+          ...?course.topics?.map<Widget>(
+            (topic) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3),
+              child: Row(
                 children: [
-                  const Divider(),
-                  const SizedBox(height: CoursesUIConfig.spacerSmall + 2),
-                  Text(
-                    course.description ?? '',
-                    style: GoogleFonts.inter(
-                      color: CoursesUIConfig.textMedium,
-                      fontSize: CoursesUIConfig.fontLabelSmall + 1,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: CoursesUIConfig.spacerMedium - 2),
-                  Text(
-                    'Topics Covered:',
-                    style: GoogleFonts.inter(
-                      fontSize: CoursesUIConfig.fontLabelSmall + 1,
-                      fontWeight: FontWeight.w700,
-                      color: CoursesUIConfig.textDark,
-                    ),
-                  ),
-                  const SizedBox(height: CoursesUIConfig.spacerSmall),
-                  ...?course.topics?.map<Widget>(
-                    (topic) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.check_circle,
-                              color: CoursesUIConfig.successGreen, size: CoursesUIConfig.radiusSmall + 4),
-                          const SizedBox(width: CoursesUIConfig.spacerSmall),
-                          Expanded(
-                            child: Text(
-                              topic ?? '',
-                              style: GoogleFonts.inter(
-                                  fontSize: CoursesUIConfig.fontLabelSmall + 1, 
-                                  color: CoursesUIConfig.textMedium,
-                              ),
-                            ),
-                          ),
-                        ],
+                  Icon(Icons.check_circle,
+                      color: CoursesUIConfig.successGreen, size: CoursesUIConfig.radiusSmall(context) + 4),
+                  const SizedBox(width: CoursesUIConfig.spacerSmall),
+                  Expanded(
+                    child: Text(
+                      topic ?? '',
+                      style: GoogleFonts.getFont(
+                          CoursesUIConfig.fontFamily(context),
+                          fontSize: CoursesUIConfig.fontLabelSmall(context) + 1, 
+                          color: CoursesUIConfig.bodyColor(context),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: CoursesUIConfig.spacerLarge - 6),
-                  // Pricing highlight row
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: CoursesUIConfig.spacerMedium,
-                      vertical: CoursesUIConfig.spacerSmall + 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: CoursesUIConfig.offWhite,
-                      borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall),
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Course Fee',
-                              style: GoogleFonts.inter(
-                                fontSize: CoursesUIConfig.fontLabelSmall - 1,
-                                color: CoursesUIConfig.textMedium,
-                              ),
-                            ),
-                            Text(
-                              course.fee ?? '',
-                              style: GoogleFonts.inter(
-                                fontSize: CoursesUIConfig.fontHeadlineSmall,
-                                fontWeight: FontWeight.w800,
-                                color: CoursesUIConfig.darkGreen,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              'Duration',
-                              style: GoogleFonts.inter(
-                                fontSize: CoursesUIConfig.fontLabelSmall - 1,
-                                color: CoursesUIConfig.textMedium,
-                              ),
-                            ),
-                            Text(
-                              course.duration ?? '',
-                              style: GoogleFonts.inter(
-                                fontSize: CoursesUIConfig.fontBodyMedium,
-                                fontWeight: FontWeight.w700,
-                                color: CoursesUIConfig.accentGold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: CoursesUIConfig.spacerMedium),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _primaryButton(context, 'Register Now',
-                            () => _launchRegistrationLink(
-                                context, course.registrationLink as String?)),
-                      ),
-                      const SizedBox(width: CoursesUIConfig.spacerMedium - 4),
-                      Expanded(
-                        child: _secondaryButton(context, 'Chat on WhatsApp',
-                            () => _launchWhatsApp(context)),
-                      ),
-                    ],
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: CoursesUIConfig.spacerLarge - 6),
+          // Pricing highlight row
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: CoursesUIConfig.spacerMedium,
+              vertical: CoursesUIConfig.spacerSmall + 4,
+            ),
+            decoration: BoxDecoration(
+              color: CoursesUIConfig.backgroundColor(context),
+              borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall(context)),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Course Fee',
+                      style: GoogleFonts.getFont(
+                        CoursesUIConfig.fontFamily(context),
+                        fontSize: CoursesUIConfig.fontLabelSmall(context) - 1,
+                        color: CoursesUIConfig.bodyColor(context),
+                      ),
+                    ),
+                    Text(
+                      course.fee ?? '',
+                      style: GoogleFonts.getFont(
+                        CoursesUIConfig.fontFamily(context),
+                        fontSize: CoursesUIConfig.fontHeadlineSmall(context),
+                        fontWeight: FontWeight.w800,
+                        color: CoursesUIConfig.titleColor(context),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Duration',
+                      style: GoogleFonts.getFont(
+                        CoursesUIConfig.fontFamily(context),
+                        fontSize: CoursesUIConfig.fontLabelSmall(context) - 1,
+                        color: CoursesUIConfig.bodyColor(context),
+                      ),
+                    ),
+                    Text(
+                      course.duration ?? '',
+                      style: GoogleFonts.getFont(
+                        CoursesUIConfig.fontFamily(context),
+                        fontSize: CoursesUIConfig.fontBodyMedium(context),
+                        fontWeight: FontWeight.w700,
+                        color: CoursesUIConfig.accentGold(context),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: CoursesUIConfig.spacerMedium),
+          Row(
+            children: [
+              Expanded(
+                child: _secondaryButton(context, 'Chat on WhatsApp',
+                    () => _launchWhatsApp(context)),
+              ),
+              const SizedBox(width: CoursesUIConfig.spacerMedium - 4),
+              Expanded(
+                child: _primaryButton(context, 'Register Now',
+                    () => _launchRegistrationLink(
+                        context, course.registrationLink as String?)),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -608,6 +429,8 @@ class CoursesScreen extends StatelessWidget {
   /// Builds the 'Early Bird Discounts' section with dynamic item width logic.
   Widget _buildEarlyBirdSection(BuildContext context) {
     final hPad = Responsive.contentPaddingH(context);
+    final secStyle = CoursesUIConfig._sec(context, 'courses_discounts');
+
     final discounts = [
       {
         'students': 'First 5 Students',
@@ -632,7 +455,7 @@ class CoursesScreen extends StatelessWidget {
     ];
 
     return Container(
-      color: CoursesUIConfig.white,
+      color: hexToColor(secStyle.backgroundColorHex),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: CoursesUIConfig.maxContentWidth),
@@ -643,27 +466,33 @@ class CoursesScreen extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Text(
-                  'Early Bird Discounts',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: CoursesUIConfig.darkGreen,
-                    fontSize: Responsive.isDesktop(context) 
-                        ? CoursesUIConfig.fontHeadlineLarge
-                        : CoursesUIConfig.radiusMedium,
-                    fontWeight: FontWeight.bold,
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Early Bird Discounts',
+                    textAlign: TextAlign.start,
+                    style: GoogleFonts.getFont(
+                      secStyle.fontFamily,
+                      color: hexToColor(secStyle.titleColorHex),
+                      fontSize: secStyle.titleFontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: CoursesUIConfig.spacerSmall),
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 560),
-                  child: Text(
-                    'Limited seats available — total seats are only 20. Discounts are applied from highest to lowest on a first-come, first-served basis.',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      color: CoursesUIConfig.textMedium, 
-                      fontSize: CoursesUIConfig.fontLabelSmall + 1, 
-                      height: 1.5,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Limited seats available — total seats are only 20. Discounts are applied from highest to lowest on a first-come, first-served basis.',
+                      textAlign: TextAlign.start,
+                      style: GoogleFonts.getFont(
+                        secStyle.fontFamily,
+                        color: hexToColor(secStyle.bodyColorHex), 
+                        fontSize: secStyle.bodyFontSize, 
+                        height: 1.5,
+                      ),
                     ),
                   ),
                 ),
@@ -675,13 +504,13 @@ class CoursesScreen extends StatelessWidget {
                   spacing: CoursesUIConfig.gridSpacing - 4,
                   children: discounts.map((d) {
                     return Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: CoursesUIConfig.radiusMedium, 
+                      padding: EdgeInsets.symmetric(
+                          vertical: CoursesUIConfig.radiusMedium(context), 
                           horizontal: CoursesUIConfig.spacerSmall + 2,
                       ),
                       decoration: BoxDecoration(
                         color: d['color'] as Color,
-                        borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall + 2),
+                        borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall(context) + 2),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -689,9 +518,10 @@ class CoursesScreen extends StatelessWidget {
                           Text(
                             d['students'] as String,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.getFont(
+                              CoursesUIConfig.fontFamily(context),
                               fontSize: 10,
-                              color: CoursesUIConfig.textMedium,
+                              color: CoursesUIConfig.bodyColor(context),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -699,9 +529,10 @@ class CoursesScreen extends StatelessWidget {
                           Text(
                             d['off'] as String,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(
-                              fontSize: CoursesUIConfig.fontBodyLarge,
-                              color: CoursesUIConfig.darkGreen,
+                            style: GoogleFonts.getFont(
+                              CoursesUIConfig.fontFamily(context),
+                              fontSize: CoursesUIConfig.fontBodyLarge(context),
+                              color: CoursesUIConfig.titleColor(context),
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -712,25 +543,26 @@ class CoursesScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: CoursesUIConfig.spacerLarge - 4),
                 Container(
-                  padding: const EdgeInsets.all(CoursesUIConfig.spacerMedium),
+                  padding: EdgeInsets.all(CoursesUIConfig.spacerMedium),
                   decoration: BoxDecoration(
-                    color: CoursesUIConfig.offWhite,
-                    borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall),
+                    color: CoursesUIConfig.backgroundColor(context),
+                    borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall(context)),
                     border: Border.all(color: Colors.grey.shade200),
                   ),
                   child: Column(
                     children: [
                       Text(
                         'Important Notes',
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.getFont(
+                          CoursesUIConfig.fontFamily(context),
                           fontWeight: FontWeight.w700,
-                          fontSize: CoursesUIConfig.fontLabelLarge,
-                          color: CoursesUIConfig.textDark,
+                          fontSize: CoursesUIConfig.fontLabelLarge(context),
+                          color: CoursesUIConfig.titleColor(context),
                         ),
                       ),
                       const SizedBox(height: CoursesUIConfig.spacerSmall + 2),
-                      _noteItem('Only one discount applies per student.'),
-                      _noteItem('30% Advance Fee is required to confirm your booking.'),
+                      _noteItem(context, 'Only one discount applies per student.'),
+                      _noteItem(context, '30% Advance Fee is required to confirm your booking.'),
                     ],
                   ),
                 ),
@@ -743,20 +575,21 @@ class CoursesScreen extends StatelessWidget {
   }
 
   /// Helper to build a small informational note with an icon.
-  Widget _noteItem(String text) {
+  Widget _noteItem(BuildContext context, String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
           // Informative glyph
-          const Icon(Icons.info_outline, color: CoursesUIConfig.accentGold, size: 15),
+          Icon(Icons.info_outline, color: CoursesUIConfig.accentGold(context), size: 15),
           const SizedBox(width: 8),
           // Descriptive text
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.inter(
-                  fontSize: 12, color: CoursesUIConfig.textMedium),
+              style: GoogleFonts.getFont(
+                  CoursesUIConfig.fontFamily(context),
+                  fontSize: 12, color: CoursesUIConfig.bodyColor(context)),
             ),
           ),
         ],
@@ -775,46 +608,28 @@ class CoursesScreen extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(CoursesUIConfig.cardPadding - 2),
             decoration: BoxDecoration(
-              color: CoursesUIConfig.darkGreen,
-              borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall + 4),
+              color: CoursesUIConfig.darkGreen(context),
+              borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall(context) + 4),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: CoursesUIConfig.spacerExtraLarge + 6,
-                  height: CoursesUIConfig.spacerExtraLarge + 6,
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.circle, color: CoursesUIConfig.accentGold),
-                  child: Center(
-                    child: renderDynamicIcon(
-                      provider.content.courseOrphanSupportIcon,
-                      size: CoursesUIConfig.spacerLarge,
-                      color: Colors.white,
-                    ),
+                Text(
+                  provider.content.courseOrphanSupportTitle,
+                  style: GoogleFonts.getFont(
+                    CoursesUIConfig.fontFamily(context),
+                    color: CoursesUIConfig.white(context),
+                    fontSize: CoursesUIConfig.fontBodyLarge(context),
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(width: CoursesUIConfig.spacerMedium + 2),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        provider.content.courseOrphanSupportTitle,
-                        style: GoogleFonts.inter(
-                          color: CoursesUIConfig.white,
-                          fontSize: CoursesUIConfig.fontBodyLarge,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        provider.content.courseOrphanSupportDescription,
-                        style: GoogleFonts.inter(
-                          color: Colors.white70, 
-                          fontSize: CoursesUIConfig.fontLabelSmall + 1,
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 5),
+                Text(
+                  provider.content.courseOrphanSupportDescription,
+                  style: GoogleFonts.getFont(
+                    CoursesUIConfig.fontFamily(context),
+                    color: Colors.white70, 
+                    fontSize: CoursesUIConfig.fontLabelSmall(context) + 1,
                   ),
                 ),
               ],
@@ -836,41 +651,49 @@ class CoursesScreen extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(CoursesUIConfig.spacerLarge + 4),
             decoration: BoxDecoration(
-              color: CoursesUIConfig.darkGreen,
-              borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall + 4),
+              color: CoursesUIConfig.darkGreen(context),
+              borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall(context) + 4),
             ),
             child: Column(
               children: [
-                Text(
-                  'Ready to Start?',
-                  style: GoogleFonts.inter(
-                    color: CoursesUIConfig.white,
-                    fontSize: CoursesUIConfig.fontDisplayMobile + 2,
-                    fontWeight: FontWeight.bold,
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Ready to Start?',
+                    style: GoogleFonts.getFont(
+                      CoursesUIConfig.fontFamily(context),
+                      color: CoursesUIConfig.white(context),
+                      fontSize: CoursesUIConfig.fontDisplay(context) + 2,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: CoursesUIConfig.spacerSmall),
-                Text(
-                  'Secure your spot in the upcoming batch.',
-                  style:
-                      GoogleFonts.inter(
-                        color: Colors.white70, 
-                        fontSize: CoursesUIConfig.fontLabelSmall + 1,
-                      ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Secure your spot in the upcoming batch.',
+                    style:
+                        GoogleFonts.getFont(
+                          CoursesUIConfig.fontFamily(context),
+                          color: Colors.white70, 
+                          fontSize: CoursesUIConfig.fontLabelSmall(context) + 1,
+                        ),
+                  ),
                 ),
                 const SizedBox(height: CoursesUIConfig.spacerLarge),
                 Row(
                   children: [
+                    Expanded(
+                      child: _secondaryButton(context, 'Chat on WhatsApp',
+                          () => _launchWhatsApp(context))),
+                    const SizedBox(width: CoursesUIConfig.spacerMedium - 4),
                     Expanded(
                       child: _primaryButton(
                           context,
                           'Apply Online',
                           () =>
                               context.read<AppState>().navigate('contact'))),
-                    const SizedBox(width: CoursesUIConfig.spacerMedium - 4),
-                    Expanded(
-                      child: _secondaryButton(context, 'Chat on WhatsApp',
-                          () => _launchWhatsApp(context))),
                   ],
                 ),
               ],
@@ -881,43 +704,42 @@ class CoursesScreen extends StatelessWidget {
     );
   }
 
-  /// Helper to build a high-priority solid brand button.
-  Widget _primaryButton(
-      BuildContext context, String label, VoidCallback onPressed) {
+  /// Helper for primary buttons with dynamic colors.
+  Widget _primaryButton(BuildContext context, String label, VoidCallback onTap) {
     return ElevatedButton(
-      onPressed: onPressed,
+      onPressed: onTap,
       style: ElevatedButton.styleFrom(
-        backgroundColor: CoursesUIConfig.accentGold,
-        foregroundColor: CoursesUIConfig.darkGreen,
-        padding: const EdgeInsets.symmetric(vertical: CoursesUIConfig.paddingButtonSmallV + 2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CoursesUIConfig.radiusLarge - 5)),
+        backgroundColor: CoursesUIConfig.buttonColor(context),
+        foregroundColor: CoursesUIConfig.buttonTextColor(context),
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(CoursesUIConfig.radiusSmall(context))),
+        elevation: 0,
       ),
-      child: Text(label,
-          style:
-              GoogleFonts.inter(
-                fontWeight: FontWeight.w700, 
-                fontSize: CoursesUIConfig.fontLabelSmall + 1,
-              )),
+      child: Text(
+        label,
+        style: GoogleFonts.getFont(
+          CoursesUIConfig.fontFamily(context),
+          fontWeight: FontWeight.w700,
+        ),
+      ),
     );
   }
 
-  /// Helper to build a medium-priority outlined button.
-  Widget _secondaryButton(
-      BuildContext context, String label, VoidCallback onPressed) {
+  /// Helper for secondary buttons with dynamic colors.
+  Widget _secondaryButton(BuildContext context, String label, VoidCallback onTap) {
     return OutlinedButton(
-      onPressed: onPressed,
+      onPressed: onTap,
       style: OutlinedButton.styleFrom(
-        foregroundColor: CoursesUIConfig.white,
-        padding: const EdgeInsets.symmetric(vertical: CoursesUIConfig.paddingButtonSmallV + 2),
-        side: const BorderSide(color: CoursesUIConfig.white),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CoursesUIConfig.radiusLarge - 5)),
+        foregroundColor: CoursesUIConfig.darkGreen(context),
+        side: BorderSide(color: CoursesUIConfig.darkGreen(context)),
+        textStyle: GoogleFonts.getFont(
+          CoursesUIConfig.fontFamily(context),
+          fontWeight: FontWeight.w600,
+          fontSize: CoursesUIConfig.fontLabelSmall(context) + 1,
+        ),
       ),
-      child: Text(label,
-          style:
-              GoogleFonts.inter(
-                fontWeight: FontWeight.w600, 
-                fontSize: CoursesUIConfig.fontLabelSmall + 1,
-              )),
+      child: Text(label),
     );
   }
 }

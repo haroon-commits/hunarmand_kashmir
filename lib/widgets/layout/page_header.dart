@@ -18,30 +18,52 @@
 ///   - DEPENDS ON: google_fonts → GoogleFonts.playfairDisplay, GoogleFonts.poppins
 /// ═══════════════════════════════════════════════════════════════════════
 
-import 'package:flutter/material.dart'; // Flutter core for Container, Text, Column, etc.
-import 'package:google_fonts/google_fonts.dart'; // Google Fonts for PlayfairDisplay (titles) and Poppins (subtitles)
-import '../../utils/responsive.dart'; // Responsive: isDesktop(), isTablet(), contentPaddingH()
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../utils/responsive.dart';
+import '../../utils/color_utils.dart';
+import '../../providers/dynamic_content_provider.dart';
+import '../../models/content_model.dart';
+import '../../models/content_model.dart';
 
 
 // ─── PAGEHEADERUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to page_header.dart.
 class PageHeaderUIConfig {
-  // Brand Colors used locally
-  static const Color darkGreen = Color(0xFF0D3320);
-  static const Color white = Color(0xFFFFFFFF);
+  // Brand Colors mapped to dynamic settings
+  static Color darkGreen(BuildContext context) => _hexToColor(_t(context).primaryColorHex);
+  static Color white(BuildContext context) => _hexToColor(_t(context).cardBackgroundColorHex);
+
+  static ThemeConfig _t(BuildContext context) => context.read<DynamicContentProvider>().content.themeConfig;
+
+  static Color _hexToColor(String hex) {
+    final buffer = StringBuffer();
+    if (hex.length == 6 || hex.length == 7) buffer.write('ff');
+    buffer.write(hex.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
 
   // Dimensions, Spacing & Typography
-  static const double fontBodyLarge = 26.0;
-  static const double fontBodyMedium = 14.0;
-  static const double fontPageTitle = 52.0;
-  static const double fontPageTitleMobile = 28.0;
-  static const double fontPageTitleTablet = 34.0;
+  static double fontBodyLarge(BuildContext context) => _t(context).fontBodyLarge;
+  static double fontBodyMedium(BuildContext context) => _t(context).fontBodyMedium;
+
+  static double fontPageTitle(BuildContext context) {
+    final theme = _t(context);
+    if (Responsive.isDesktop(context)) return theme.fontDisplayDesktop;
+    if (Responsive.isTablet(context)) return theme.fontDisplayTablet;
+    return theme.fontDisplayMobile;
+  }
   static const double maxContentWidth = 1200.0;
   static const double maxTextWidth = 640.0;
   static const double paddingHero = 72.0;
   static const double paddingHeroMobile = 44.0;
   static const double paddingHeroTablet = 56.0;
   static const double spacerMedium = 16.0;
+
+  // Font Families
+  static String fontFamilyHeadings(BuildContext context) => _t(context).fontFamilyHeadings;
+  static String fontFamilyBody(BuildContext context) => _t(context).fontFamilyBody;
 }
 
 
@@ -60,16 +82,15 @@ class GreenPageHeader extends StatelessWidget {
   /// The primary title shown in large, bold calligraphy (PlayfairDisplay font).
   /// Content sourced from DynamicContentProvider by the parent screen.
   final String title;
-
-  /// Supporting explanatory text shown beneath the main title (Poppins font).
-  /// Content sourced from DynamicContentProvider by the parent screen.
   final String subtitle;
+  final String? sectionId;
 
   /// Default constructor for the page header.
   const GreenPageHeader({
     super.key,
-    required this.title, // Required: the main heading text
-    required this.subtitle, // Required: the supporting subtitle text
+    required this.title,
+    required this.subtitle,
+    this.sectionId,
   });
 
   @override
@@ -80,31 +101,30 @@ class GreenPageHeader extends StatelessWidget {
 
     // Selecting adaptive title font size from the design system.
     // Desktop gets the largest (42px), tablet medium (34px), mobile smallest (28px).
-    final titleSize = isDesktop
-        ? PageHeaderUIConfig.fontPageTitle // 42px desktop title
-        : isTablet
-            ? PageHeaderUIConfig.fontPageTitleTablet // 34px tablet title
-            : PageHeaderUIConfig.fontPageTitleMobile; // 28px mobile title
+    final provider = context.read<DynamicContentProvider>();
+    final sectionStyle = sectionId != null ? provider.content.sectionStyles[sectionId] : null;
 
-    // Selecting adaptive subtitle font size.
-    // Desktop gets 17px, tablet 16px, mobile 15px.
-    final subSize = isDesktop
-        ? PageHeaderUIConfig.fontBodyLarge + 1 // 17px desktop subtitle
+    final titleSize = sectionStyle?.titleFontSize ?? PageHeaderUIConfig.fontPageTitle(context);
+    final subSize = sectionStyle?.bodyFontSize ?? (isDesktop
+        ? PageHeaderUIConfig.fontBodyLarge(context) + 1
         : isTablet
-            ? PageHeaderUIConfig.fontBodyLarge // 16px tablet subtitle
-            : PageHeaderUIConfig.fontBodyMedium + 1; // 15px mobile subtitle
+            ? PageHeaderUIConfig.fontBodyLarge(context)
+            : PageHeaderUIConfig.fontBodyMedium(context) + 1);
 
-    // Adaptive vertical breathing room.
-    // Desktop gets 72px, tablet 56px, mobile 44px.
     final vPad = isDesktop
-        ? PageHeaderUIConfig.paddingHero // 72px desktop padding
+        ? PageHeaderUIConfig.paddingHero
         : isTablet
-            ? PageHeaderUIConfig.paddingHeroTablet // 56px tablet padding
-            : PageHeaderUIConfig.paddingHeroMobile; // 44px mobile padding
+            ? PageHeaderUIConfig.paddingHeroTablet
+            : PageHeaderUIConfig.paddingHeroMobile;
+
+    final bgColor = sectionStyle != null ? hexToColor(sectionStyle.backgroundColorHex) : PageHeaderUIConfig.darkGreen(context);
+    final titleColor = sectionStyle != null ? hexToColor(sectionStyle.titleColorHex) : PageHeaderUIConfig.white(context);
+    final bodyColor = sectionStyle != null ? hexToColor(sectionStyle.bodyColorHex) : Colors.white70;
+    final fontFamily = sectionStyle?.fontFamily ?? PageHeaderUIConfig.fontFamilyHeadings(context);
 
     return Container(
       width: double.infinity, // Full-width container to span the entire screen
-      color: PageHeaderUIConfig.darkGreen, // Dark green brand background
+      color: PageHeaderUIConfig.darkGreen(context), // Dark green brand background
       child: Center(
         child: ConstrainedBox(
           // Cap content width at 1200px for readability on ultra-wide screens
@@ -120,10 +140,11 @@ class GreenPageHeader extends StatelessWidget {
                 Text(
                   title, // Title string passed from parent screen
                   textAlign: TextAlign.center, // Centered for visual impact
-                  style: GoogleFonts.inter(
-                    color: PageHeaderUIConfig.white, // White text on dark background
-                    fontSize: titleSize, // Adaptive font size (42/34/28px)
-                    fontWeight: FontWeight.bold, // Bold for heading emphasis
+                  style: GoogleFonts.getFont(
+                    fontFamily,
+                    color: titleColor,
+                    fontSize: titleSize,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: PageHeaderUIConfig.spacerMedium - 2), // 14px gap between title and subtitle
@@ -134,10 +155,11 @@ class GreenPageHeader extends StatelessWidget {
                   child: Text(
                     subtitle, // Subtitle string passed from parent screen
                     textAlign: TextAlign.center, // Centered below the title
-                    style: GoogleFonts.inter(
-                      color: Colors.white70, // Semi-transparent for secondary emphasis
-                      fontSize: subSize, // Adaptive font size (17/16/15px)
-                      height: 1.6, // Generous line height for readability
+                    style: GoogleFonts.getFont(
+                      sectionStyle?.fontFamily ?? PageHeaderUIConfig.fontFamilyBody(context),
+                      color: bodyColor,
+                      fontSize: subSize,
+                      height: 1.6,
                     ),
                   ),
                 ),
@@ -161,24 +183,21 @@ class GreenPageHeader extends StatelessWidget {
 /// USED BY: All interior screen files (about, courses, gallery, contact, donate)
 ///          as the first sliver in their CustomScrollView.
 class SliverGreenPageHeader extends StatelessWidget {
-  /// The main heading text to display.
   final String title;
-  /// The supporting subtitle text.
   final String subtitle;
+  final String? sectionId;
 
   const SliverGreenPageHeader({
     super.key,
-    required this.title, // Required: heading text
-    required this.subtitle, // Required: subtitle text
+    required this.title,
+    required this.subtitle,
+    this.sectionId,
   });
 
   @override
   Widget build(BuildContext context) {
-    // SliverToBoxAdapter wraps a regular widget for use inside CustomScrollView.
-    // It creates a sliver that contains exactly one box widget (GreenPageHeader).
     return SliverToBoxAdapter(
-      // Delegate rendering to the standard GreenPageHeader widget
-      child: GreenPageHeader(title: title, subtitle: subtitle),
+      child: GreenPageHeader(title: title, subtitle: subtitle, sectionId: sectionId),
     );
   }
 }

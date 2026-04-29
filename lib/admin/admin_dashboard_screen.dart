@@ -21,6 +21,8 @@ import 'editors/gallery_editor.dart';
 import 'editors/donate_editor.dart';
 import 'editors/contact_editor.dart';
 import 'editors/theme_editor.dart';
+import 'editors/screen_theme_editor.dart';
+import '../utils/responsive.dart';
 
 // ─── ADMINDASHBOARDUICONFIG ──────────────────────────────
 /// Isolated UI configuration specific to admin_dashboard_screen.dart.
@@ -49,80 +51,114 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     DonateEditor(),
     ContactEditor(),
     ThemeEditor(),
+    ScreenThemeEditor(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
+    final isDesktop = Responsive.isDesktop(context);
+    final isTablet = Responsive.isTablet(context);
+    final isMobile = Responsive.isMobile(context);
+    final showSidebar = isDesktop || isTablet;
+
+    Widget sidebarContent = Container(
+      width: 250,
+      color: AdminDashboardUIConfig.darkGreen,
+      child: Column(
         children: [
-          // Sidebar
-          Container(
-            width: 250,
-            color: AdminDashboardUIConfig.darkGreen,
-            child: Column(
-              children: [
-                const SizedBox(height: 40),
-                Text(
-                  'Admin Panel',
-                  style: GoogleFonts.inter(
-                    color: AdminDashboardUIConfig.accentGold,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                _buildNavItem(0, Icons.settings, 'Global Settings'),
-                _buildNavItem(1, Icons.home, 'Home Screen'),
-                _buildNavItem(2, Icons.school, 'Courses'),
-                _buildNavItem(3, Icons.info, 'About Screen'),
-                _buildNavItem(4, Icons.photo_library, 'Gallery'),
-                _buildNavItem(5, Icons.volunteer_activism, 'Donate Screen'),
-                _buildNavItem(6, Icons.contact_mail, 'Contact Screen'),
-                _buildNavItem(7, Icons.color_lens, 'Theme Editor'),
-                const Spacer(),
-                // ── View Website button ────────────────────────────────
-                Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AdminDashboardUIConfig.accentGold.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: AdminDashboardUIConfig.accentGold.withOpacity(0.4),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 40),
+                  Text(
+                    'Admin Panel',
+                    style: GoogleFonts.inter(
+                      color: AdminDashboardUIConfig.accentGold,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  child: ListTile(
-                    leading: const Icon(Icons.open_in_new,
-                        color: AdminDashboardUIConfig.accentGold),
-                    title: Text(
-                      'View Website',
-                      style: GoogleFonts.inter(
-                        color: AdminDashboardUIConfig.accentGold,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    onTap: () => context.read<AppState>().navigate('home'),
-                  ),
-                ),
-                // ── Logout button ──────────────────────────────────────
-                ListTile(
-                  leading: const Icon(Icons.logout, color: Colors.white70),
-                  title: Text(
-                    'Logout',
-                    style: GoogleFonts.inter(color: Colors.white70),
-                  ),
-                  onTap: () => context.read<AdminProvider>().logout(),
-                ),
-                const SizedBox(height: 20),
-              ],
+                  const SizedBox(height: 40),
+                  _buildNavItem(0, Icons.settings, 'Global Settings'),
+                  _buildNavItem(1, Icons.home, 'Home Screen'),
+                  _buildNavItem(2, Icons.school, 'Courses'),
+                  _buildNavItem(3, Icons.info, 'About Screen'),
+                  _buildNavItem(4, Icons.photo_library, 'Gallery'),
+                  _buildNavItem(5, Icons.volunteer_activism, 'Donate Screen'),
+                  _buildNavItem(6, Icons.contact_mail, 'Contact Screen'),
+                  _buildNavItem(7, Icons.color_lens, 'Global Theme'),
+                  _buildNavItem(8, Icons.palette, 'Screen Styles'),
+                ],
+              ),
             ),
           ),
+          const Divider(color: Colors.white12, height: 1),
+          // ── View Website button ────────────────────────────────
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: AdminDashboardUIConfig.accentGold.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: AdminDashboardUIConfig.accentGold.withOpacity(0.4),
+              ),
+            ),
+            child: ListTile(
+              dense: true,
+              leading: const Icon(Icons.open_in_new,
+                  color: AdminDashboardUIConfig.accentGold, size: 20),
+              title: Text(
+                'View Website',
+                style: GoogleFonts.inter(
+                  color: AdminDashboardUIConfig.accentGold,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+              onTap: () => context.read<AppState>().navigate('home'),
+            ),
+          ),
+          // ── Logout button ──────────────────────────────────────
+          ListTile(
+            dense: true,
+            leading:
+                const Icon(Icons.logout, color: Colors.white70, size: 20),
+            title: Text(
+              'Logout',
+              style: GoogleFonts.inter(color: Colors.white70, fontSize: 13),
+            ),
+            onTap: () => context.read<AdminProvider>().logout(),
+          ),
+          const SizedBox(height: 12),
+        ],
+      ),
+    );
+
+    return Scaffold(
+      appBar: !showSidebar
+          ? AppBar(
+              backgroundColor: AdminDashboardUIConfig.darkGreen,
+              title: Text(
+                'Admin Panel',
+                style: GoogleFonts.inter(
+                  color: AdminDashboardUIConfig.accentGold,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              iconTheme:
+                  const IconThemeData(color: AdminDashboardUIConfig.accentGold),
+            )
+          : null,
+      drawer: !showSidebar ? Drawer(child: sidebarContent) : null,
+      body: Row(
+        children: [
+          if (showSidebar) sidebarContent,
           // Content
           Expanded(
             child: Container(
               color: Colors.grey.shade50,
-              padding: const EdgeInsets.all(32),
+              padding: EdgeInsets.all(isMobile ? 16 : 32),
               child: _editors[_selectedIndex],
             ),
           ),

@@ -202,6 +202,17 @@ class DynamicContentProvider extends ChangeNotifier {
         textLightHex: '#FFFFFF',
         cardBorderRadius: 20.0,
         buttonBorderRadius: 16.0,
+        fontDisplayDesktop: 82.0,
+        fontDisplayTablet: 56.0,
+        fontDisplayMobile: 42.0,
+        fontHeadlineLarge: 42.0,
+        fontHeadlineMedium: 32.0,
+        fontBodyLarge: 26.0,
+        fontBodyMedium: 16.0,
+        fontLabelLarge: 16.0,
+        fontLabelSmall: 12.0,
+        fontFamilyHeadings: 'Playfair Display',
+        fontFamilyBody: 'Inter',
       ),
       layoutConfig: LayoutConfig(
         showHomeCourses: true,
@@ -212,6 +223,148 @@ class DynamicContentProvider extends ChangeNotifier {
         showAboutTeam: true,
         showIconsInCards: true,
       ),
+      homeSettings: ScreenSettings(
+          backgroundColorHex: '#FAFAFA',
+          titleColorHex: '#1A1A1A',
+          bodyColorHex: '#555555',
+          buttonColorHex: '#0D3320',
+          buttonTextColorHex: '#FFFFFF',
+          titleFontSize: 42.0,
+          bodyFontSize: 16.0,
+          subtitleFontSize: 18.0,
+          fontFamily: 'Inter'),
+      aboutSettings: ScreenSettings(
+          backgroundColorHex: '#FAFAFA',
+          titleColorHex: '#1A1A1A',
+          bodyColorHex: '#555555',
+          buttonColorHex: '#0D3320',
+          buttonTextColorHex: '#FFFFFF',
+          titleFontSize: 42.0,
+          bodyFontSize: 16.0,
+          subtitleFontSize: 18.0,
+          fontFamily: 'Inter'),
+      coursesSettings: ScreenSettings(
+          backgroundColorHex: '#FAFAFA',
+          titleColorHex: '#1A1A1A',
+          bodyColorHex: '#555555',
+          buttonColorHex: '#0D3320',
+          buttonTextColorHex: '#FFFFFF',
+          titleFontSize: 42.0,
+          bodyFontSize: 16.0,
+          subtitleFontSize: 18.0,
+          fontFamily: 'Inter'),
+      gallerySettings: ScreenSettings(
+          backgroundColorHex: '#FAFAFA',
+          titleColorHex: '#1A1A1A',
+          bodyColorHex: '#555555',
+          buttonColorHex: '#0D3320',
+          buttonTextColorHex: '#FFFFFF',
+          titleFontSize: 42.0,
+          bodyFontSize: 16.0,
+          subtitleFontSize: 18.0,
+          fontFamily: 'Inter'),
+      contactSettings: ScreenSettings(
+          backgroundColorHex: '#FAFAFA',
+          titleColorHex: '#1A1A1A',
+          bodyColorHex: '#555555',
+          buttonColorHex: '#0D3320',
+          buttonTextColorHex: '#FFFFFF',
+          titleFontSize: 42.0,
+          bodyFontSize: 16.0,
+          subtitleFontSize: 18.0,
+          fontFamily: 'Inter'),
+      donateSettings: ScreenSettings(
+          backgroundColorHex: '#1A4A2E',
+          titleColorHex: '#FFFFFF',
+          bodyColorHex: '#E0E0E0',
+          buttonColorHex: '#F5A623',
+          buttonTextColorHex: '#0D3320',
+          titleFontSize: 42.0,
+          bodyFontSize: 16.0,
+          subtitleFontSize: 18.0,
+          fontFamily: 'Inter'),
+      sectionStyles: {
+        'home_hero': ScreenSettings(
+            backgroundColorHex: '#0D3320',
+            titleColorHex: '#FFFFFF',
+            bodyColorHex: '#E0E0E0',
+            buttonColorHex: '#F5A623',
+            buttonTextColorHex: '#0D3320',
+            titleFontSize: 64.0,
+            bodyFontSize: 18.0,
+            subtitleFontSize: 20.0,
+            fontFamily: 'Playfair Display'),
+        'home_features': ScreenSettings(
+            backgroundColorHex: '#FFFFFF',
+            titleColorHex: '#1A1A1A',
+            bodyColorHex: '#555555',
+            buttonColorHex: '#0D3320',
+            buttonTextColorHex: '#FFFFFF',
+            titleFontSize: 36.0,
+            bodyFontSize: 14.0,
+            subtitleFontSize: 16.0,
+            fontFamily: 'Inter'),
+        'home_why': ScreenSettings(
+            backgroundColorHex: '#FAFAFA',
+            titleColorHex: '#1A1A1A',
+            bodyColorHex: '#555555',
+            buttonColorHex: '#0D3320',
+            buttonTextColorHex: '#FFFFFF',
+            titleFontSize: 36.0,
+            bodyFontSize: 16.0,
+            subtitleFontSize: 18.0,
+            fontFamily: 'Inter'),
+        'home_cta': ScreenSettings(
+            backgroundColorHex: '#0D3320',
+            titleColorHex: '#FFFFFF',
+            bodyColorHex: '#E0E0E0',
+            buttonColorHex: '#F5A623',
+            buttonTextColorHex: '#0D3320',
+            titleFontSize: 42.0,
+            bodyFontSize: 16.0,
+            subtitleFontSize: 18.0,
+            fontFamily: 'Inter'),
+        'courses_list': ScreenSettings(
+            backgroundColorHex: '#FAFAFA',
+            titleColorHex: '#1A1A1A',
+            bodyColorHex: '#555555',
+            buttonColorHex: '#0D3320',
+            buttonTextColorHex: '#FFFFFF',
+            titleFontSize: 36.0,
+            bodyFontSize: 16.0,
+            subtitleFontSize: 18.0,
+            fontFamily: 'Inter'),
+        'courses_discounts': ScreenSettings(
+            backgroundColorHex: '#FFFFFF',
+            titleColorHex: '#1A1A1A',
+            bodyColorHex: '#555555',
+            buttonColorHex: '#0D3320',
+            buttonTextColorHex: '#FFFFFF',
+            titleFontSize: 28.0,
+            bodyFontSize: 14.0,
+            subtitleFontSize: 16.0,
+            fontFamily: 'Inter'),
+        'about_story': ScreenSettings(
+            backgroundColorHex: '#FFFFFF',
+            titleColorHex: '#1A1A1A',
+            bodyColorHex: '#555555',
+            buttonColorHex: '#0D3320',
+            buttonTextColorHex: '#FFFFFF',
+            titleFontSize: 36.0,
+            bodyFontSize: 16.0,
+            subtitleFontSize: 18.0,
+            fontFamily: 'Playfair Display'),
+        'about_team': ScreenSettings(
+            backgroundColorHex: '#FAFAFA',
+            titleColorHex: '#1A1A1A',
+            bodyColorHex: '#555555',
+            buttonColorHex: '#0D3320',
+            buttonTextColorHex: '#FFFFFF',
+            titleFontSize: 36.0,
+            bodyFontSize: 14.0,
+            subtitleFontSize: 16.0,
+            fontFamily: 'Inter'),
+      },
 
       // ... existing Hero ...
       heroHeadline: 'Empowering Kashmir through Digital Excellence',
@@ -701,6 +854,44 @@ class DynamicContentProvider extends ChangeNotifier {
   Future<void> updateLayout(LayoutConfig newLayout) async {
     _content = _content.copyWith(layoutConfig: newLayout);
     await saveContent();
+  }
+
+  Future<void> updateHomeTheme(ScreenSettings settings) async {
+    _content = _content.copyWith(homeSettings: settings);
+    await saveContent();
+  }
+
+  Future<void> updateAboutTheme(ScreenSettings settings) async {
+    _content = _content.copyWith(aboutSettings: settings);
+    await saveContent();
+  }
+
+  Future<void> updateCoursesTheme(ScreenSettings settings) async {
+    _content = _content.copyWith(coursesSettings: settings);
+    await saveContent();
+  }
+
+  Future<void> updateGalleryTheme(ScreenSettings settings) async {
+    _content = _content.copyWith(gallerySettings: settings);
+    await saveContent();
+  }
+
+  Future<void> updateContactTheme(ScreenSettings settings) async {
+    _content = _content.copyWith(contactSettings: settings);
+    await saveContent();
+  }
+
+  Future<void> updateDonateTheme(ScreenSettings settings) async {
+    _content = _content.copyWith(donateSettings: settings);
+    await saveContent();
+  }
+
+  void updateSectionStyle(String sectionId, ScreenSettings settings) {
+    final Map<String, ScreenSettings> newStyles = Map.from(_content.sectionStyles);
+    newStyles[sectionId] = settings;
+    _content = _content.copyWith(sectionStyles: newStyles);
+    saveContent();
+    notifyListeners();
   }
 
   /// Generic update for entire content object
